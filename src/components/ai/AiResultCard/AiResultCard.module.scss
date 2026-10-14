@@ -1,0 +1,67 @@
+@use '@/styles/mixins' as *;
+
+.card {
+  padding: 19px;
+  border: 1px solid var(--sl-border);
+  border-radius: 13px;
+  background: var(--sl-surface);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  min-width: 0;
+}
+
+.title {
+  @include text('h3');
+}
+
+.subtitle {
+  @include text('body-sm');
+
+  margin-top: 3px;
+  color: var(--sl-muted);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sl-space-4);
+  margin-top: 14px;
+
+  @include down('mobile') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.groupTitle {
+  font-size: var(--sl-text-sm);
+}
+
+.list {
+  @include text('body-sm');
+
+  margin: var(--sl-space-2) 0 0;
+  padding-left: 19px;
+
+  li + li {
+    margin-top: 5px;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+  margin-top: 14px;
+}

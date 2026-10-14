@@ -1,0 +1,45 @@
+@use '@/styles/mixins' as *;
+
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  padding: 15px 0;
+  border-bottom: 1px solid var(--sl-border);
+
+  &:first-child {
+    padding-top: 2px;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  @include down('mobile') {
+    flex-wrap: wrap;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--sl-text-base);
+}
+
+.description {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+// Keeps the action right-aligned when it wraps under a long title.
+.action {
+  margin-left: auto;
+}

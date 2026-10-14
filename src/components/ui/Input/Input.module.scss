@@ -1,0 +1,23 @@
+@use '@/styles/mixins' as *;
+
+.control {
+  position: relative;
+}
+
+.input {
+  @include field-control;
+}
+
+.withIcon {
+  padding-left: 38px;
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: var(--sl-space-3);
+  display: inline-flex;
+  color: var(--sl-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}

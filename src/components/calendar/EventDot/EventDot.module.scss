@@ -1,0 +1,23 @@
+.dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.performance {
+  background: var(--sl-cal-performance-text);
+}
+
+.cfp {
+  background: var(--sl-cal-cfp-text);
+}
+
+.invite {
+  background: var(--sl-cal-invite-text);
+}
+
+.event {
+  background: var(--sl-cal-event-text);
+}

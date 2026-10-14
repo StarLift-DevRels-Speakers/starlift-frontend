@@ -1,0 +1,28 @@
+@use '@/styles/mixins' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  @include text('label');
+
+  color: var(--sl-text);
+}
+
+.required {
+  color: var(--sl-danger-text);
+}
+
+.message {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.error {
+  color: var(--sl-danger-text);
+}

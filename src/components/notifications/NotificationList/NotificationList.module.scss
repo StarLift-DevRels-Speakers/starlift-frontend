@@ -1,0 +1,56 @@
+@use '@/styles/mixins' as *;
+
+.list {
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sl-space-3);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sl-border);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+.icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-brand-bg);
+  font-size: 17px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.date {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.srOnly {
+  @include visually-hidden;
+}
+
+.action {
+  flex-shrink: 0;
+  margin-left: auto;
+  align-self: center;
+}

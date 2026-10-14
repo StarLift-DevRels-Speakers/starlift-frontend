@@ -1,0 +1,19 @@
+@use '@/styles/mixins' as *;
+
+.signals {
+  border-color: var(--sl-ai-bg);
+  background: var(--sl-ai-bg-soft);
+}
+
+.note {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2) var(--sl-space-3);
+}

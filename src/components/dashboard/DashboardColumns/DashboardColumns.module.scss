@@ -1,0 +1,11 @@
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+
+  // Wider than the 'tablet' breakpoint: two columns get cramped before the sidebar collapses.
+  @media (max-width: 1150px) {
+    grid-template-columns: 1fr;
+  }
+}

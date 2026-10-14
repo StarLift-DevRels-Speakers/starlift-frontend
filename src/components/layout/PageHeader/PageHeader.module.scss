@@ -1,0 +1,50 @@
+@use '@/styles/mixins' as *;
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-4);
+  margin-bottom: 22px;
+
+  @include down('mobile') {
+    flex-direction: column;
+    gap: var(--sl-space-3);
+  }
+}
+
+.text {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin-bottom: 6px;
+  color: var(--sl-action);
+  font: var(--sl-weight-bold) var(--sl-text-2xs) / var(--sl-leading-control) var(--sl-font);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  @include text('h1');
+
+  margin-bottom: 7px;
+  letter-spacing: -0.9px;
+
+  @include down('tablet') {
+    font-size: 23px;
+  }
+}
+
+.description {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}

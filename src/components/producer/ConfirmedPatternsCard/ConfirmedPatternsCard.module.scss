@@ -1,0 +1,29 @@
+@use '@/styles/mixins' as *;
+
+.insight {
+  margin: var(--sl-space-3) 0;
+  padding: 10px 0 10px 15px;
+  border-left: 3px solid var(--sl-action);
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.issue {
+  border-color: var(--sl-warning-border);
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2);
+}
+
+.evidence {
+  @include text('caption');
+
+  margin-top: 5px;
+  color: var(--sl-muted);
+}

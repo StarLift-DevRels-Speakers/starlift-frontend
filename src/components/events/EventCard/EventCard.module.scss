@@ -1,0 +1,61 @@
+@use '@/styles/mixins' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.top,
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.date,
+.deadline {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.title {
+  @include text('h3');
+
+  margin-top: var(--sl-space-4);
+}
+
+.meta {
+  @include text('body-sm');
+
+  margin-top: 2px;
+  color: var(--sl-muted);
+}
+
+.description {
+  @include text('body-sm');
+
+  margin: var(--sl-space-3) 0 var(--sl-space-4);
+  color: var(--sl-muted);
+}
+
+// Pinned to the bottom so cards in one grid row line up.
+.footer {
+  margin-top: auto;
+  padding-top: var(--sl-space-4);
+  border-top: 1px solid var(--sl-border);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}

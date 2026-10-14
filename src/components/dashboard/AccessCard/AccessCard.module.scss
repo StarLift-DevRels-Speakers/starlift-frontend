@@ -1,0 +1,8 @@
+@use '@/styles/mixins' as *;
+
+.text {
+  @include text('body-sm');
+
+  margin-bottom: 10px;
+  color: var(--sl-muted);
+}

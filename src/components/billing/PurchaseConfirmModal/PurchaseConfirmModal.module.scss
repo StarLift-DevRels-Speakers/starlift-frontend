@@ -1,0 +1,21 @@
+@use '@/styles/mixins' as *;
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.price {
+  font-size: 23px;
+  font-weight: var(--sl-weight-bold);
+  line-height: var(--sl-leading-h1);
+}
+
+.note {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}

@@ -1,0 +1,35 @@
+@use '@/styles/mixins' as *;
+
+.toast {
+  @include text('body-sm');
+
+  position: fixed;
+  right: 22px;
+  bottom: var(--sl-space-6);
+  z-index: var(--sl-z-toast);
+  max-width: 330px;
+  padding: 13px 17px;
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-surface-inverse);
+  color: var(--sl-text-on-action);
+  box-shadow: var(--sl-shadow-toast);
+  opacity: 0;
+  transform: translateY(8px);
+  visibility: hidden;
+  transition:
+    opacity var(--sl-transition-base),
+    transform var(--sl-transition-base),
+    visibility var(--sl-transition-base);
+
+  @include down('mobile') {
+    right: var(--sl-space-4);
+    left: var(--sl-space-4);
+    max-width: none;
+  }
+}
+
+.visible {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}

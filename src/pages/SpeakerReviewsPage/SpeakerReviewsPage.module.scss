@@ -1,0 +1,20 @@
+@use '@/styles/mixins' as *;
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}
+
+.fineprint {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.note {
+  @include text('body-sm');
+
+  margin-top: var(--sl-space-4);
+  color: var(--sl-muted);
+}

@@ -1,0 +1,34 @@
+@use '@/styles/mixins' as *;
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.header {
+  @include text('body-sm');
+
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.value {
+  font-weight: var(--sl-weight-semibold);
+}
+
+.track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--sl-radius-pill);
+  background: var(--sl-border);
+}
+
+.fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sl-action);
+  transition: width var(--sl-transition-base);
+}

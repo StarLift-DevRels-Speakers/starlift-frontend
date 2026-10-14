@@ -1,0 +1,23 @@
+@use '@/styles/mixins' as *;
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.date {
+  @include text('caption');
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}
+
+.note {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}

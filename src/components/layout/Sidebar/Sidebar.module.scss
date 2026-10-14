@@ -1,0 +1,138 @@
+@use '@/styles/mixins' as *;
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  z-index: var(--sl-z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--sl-layout-sidebar);
+  height: 100vh;
+  height: 100dvh;
+  padding: 25px 14px 15px;
+  overflow-y: auto;
+  border-right: 1px solid var(--sl-border);
+  background: var(--sl-surface);
+
+  // Off-canvas drawer.
+  @include down('tablet') {
+    position: fixed;
+    left: 0;
+    width: var(--sl-layout-sidebar-drawer);
+    box-shadow: var(--sl-shadow-drawer);
+    transform: translateX(-110%);
+    transition: transform var(--sl-transition-base);
+  }
+}
+
+.open {
+  @include down('tablet') {
+    transform: none;
+  }
+}
+
+.brand {
+  margin: 0 11px 29px;
+}
+
+.section {
+  margin: 0 12px 7px;
+  color: var(--sl-text-section);
+  font: var(--sl-weight-bold) 10px / var(--sl-leading-control) var(--sl-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.list {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  min-height: 39px;
+  padding: 10px var(--sl-space-3);
+  border-radius: var(--sl-radius-md);
+  color: var(--sl-text-nav);
+  font: var(--sl-weight-medium) var(--sl-text-sm) / var(--sl-leading-control) var(--sl-font);
+  text-decoration: none;
+  transition:
+    background var(--sl-transition-fast),
+    color var(--sl-transition-fast);
+
+  &:hover {
+    background: var(--sl-page);
+    text-decoration: none;
+  }
+
+  @include down('mobile') {
+    min-height: var(--sl-touch-target);
+  }
+}
+
+.active {
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+  font-weight: var(--sl-weight-bold);
+
+  &:hover {
+    background: var(--sl-brand-bg);
+  }
+}
+
+.icon {
+  width: 21px;
+  flex-shrink: 0;
+  font-size: 17px;
+  text-align: center;
+}
+
+.account {
+  margin-top: auto;
+  padding: var(--sl-space-3);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-surface-soft);
+}
+
+.nav {
+  margin-bottom: var(--sl-space-5);
+}
+
+.accountUser {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accountText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.accountName {
+  @include truncate;
+
+  font-size: var(--sl-text-sm);
+}
+
+.accountMeta,
+.accountPlan {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.accountPlan {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--sl-border);
+}
+
+.reset {
+  margin: var(--sl-space-1) 0 0 calc(-1 * var(--sl-space-2));
+}

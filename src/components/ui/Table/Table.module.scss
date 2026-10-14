@@ -1,0 +1,49 @@
+@use '@/styles/mixins' as *;
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-surface);
+}
+
+.table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: var(--sl-text-sm);
+
+  th,
+  td {
+    padding: var(--sl-space-3) var(--sl-space-4);
+    border-bottom: 1px solid var(--sl-border);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    @include overline;
+
+    background: var(--sl-surface-subtle);
+    color: var(--sl-text-subtle);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .end {
+    text-align: right;
+  }
+
+  .empty {
+    padding: var(--sl-space-8) var(--sl-space-4);
+    color: var(--sl-muted);
+    text-align: center;
+  }
+}
+
+.caption {
+  @include visually-hidden;
+}
+

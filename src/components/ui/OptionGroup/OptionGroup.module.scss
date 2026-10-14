@@ -1,0 +1,69 @@
+@use '@/styles/mixins' as *;
+
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  @include text('label');
+
+  margin-bottom: var(--sl-space-2);
+  padding: 0;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}
+
+.option {
+  position: relative;
+  display: inline-flex;
+}
+
+.input {
+  @include visually-hidden;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sl-space-2) var(--sl-space-3);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-surface);
+  color: var(--sl-text);
+  font: var(--sl-weight-semibold) var(--sl-text-xs) / var(--sl-leading-control) var(--sl-font);
+  cursor: pointer;
+  transition:
+    background var(--sl-transition-fast),
+    border-color var(--sl-transition-fast);
+
+  &:hover {
+    border-color: var(--sl-brand);
+  }
+
+  .input:checked + & {
+    border-color: var(--sl-brand);
+    background: var(--sl-brand-bg);
+    color: var(--sl-action);
+  }
+
+  .input:focus-visible + & {
+    outline: var(--sl-focus-outline);
+    outline-offset: 2px;
+  }
+
+  .input:disabled + & {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  @include down('mobile') {
+    min-height: var(--sl-touch-target);
+  }
+}

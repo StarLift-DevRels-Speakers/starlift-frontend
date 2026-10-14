@@ -1,0 +1,82 @@
+@use '@/styles/mixins' as *;
+
+.page {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px var(--sl-space-4);
+  background: linear-gradient(160deg, var(--sl-public-bg-start), var(--sl-public-bg-end));
+
+  @include down('mobile') {
+    padding: 18px var(--sl-space-3);
+  }
+}
+
+.wrap {
+  width: 100%;
+  max-width: 650px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 25px;
+}
+
+.eyebrow {
+  margin-bottom: 6px;
+  color: var(--sl-action);
+  font: var(--sl-weight-bold) var(--sl-text-2xs) / var(--sl-leading-control) var(--sl-font);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-bottom: var(--sl-space-2);
+  font-size: 25px;
+  line-height: var(--sl-leading-h1);
+}
+
+.muted {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.form {
+  margin-top: var(--sl-space-4);
+  padding-top: var(--sl-space-4);
+  border-top: 1px solid var(--sl-border);
+}
+
+.question {
+  padding: 14px var(--sl-space-4);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+}
+
+.fineprint {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.message,
+.success {
+  padding: var(--sl-space-3) 0;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-space-2);
+  text-align: center;
+}
+
+.check {
+  color: var(--sl-action);
+  font-size: 48px;
+  line-height: 1;
+}

@@ -1,0 +1,41 @@
+@use '@/styles/mixins' as *;
+
+.version {
+  padding: var(--sl-space-3) 0;
+  border-bottom: 1px solid var(--sl-border);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &[open] .summary {
+    margin-bottom: 10px;
+  }
+}
+
+.summary {
+  @include text('label');
+
+  cursor: pointer;
+}
+
+.archive {
+  @include text('caption');
+
+  line-height: 1.7;
+  color: var(--sl-muted);
+
+  dt {
+    display: inline;
+    font-weight: var(--sl-weight-bold);
+    color: var(--sl-text);
+  }
+
+  dd {
+    display: inline;
+  }
+}

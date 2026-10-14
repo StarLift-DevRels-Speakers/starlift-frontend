@@ -1,0 +1,8 @@
+@use '@/styles/mixins' as *;
+
+.textarea {
+  @include field-control;
+
+  min-height: var(--sl-textarea-min-height);
+  resize: vertical;
+}

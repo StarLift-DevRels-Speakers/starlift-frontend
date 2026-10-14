@@ -1,0 +1,122 @@
+@use '@/styles/mixins' as *;
+
+.button {
+  @include text('control');
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-space-2);
+  min-height: var(--sl-control-md);
+  padding: 9px var(--sl-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--sl-radius-md);
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    background var(--sl-transition-fast),
+    border-color var(--sl-transition-fast),
+    transform var(--sl-transition-fast);
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+    transform: none;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+// ---------- Variants ----------
+.primary {
+  background: var(--sl-action);
+  color: var(--sl-text-on-action);
+
+  &:hover:not(:disabled) {
+    background: var(--sl-action-hover);
+  }
+}
+
+.secondary {
+  background: var(--sl-surface);
+  border-color: var(--sl-border);
+  color: var(--sl-text);
+
+  &:hover:not(:disabled) {
+    background: var(--sl-page);
+  }
+}
+
+.soft {
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+
+  &:hover:not(:disabled) {
+    background: var(--sl-brand-bg-hover);
+  }
+}
+
+.danger {
+  background: var(--sl-danger-bg);
+  color: var(--sl-danger-text);
+
+  &:hover:not(:disabled) {
+    border-color: var(--sl-danger);
+  }
+}
+
+.text {
+  padding-inline: var(--sl-space-2);
+  background: transparent;
+  color: var(--sl-action);
+
+  &:hover:not(:disabled) {
+    background: var(--sl-brand-bg);
+  }
+}
+
+// ---------- Sizes ----------
+.sm {
+  min-height: var(--sl-control-sm);
+  padding-block: 5px;
+  font-size: var(--sl-text-sm);
+
+  &:not(.text) {
+    padding-inline: var(--sl-space-3);
+  }
+}
+
+.lg {
+  min-height: var(--sl-control-lg);
+  padding-block: 13px;
+  font-size: var(--sl-text-md);
+
+  &:not(.text) {
+    padding-inline: var(--sl-space-5);
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+// Minimum touch target on phones, regardless of size.
+@include down('mobile') {
+  .sm,
+  .md {
+    min-height: var(--sl-touch-target);
+  }
+}

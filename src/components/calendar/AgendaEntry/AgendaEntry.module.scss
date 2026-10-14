@@ -1,0 +1,74 @@
+@use '@/styles/mixins' as *;
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  min-width: 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sl-border);
+
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  @include down('mobile') {
+    flex-wrap: wrap;
+    gap: var(--sl-space-2);
+  }
+}
+
+.date {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 49px;
+  padding: 7px 6px;
+  border: 1px solid var(--sl-cal-date-border);
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-cal-date-bg);
+  line-height: 1.1;
+  text-align: center;
+
+  span {
+    margin-top: 4px;
+    color: var(--sl-muted);
+    font-size: 10px;
+  }
+}
+
+.copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.title {
+  font-size: var(--sl-text-sm);
+  line-height: 1.35;
+}
+
+.detail {
+  @include text('caption');
+
+  color: var(--sl-muted);
+  line-height: 1.3;
+}
+
+.action {
+  flex-shrink: 0;
+
+  @include down('mobile') {
+    margin-left: auto;
+  }
+}

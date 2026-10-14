@@ -1,0 +1,33 @@
+@use '@/styles/mixins' as *;
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  color: var(--sl-action);
+  font: var(--sl-weight-bold) var(--sl-text-2xs) / var(--sl-leading-control) var(--sl-font);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.month {
+  font-size: 22px;
+  font-weight: var(--sl-weight-bold);
+  line-height: var(--sl-leading-h1);
+
+  @include down('mobile') {
+    font-size: 19px;
+  }
+}
+
+.filters {
+  margin-bottom: 5px;
+  padding: var(--sl-space-3) 0 17px;
+  border-top: 1px solid var(--sl-border);
+}
