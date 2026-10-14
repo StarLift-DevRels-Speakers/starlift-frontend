@@ -1,0 +1,12 @@
+@use '@/styles/mixins' as *;
+
+.event {
+  @include text('body-sm');
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-3);
+}

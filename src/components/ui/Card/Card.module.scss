@@ -1,0 +1,64 @@
+@use '@/styles/mixins' as *;
+
+.card {
+  min-width: 0;
+  padding: var(--sl-space-5);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-card);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-card);
+
+  @include down('mobile') {
+    padding: var(--sl-space-4);
+  }
+}
+
+.flat {
+  box-shadow: none;
+}
+
+// AI result: must also explain the reasons, not only the score.
+.ai {
+  border-color: var(--sl-brand-border);
+  background: linear-gradient(150deg, var(--sl-surface), var(--sl-brand-gradient-end));
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  margin-bottom: var(--sl-space-3);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.heading {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sl-space-2);
+}
+
+.title {
+  @include text('h3');
+}
+
+.sectionTitle {
+  @include text('h2');
+
+  letter-spacing: -0.3px;
+}
+
+.description {
+  @include text('body-sm');
+
+  margin-top: 6px;
+  color: var(--sl-muted);
+}

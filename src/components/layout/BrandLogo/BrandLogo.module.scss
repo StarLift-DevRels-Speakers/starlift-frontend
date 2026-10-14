@@ -1,0 +1,25 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--sl-text);
+  font: var(--sl-weight-bold) 20px / 1 var(--sl-font);
+  letter-spacing: -0.55px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--sl-action);
+  color: var(--sl-text-on-action);
+  font-size: 19px;
+  letter-spacing: 0;
+}

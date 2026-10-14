@@ -1,0 +1,76 @@
+@use '@/styles/mixins' as *;
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(175px, 1.2fr) minmax(210px, 2.1fr) 62px;
+  align-items: center;
+  gap: var(--sl-space-3);
+  margin-bottom: 3px;
+
+  @include down('tablet') {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+.question {
+  @include text('label');
+
+  font-size: var(--sl-text-xs);
+}
+
+.track {
+  display: flex;
+  gap: 2px;
+  height: 11px;
+  overflow: hidden;
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-chart-track);
+}
+
+.segment {
+  height: 100%;
+}
+
+.option1 {
+  background: var(--sl-chart-option-1);
+}
+
+.option2 {
+  background: var(--sl-chart-option-2);
+}
+
+.option3 {
+  background: var(--sl-chart-option-3);
+}
+
+.micro {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.legend {
+  @include text('caption');
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-3);
+  margin-top: 13px;
+  color: var(--sl-muted);
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  border-radius: 2px;
+}

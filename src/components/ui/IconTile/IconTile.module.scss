@@ -1,0 +1,11 @@
+.tile {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--sl-icon-tile-size);
+  height: var(--sl-icon-tile-size);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+  font-size: 19px;
+}

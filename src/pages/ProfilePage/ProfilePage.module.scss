@@ -1,0 +1,41 @@
+@use '@/styles/mixins' as *;
+
+.layout {
+  align-items: start;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-4);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sl-space-1);
+  min-width: 0;
+}
+
+.name {
+  @include text('h2');
+}
+
+.muted {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.bio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+}
+
+.divider {
+  margin: var(--sl-space-4) 0;
+  border: none;
+  border-top: 1px solid var(--sl-border);
+}

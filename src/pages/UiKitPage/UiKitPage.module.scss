@@ -1,0 +1,51 @@
+@use '@/styles/mixins' as *;
+
+.page {
+  display: grid;
+  gap: var(--sl-space-7);
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+  padding: var(--sl-layout-padding);
+
+  @include down('mobile') {
+    padding: var(--sl-layout-padding-mobile);
+  }
+}
+
+.section {
+  display: grid;
+  gap: var(--sl-space-3);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sl-space-4);
+}
+
+.stack {
+  display: grid;
+  gap: var(--sl-space-2);
+}
+
+.fieldset {
+  display: grid;
+  gap: var(--sl-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    @include text('label');
+
+    margin-bottom: var(--sl-space-2);
+    padding: 0;
+  }
+}

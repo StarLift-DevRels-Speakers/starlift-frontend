@@ -1,0 +1,39 @@
+.skeleton {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    var(--sl-skeleton-base),
+    var(--sl-skeleton-highlight),
+    var(--sl-skeleton-base)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+.text {
+  width: 100%;
+  height: 12px;
+  border-radius: 7px;
+}
+
+.block {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--sl-radius-lg);
+}
+
+.circle {
+  width: var(--sl-avatar-size);
+  height: var(--sl-avatar-size);
+  border-radius: 50%;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}

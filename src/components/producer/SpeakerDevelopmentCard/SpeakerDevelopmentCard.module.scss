@@ -1,0 +1,36 @@
+@use '@/styles/mixins' as *;
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.identity {
+  min-width: 0;
+}
+
+.eyebrow {
+  @include overline;
+
+  color: var(--sl-action);
+}
+
+.name {
+  @include text('h2');
+
+  margin: 6px 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2);
+}
+
+.divider {
+  margin: var(--sl-space-4) 0;
+}

@@ -1,0 +1,30 @@
+@use '@/styles/mixins' as *;
+
+.list {
+  display: grid;
+  gap: var(--sl-space-3) var(--sl-space-4);
+  margin: 0;
+}
+
+.twoColumns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @include down('mobile') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.item {
+  min-width: 0;
+}
+
+.label {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}
+
+.value {
+  margin: 0;
+  font-weight: var(--sl-weight-semibold);
+}

@@ -1,0 +1,47 @@
+@use '@/styles/mixins' as *;
+
+.alert {
+  @include text('body-sm');
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sl-space-3);
+  padding: 14px var(--sl-space-4);
+  border-radius: var(--sl-radius-lg);
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  font-weight: var(--sl-weight-bold);
+}
+
+.body {
+  min-width: 0;
+}
+
+.title {
+  display: block;
+  margin-bottom: 3px;
+  font-weight: var(--sl-weight-bold);
+}
+
+.info {
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+}
+
+.neutral {
+  background: var(--sl-neutral-bg);
+  color: var(--sl-neutral-text);
+}
+
+.warning {
+  background: var(--sl-warning-bg);
+  color: var(--sl-warning-text);
+}
+
+.danger {
+  background: var(--sl-danger-bg);
+  color: var(--sl-danger-text);
+}

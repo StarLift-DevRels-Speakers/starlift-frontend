@@ -1,0 +1,46 @@
+@use '@/styles/mixins' as *;
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px var(--sl-space-5);
+  text-align: center;
+}
+
+.dashed {
+  border: 1px dashed var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+}
+
+.plain {
+  padding-block: var(--sl-space-6);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--sl-space-3);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+  font-size: var(--sl-text-lg);
+}
+
+.title {
+  @include text('h3');
+}
+
+.description {
+  @include text('body-sm');
+
+  max-width: 420px;
+  margin-top: var(--sl-space-1);
+  color: var(--sl-muted);
+}
+
+.action {
+  margin-top: var(--sl-space-4);
+}

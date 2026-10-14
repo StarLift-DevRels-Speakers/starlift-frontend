@@ -1,0 +1,19 @@
+@use '@/styles/mixins' as *;
+
+.offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.price {
+  @include text('h1');
+}
+
+.period {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}

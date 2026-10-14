@@ -1,0 +1,18 @@
+@use '@/styles/mixins' as *;
+
+.price {
+  font-size: 23px;
+  font-weight: var(--sl-weight-bold);
+  line-height: var(--sl-leading-h1);
+}
+
+.note {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.action {
+  margin-top: var(--sl-space-3);
+}
+

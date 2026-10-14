@@ -1,0 +1,15 @@
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 11px;
+  color: var(--sl-muted);
+  font-size: var(--sl-text-2xs);
+  list-style: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

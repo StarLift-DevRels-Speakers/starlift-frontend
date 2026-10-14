@@ -1,0 +1,7 @@
+@use '@/styles/mixins' as *;
+
+.note {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}

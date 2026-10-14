@@ -1,0 +1,50 @@
+@use '@/styles/mixins' as *;
+
+.top,
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  min-width: 0;
+}
+
+.name {
+  @include text('h2');
+}
+
+.meta {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.skills {
+  @include text('caption');
+
+  margin-top: 2px;
+  color: var(--sl-muted);
+}
+
+.footer {
+  margin-top: var(--sl-space-4);
+  padding-top: var(--sl-space-4);
+  border-top: 1px solid var(--sl-border);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}
+
+.signalsAction {
+  margin-top: var(--sl-space-3);
+}

@@ -1,0 +1,20 @@
+@use '@/styles/mixins' as *;
+
+// Wider data column and a narrower explanation column, as in the mockup.
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--sl-space-4);
+
+  @include down('tablet') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fineprint {
+  @include text('caption');
+
+  margin-top: var(--sl-space-3);
+  color: var(--sl-muted);
+}

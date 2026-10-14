@@ -1,0 +1,39 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sl-space-1) 10px;
+  border-radius: var(--sl-radius-pill);
+  font: var(--sl-weight-semibold) var(--sl-text-xs) / var(--sl-leading-control) var(--sl-font);
+  white-space: nowrap;
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.brand {
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+}
+
+.muted {
+  background: var(--sl-surface-muted);
+  color: var(--sl-text-subtle);
+}
+
+.warning {
+  background: var(--sl-warning-bg);
+  color: var(--sl-warning-text);
+}
+
+.ai {
+  background: var(--sl-ai-bg);
+  color: var(--sl-ai-text);
+}
+
+.danger {
+  background: var(--sl-danger-bg);
+  color: var(--sl-danger-text);
+}

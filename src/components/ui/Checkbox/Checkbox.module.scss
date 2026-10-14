@@ -1,0 +1,44 @@
+@use '@/styles/mixins' as *;
+
+// Shared by Checkbox and Radio: native control tinted with the action color.
+.check {
+  @include text('body-sm');
+
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.input {
+  flex-shrink: 0;
+  width: var(--sl-checkbox-size);
+  height: var(--sl-checkbox-size);
+  margin: 2px 0 0;
+  accent-color: var(--sl-action);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+
+    + .text {
+      color: var(--sl-muted);
+    }
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.hint {
+  @include text('caption');
+
+  color: var(--sl-muted);
+}

@@ -1,0 +1,51 @@
+@use '@/styles/mixins' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--sl-radius-lg);
+  font-size: 21px;
+}
+
+.brand {
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+}
+
+.ai {
+  background: var(--sl-ai-bg-soft);
+  color: var(--sl-ai-text);
+}
+
+.title {
+  @include text('h2');
+
+  margin: 14px 0 5px;
+  letter-spacing: -0.3px;
+}
+
+.description {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.action {
+  margin-top: auto;
+  padding-top: 15px;
+}

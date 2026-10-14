@@ -1,0 +1,27 @@
+@use '@/styles/mixins' as *;
+
+.sectionTitle {
+  @include text('h2');
+
+  margin-bottom: var(--sl-space-3);
+  letter-spacing: -0.3px;
+}
+
+.balance {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sl-space-3);
+    padding: var(--sl-space-3) 0;
+    border-bottom: 1px solid var(--sl-border);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}

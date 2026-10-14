@@ -1,0 +1,17 @@
+@use '@/styles/mixins' as *;
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-4);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.description {
+  @include text('body');
+}
