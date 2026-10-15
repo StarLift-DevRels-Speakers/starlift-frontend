@@ -79,7 +79,7 @@ export function DevrelDashboardPage() {
                   title="AI-подбор спикеров"
                   description="Укажите требования к выступлению и получите подбор кандидатов с объяснениями."
                   status={aiAccessLabel(billing)}
-                  action={<LinkButton to={to('ai')}>Открыть AI-подбор</LinkButton>}
+                  action={<LinkButton to={to('ai/speaker')}>Открыть AI-подбор</LinkButton>}
                 />
                 <FeatureCard
                   icon="☆"

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
-import { findNavItem } from '@/app/navigation';
+import { findNavTrail } from '@/app/navigation';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TopBar } from '@/components/layout/TopBar/TopBar';
 import { isSubscriptionActive } from '@/features/billing/access';
@@ -28,7 +28,7 @@ export function AppLayout({ role }: AppLayoutProps) {
   const { billing, notifications, profiles } = useDemoState();
   const user = profiles[role];
   const hasSubscription = isSubscriptionActive(billing[role]);
-  const page = findNavItem(role, pathname);
+  const trail = findNavTrail(role, pathname);
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -68,7 +68,7 @@ export function AppLayout({ role }: AppLayoutProps) {
           user={user}
           hasSubscription={hasSubscription}
           unreadNotifications={notifications[role].filter((notification) => !notification.read).length}
-          page={page}
+          trail={trail}
           sidebarId={sidebarId}
           sidebarOpen={drawerOpen}
           onMenuToggle={() => setMenuOpen((open) => !open)}

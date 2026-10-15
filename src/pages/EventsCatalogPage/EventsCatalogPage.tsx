@@ -33,7 +33,7 @@ export function EventsCatalogPage() {
       <PageHeader
         title="Мероприятия и CFP"
         description="Бесплатный каталог и ручной поиск. AI-подбор — отдельная функция."
-        actions={<LinkButton to={rolePath('speaker', 'ai')} variant="soft">Перейти к AI-подбору</LinkButton>}
+        actions={<LinkButton to={rolePath('speaker', 'ai/events')} variant="soft">Перейти к AI-подбору</LinkButton>}
       />
 
       <Stack>

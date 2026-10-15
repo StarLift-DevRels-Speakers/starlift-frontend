@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
-import { navigation, roleBasePath } from '@/app/navigation';
+import { navigation, roleBasePath, rolePath, type NavItem } from '@/app/navigation';
 import { AppLayout } from '@/components/layout/AppLayout/AppLayout';
 import { AiMatchPage } from '@/pages/AiMatchPage/AiMatchPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage/AnalyticsPage';
@@ -26,7 +26,7 @@ import { TalksPage } from '@/pages/TalksPage/TalksPage';
 import { UiKitPage } from '@/pages/UiKitPage/UiKitPage';
 import type { Role } from '@/types/role';
 
-/** Ported screens by menu slug; the rest of the menu shows a placeholder. */
+/** Ported screens by menu slug (group children by full path); the rest of the menu shows a placeholder. */
 const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
   speaker: {
     '': <SpeakerDashboardPage />,
@@ -36,8 +36,8 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     events: <EventsCatalogPage />,
     applications: <SpeakerApplicationsPage />,
     invitations: <SpeakerInvitationsPage />,
-    producer: <ProducerPage />,
-    ai: <AiMatchPage role="speaker" />,
+    'ai/events': <AiMatchPage role="speaker" />,
+    'ai/producer': <ProducerPage />,
     reviews: <SpeakerReviewsPage />,
     media: <MediaPage />,
     billing: <BillingPage role="speaker" />,
@@ -50,7 +50,7 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     events: <DevrelEventsPage />,
     applications: <DevrelApplicationsPage />,
     catalog: <SpeakerCatalogPage />,
-    ai: <AiMatchPage role="devrel" />,
+    'ai/speaker': <AiMatchPage role="devrel" />,
     analytics: <AnalyticsPage />,
     billing: <BillingPage role="devrel" />,
     notifications: <NotificationsPage role="devrel" />,
@@ -63,15 +63,26 @@ const detailRoutes: Record<Role, RouteObject[]> = {
   devrel: [{ path: 'catalog/:speakerId', element: <SpeakerProfileViewPage /> }],
 };
 
+function pageRoute(role: Role, item: NavItem): RouteObject {
+  const element = pages[role][item.slug] ?? <PlaceholderPage title={item.title} />;
+  return item.slug ? { path: item.slug, element } : { index: true, element };
+}
+
+/** A group has no page of its own: its address opens the first child. */
+function menuRoutes(role: Role, item: NavItem): RouteObject[] {
+  if (!item.children) return [pageRoute(role, item)];
+  return [
+    { path: item.slug, element: <Navigate to={rolePath(role, item.children[0].slug)} replace /> },
+    ...item.children.map((child) => pageRoute(role, child)),
+  ];
+}
+
 function roleRoutes(role: Role): RouteObject {
   return {
     path: roleBasePath[role],
     element: <AppLayout role={role} />,
     children: [
-      ...navigation[role].map((item): RouteObject => {
-        const element = pages[role][item.slug] ?? <PlaceholderPage title={item.title} />;
-        return item.slug ? { path: item.slug, element } : { index: true, element };
-      }),
+      ...navigation[role].flatMap((item) => menuRoutes(role, item)),
       ...detailRoutes[role],
     ],
   };

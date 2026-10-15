@@ -84,7 +84,7 @@ export function SpeakerDashboardPage() {
                   title="AI-подбор мероприятий"
                   description="Подберите релевантные CFP по вашему профилю и предпочтениям."
                   status={aiAccessLabel(billing)}
-                  action={<LinkButton to={to('ai')}>Открыть AI-подбор</LinkButton>}
+                  action={<LinkButton to={to('ai/events')}>Открыть AI-подбор</LinkButton>}
                 />
                 <FeatureCard
                   icon="✺"
@@ -92,7 +92,7 @@ export function SpeakerDashboardPage() {
                   title="ИИ-продюсер"
                   description="Персональный план развития, обоснованные сильные стороны и направления роста."
                   status={hasSubscription ? 'Доступно' : 'По подписке'}
-                  action={<LinkButton to={to('producer')} variant="secondary">Перейти к плану</LinkButton>}
+                  action={<LinkButton to={to('ai/producer')} variant="secondary">Перейти к плану</LinkButton>}
                 />
               </Grid>
               <AccessCard role="speaker" hasSubscription={hasSubscription} />

@@ -11,7 +11,8 @@ export interface TopBarProps {
   user: UserProfile;
   hasSubscription: boolean;
   unreadNotifications: number;
-  page: NavItem;
+  /** Current menu items, outermost first; the last one is the current page. */
+  trail: ReadonlyArray<NavItem>;
   sidebarId: string;
   sidebarOpen: boolean;
   onMenuToggle: () => void;
@@ -19,7 +20,7 @@ export interface TopBarProps {
   menuButtonRef?: Ref<HTMLButtonElement>;
 }
 
-export function TopBar({ role, user, hasSubscription, unreadNotifications, page, sidebarId, sidebarOpen, onMenuToggle, menuButtonRef }: TopBarProps) {
+export function TopBar({ role, user, hasSubscription, unreadNotifications, trail, sidebarId, sidebarOpen, onMenuToggle, menuButtonRef }: TopBarProps) {
   const navigate = useNavigate();
 
   return (
@@ -43,7 +44,9 @@ export function TopBar({ role, user, hasSubscription, unreadNotifications, page,
             <li>
               <Link to={rolePath(role)}>{roleLabels[role]}</Link>
             </li>
-            <li aria-current="page">{page.title}</li>
+            {trail.map((item, index) => (
+              <li key={item.slug} aria-current={index === trail.length - 1 ? 'page' : undefined}>{item.title}</li>
+            ))}
           </ol>
         </nav>
       </div>
