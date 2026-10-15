@@ -26,7 +26,7 @@ export function SpeakerCatalogPage() {
       <PageHeader
         title="Каталог спикеров"
         description="Бесплатный просмотр доступных профилей и отзывов слушателей."
-        actions={<LinkButton to={rolePath('devrel', 'ai')}>AI-подбор под мероприятие</LinkButton>}
+        actions={<LinkButton to={rolePath('devrel', 'ai/speaker')}>AI-подбор под мероприятие</LinkButton>}
       />
 
       <Stack>

@@ -64,8 +64,8 @@ export function createInitialState(): DemoState {
 
 // ---------- Persistence ----------
 // Like the mockup, the demo survives reloads and is shared between tabs (e.g. the public
-// feedback form opened in a new tab). Bump the version when the state shape changes.
-export const STORAGE_KEY = 'starlift-demo-v4';
+// feedback form opened in a new tab). Incompatible saved data is dropped by parseState().
+export const STORAGE_KEY = 'starlift-demo';
 
 export function loadState(): DemoState {
   try {

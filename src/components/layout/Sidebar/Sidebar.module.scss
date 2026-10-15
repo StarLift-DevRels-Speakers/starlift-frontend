@@ -73,6 +73,21 @@
   }
 }
 
+// Group title: same row as a link, but not interactive.
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  min-height: 39px;
+  padding: 10px var(--sl-space-3);
+  color: var(--sl-text-nav);
+  font: var(--sl-weight-medium) var(--sl-text-sm) / var(--sl-leading-control) var(--sl-font);
+}
+
+.sublist {
+  margin-left: var(--sl-space-5);
+}
+
 .active {
   background: var(--sl-brand-bg);
   color: var(--sl-action);
