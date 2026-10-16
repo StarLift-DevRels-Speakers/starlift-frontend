@@ -14,5 +14,5 @@ jobs:
 
       - name: Build and Restart Docker Containers
         run: |
-          docker compose up -d --build
+          docker compose up -d --build --force-recreate
           docker image prune -f
