@@ -57,6 +57,8 @@ function collect(build: (add: (entry: Omit<CalendarEntry, 'id'>) => void) => voi
 
 function speakerEntries(source: CalendarSource): CalendarEntry[] {
   const eventById = new Map(source.events.map((event) => [event.id, event]));
+  // One performance per event: older saved data may hold both an accepted invitation and an accepted application.
+  const performing = new Set<string>();
 
   return collect((add) => {
     for (const speech of source.speeches) {
@@ -74,6 +76,10 @@ function speakerEntries(source: CalendarSource): CalendarEntry[] {
       const event = eventById.get(invitation.eventId);
       if (!event || invitation.status === 'declined') continue;
       const accepted = invitation.status === 'accepted';
+      if (accepted) {
+        if (performing.has(event.id)) continue;
+        performing.add(event.id);
+      }
       add({
         date: event.date,
         kind: accepted ? 'performance' : 'invite',
@@ -86,7 +92,8 @@ function speakerEntries(source: CalendarSource): CalendarEntry[] {
 
     for (const application of source.applications) {
       const event = eventById.get(application.eventId);
-      if (!event || application.status !== 'accepted') continue;
+      if (!event || application.status !== 'accepted' || performing.has(event.id)) continue;
+      performing.add(event.id);
       add({ date: event.date, kind: 'performance', title: event.name, detail: 'Заявка принята · планируемое участие', section: 'applications', eventId: event.id });
     }
   });

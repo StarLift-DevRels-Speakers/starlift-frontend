@@ -2,7 +2,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { rolePath } from '@/app/navigation';
 import { Alert, Badge, Button, DetailList, EmptyState, LinkButton, Modal, Select, useToast } from '@/components/ui';
-import { isCfpOpen } from '@/features/events/events';
+import { hasPendingInvitation, isCfpOpen, isSpeakerConfirmed } from '@/features/events/events';
 import { useDemoActions, useDemoState } from '@/store/useDemoStore';
 import type { TechEvent } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
@@ -15,7 +15,7 @@ export interface EventDetailsModalProps {
 
 /** Published event details for a speaker, with a free CFP application form while the CFP is open. */
 export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
-  const { talks } = useDemoState();
+  const { talks, applications, invitations } = useDemoState();
   const { submitApplication } = useDemoActions();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -24,7 +24,9 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
   const [error, setError] = useState<string>();
 
   const cfpOpen = isCfpOpen(event);
-  const canApply = cfpOpen && talks.length > 0;
+  const confirmed = isSpeakerConfirmed(event.id, applications, invitations);
+  const invited = hasPendingInvitation(event.id, invitations);
+  const canApply = cfpOpen && !confirmed && !invited && talks.length > 0;
 
   const handleSubmit = (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
@@ -68,8 +70,17 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
 
         <p className={styles.description}>{event.description}</p>
 
-        {!cfpOpen ? (
+        {confirmed ? (
+          <Alert>Вы уже участвуете в этом мероприятии — повторная заявка не нужна.</Alert>
+        ) : !cfpOpen ? (
           <Alert tone="warning">Прием заявок завершен.</Alert>
+        ) : invited ? (
+          <EmptyState
+            variant="plain"
+            title="Вас уже пригласили на это мероприятие"
+            description="Вместо заявки ответьте на приглашение."
+            action={<LinkButton to={rolePath('speaker', 'invitations')} variant="soft" size="sm">К приглашениям</LinkButton>}
+          />
         ) : talks.length === 0 ? (
           <EmptyState
             variant="plain"

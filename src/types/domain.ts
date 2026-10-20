@@ -47,6 +47,8 @@ export interface Application {
   topic: string;
   at: string;
   status: ApplicationStatus;
+  /** Talk the speaker asked to switch to; applied only after the DevRel approves. */
+  talkChange?: { talkId: string; topic: string };
 }
 
 export type InvitationStatus = 'sent' | 'accepted' | 'declined';

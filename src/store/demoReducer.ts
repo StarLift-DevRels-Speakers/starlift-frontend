@@ -23,6 +23,9 @@ import type { DemoState } from './demoState';
 export type DemoAction =
   | { type: 'application/submitted'; application: Application }
   | { type: 'application/decided'; applicationId: string; status: ApplicationStatus }
+  | { type: 'application/talkChangeRequested'; applicationId: string; talk: Talk }
+  /** `approved` — the requested talk replaces the current one; otherwise the request is dropped. */
+  | { type: 'application/talkChangeAnswered'; applicationId: string; approved: boolean }
   | { type: 'invitation/sent'; invitation: Invitation }
   | { type: 'invitation/answered'; invitationId: string; status: InvitationStatus }
   | { type: 'notification/added'; role: Role; notification: AppNotification }
@@ -52,6 +55,24 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
         applications: state.applications.map((application) =>
           application.id === action.applicationId ? { ...application, status: action.status } : application,
         ),
+      };
+    case 'application/talkChangeRequested':
+      return {
+        ...state,
+        applications: state.applications.map((application) =>
+          application.id === action.applicationId
+            ? { ...application, talkChange: { talkId: action.talk.id, topic: action.talk.name } }
+            : application,
+        ),
+      };
+    case 'application/talkChangeAnswered':
+      return {
+        ...state,
+        applications: state.applications.map((application) => {
+          if (application.id !== action.applicationId || !application.talkChange) return application;
+          const { talkChange, ...rest } = application;
+          return action.approved ? { ...rest, talkId: talkChange.talkId, topic: talkChange.topic } : rest;
+        }),
       };
     case 'invitation/sent':
       return { ...state, invitations: [action.invitation, ...state.invitations] };

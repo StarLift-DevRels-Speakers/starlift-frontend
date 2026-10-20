@@ -2,6 +2,7 @@ import { rolePath } from '@/app/navigation';
 import { InvitationStatusBadge } from '@/components/invitations/InvitationStatusBadge/InvitationStatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Button, Card, EmptyState, LinkButton, Stack, useToast } from '@/components/ui';
+import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useDemoActions, useDemoState } from '@/store/useDemoStore';
 import type { InvitationStatus } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
@@ -9,7 +10,7 @@ import styles from './SpeakerInvitationsPage.module.scss';
 
 /** Speaker reviews DevRel invitations and answers them; pending ones come first. */
 export function SpeakerInvitationsPage() {
-  const { invitations, events } = useDemoState();
+  const { invitations, applications, events } = useDemoState();
   const { answerInvitation } = useDemoActions();
   const { toast } = useToast();
   const eventById = new Map(events.map((event) => [event.id, event]));
@@ -29,6 +30,12 @@ export function SpeakerInvitationsPage() {
           <Stack as="ul" gap={3} aria-label="Приглашения">
             {sorted.map((invitation) => {
               const event = eventById.get(invitation.eventId);
+              // Declining stays available; accepting only while the speaker can still take part.
+              const blocked = event && (
+                isEventPast(event) ? 'Мероприятие уже прошло'
+                  : isSpeakerConfirmed(event.id, applications, invitations) ? 'Вы уже участвуете в этом мероприятии'
+                    : undefined
+              );
               return (
                 <Card
                   key={invitation.id}
@@ -45,7 +52,9 @@ export function SpeakerInvitationsPage() {
                   )}
                   {invitation.status === 'sent' && (
                     <div className={styles.actions}>
-                      <Button size="sm" onClick={() => answer(invitation.id, 'accepted')}>Принять</Button>
+                      {blocked
+                        ? <span className={styles.note}>{blocked}</span>
+                        : <Button size="sm" onClick={() => answer(invitation.id, 'accepted')}>Принять</Button>}
                       <Button size="sm" variant="secondary" onClick={() => answer(invitation.id, 'declined')}>Отклонить</Button>
                     </div>
                   )}

@@ -4,6 +4,7 @@ import { InvitationStatusBadge } from '@/components/invitations/InvitationStatus
 import { InviteSpeakerModal } from '@/components/invitations/InviteSpeakerModal/InviteSpeakerModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Avatar, Button, Card, EmptyState, Grid, ListItem, Stack, useToast } from '@/components/ui';
+import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useDemoActions, useDemoState } from '@/store/useDemoStore';
 import type { ApplicationStatus } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
@@ -14,7 +15,7 @@ type Decision = Exclude<ApplicationStatus, 'sent'>;
 /** DevRel reviews applications to their own events and sends invitations. */
 export function DevrelApplicationsPage() {
   const { applications, invitations, events, profiles } = useDemoState();
-  const { decideApplication } = useDemoActions();
+  const { decideApplication, answerTalkChange } = useDemoActions();
   const { toast } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -29,6 +30,11 @@ export function DevrelApplicationsPage() {
     toast(result.ok ? 'Статус заявки обновлен' : result.error);
   };
 
+  const answerChange = (applicationId: string, approved: boolean) => {
+    const result = answerTalkChange(applicationId, approved);
+    toast(result.ok ? (approved ? 'Смена доклада подтверждена' : 'Смена доклада отклонена') : result.error);
+  };
+
   return (
     <>
       <PageHeader
@@ -41,28 +47,50 @@ export function DevrelApplicationsPage() {
           <Card as="section" title="Поступившие заявки" titleAs="h2">
             {incoming.length > 0 ? (
               <ul className={styles.list}>
-                {incoming.map((application) => (
-                  <ListItem
-                    key={application.id}
-                    leading={<Avatar name={speakerName} decorative />}
-                    title={speakerName}
-                    meta={
-                      <>
-                        <span>{ownEvents.get(application.eventId)?.name} · {application.topic}</span>
-                        <span className={styles.date}>Подана {formatLongDate(application.at)}</span>
-                      </>
-                    }
-                  >
-                    <ApplicationStatusBadge status={application.status} />
-                    {application.status === 'sent' && (
-                      <div className={styles.actions}>
-                        <Button size="sm" onClick={() => decide(application.id, 'accepted')}>Принять</Button>
-                        <Button size="sm" variant="secondary" onClick={() => decide(application.id, 'reserve')}>В резерв</Button>
-                        <Button size="sm" variant="danger" onClick={() => decide(application.id, 'rejected')}>Отклонить</Button>
-                      </div>
-                    )}
-                  </ListItem>
-                ))}
+                {incoming.map((application) => {
+                  const event = ownEvents.get(application.eventId);
+                  const past = event === undefined || isEventPast(event);
+                  const change = application.talkChange;
+                  // A reserved application can still be accepted or rejected, until the event is over;
+                  // a requested talk change is answered first.
+                  const decidable = (application.status === 'sent' || application.status === 'reserve') && !past && !change;
+                  const confirmed = isSpeakerConfirmed(application.eventId, applications, invitations);
+                  return (
+                    <ListItem
+                      key={application.id}
+                      leading={<Avatar name={speakerName} decorative />}
+                      title={speakerName}
+                      meta={
+                        <>
+                          <span>{event?.name} · {application.topic}</span>
+                          <span className={styles.date}>Подана {formatLongDate(application.at)}</span>
+                        </>
+                      }
+                    >
+                      <ApplicationStatusBadge status={application.status} />
+                      {change && (
+                        <>
+                          <span className={styles.note}>Запрошена смена доклада на «{change.topic}»</span>
+                          <div className={styles.actions}>
+                            {!past && <Button size="sm" onClick={() => answerChange(application.id, true)}>Подтвердить смену</Button>}
+                            <Button size="sm" variant="secondary" onClick={() => answerChange(application.id, false)}>Отклонить смену</Button>
+                          </div>
+                        </>
+                      )}
+                      {decidable && (
+                        <div className={styles.actions}>
+                          {confirmed
+                            ? <span className={styles.note}>Спикер уже участвует</span>
+                            : <Button size="sm" onClick={() => decide(application.id, 'accepted')}>Принять</Button>}
+                          {application.status === 'sent' && (
+                            <Button size="sm" variant="secondary" onClick={() => decide(application.id, 'reserve')}>В резерв</Button>
+                          )}
+                          <Button size="sm" variant="danger" onClick={() => decide(application.id, 'rejected')}>Отклонить</Button>
+                        </div>
+                      )}
+                    </ListItem>
+                  );
+                })}
               </ul>
             ) : (
               <EmptyState variant="plain" title="Заявок пока нет" description="Заявки Спикеров на ваши мероприятия появятся здесь." />

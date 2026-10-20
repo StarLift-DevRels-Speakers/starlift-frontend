@@ -10,3 +10,10 @@
   gap: var(--sl-space-2);
   margin-top: var(--sl-space-3);
 }
+
+.note {
+  @include text('caption');
+
+  align-self: center;
+  color: var(--sl-muted);
+}
