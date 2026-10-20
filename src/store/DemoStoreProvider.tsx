@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { aiPayment, aiRight, isChargedOutcome } from '@/features/ai/aiMatch';
-import { applicationStatuses } from '@/features/applications/applicationStatus';
+import { applicationStatuses, canRequestTalkChange, isTalkTaken } from '@/features/applications/applicationStatus';
 import { hasRight, isSubscriptionActive } from '@/features/billing/access';
 import { rightLabels, rightPrices, subscriptions } from '@/features/billing/pricing';
-import { isCfpOpen } from '@/features/events/events';
+import { hasPendingInvitation, isCfpOpen, isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { feedbackQuestions } from '@/features/feedback/questions';
 import { buildPlanContent, collectFacts } from '@/features/producer/producer';
 import type { Feedback } from '@/types/domain';
@@ -49,7 +49,13 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       const talk = latest.current.talks.find((item) => item.id === talkId);
       if (!event || !talk) return { ok: false, error: 'Недоступное мероприятие или доклад' };
       if (!isCfpOpen(event)) return { ok: false, error: 'Прием заявок завершен' };
-      if (latest.current.applications.some((item) => item.eventId === eventId && item.talkId === talkId)) {
+      if (isSpeakerConfirmed(eventId, latest.current.applications, latest.current.invitations)) {
+        return { ok: false, error: 'Вы уже участвуете в этом мероприятии' };
+      }
+      if (hasPendingInvitation(eventId, latest.current.invitations)) {
+        return { ok: false, error: 'У вас есть приглашение на это мероприятие — ответьте на него' };
+      }
+      if (latest.current.applications.some((item) => item.eventId === eventId && (item.talkId === talkId || item.talkChange?.talkId === talkId))) {
         return { ok: false, error: 'Заявка с этим докладом уже отправлена' };
       }
 
@@ -63,11 +69,70 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       return { ok: true };
     },
 
+    requestTalkChange: (applicationId, talkId) => {
+      const application = latest.current.applications.find((item) => item.id === applicationId);
+      if (!application) return { ok: false, error: 'Заявка не найдена' };
+      const event = latest.current.events.find((item) => item.id === application.eventId);
+      if (application.talkChange) return { ok: false, error: 'Запрос на смену доклада уже ожидает ответа DevRel' };
+      if (!canRequestTalkChange(application, event)) {
+        return { ok: false, error: 'Сменить доклад можно в заявке на рассмотрении (пока открыт CFP) или в принятой заявке' };
+      }
+      const talk = latest.current.talks.find((item) => item.id === talkId);
+      if (!talk) return { ok: false, error: 'Доклад не найден' };
+      if (talk.id === application.talkId) return { ok: false, error: 'Выберите другой доклад' };
+      if (isTalkTaken(application, talkId, latest.current.applications)) {
+        return { ok: false, error: 'Заявка с этим докладом уже отправлена' };
+      }
+
+      dispatch({ type: 'application/talkChangeRequested', applicationId, talk });
+      if (event?.owner === 'devrel') {
+        dispatch({
+          type: 'notification/added',
+          role: 'devrel',
+          notification: notificationOf(`Запрошена смена доклада в заявке на «${event.name}»: «${application.topic}» → «${talk.name}»`),
+        });
+      }
+      return { ok: true };
+    },
+
+    answerTalkChange: (applicationId, approved) => {
+      const application = latest.current.applications.find((item) => item.id === applicationId);
+      const event = application && latest.current.events.find((item) => item.id === application.eventId);
+      if (!application || event?.owner !== 'devrel') return { ok: false, error: 'Заявка не найдена' };
+      const change = application.talkChange;
+      if (!change) return { ok: false, error: 'Запроса на смену доклада нет' };
+      // Rejecting is always possible; approving needs the talk to still exist and stay unique for the event.
+      if (approved) {
+        if (isEventPast(event)) return { ok: false, error: 'Мероприятие уже прошло' };
+        if (!latest.current.talks.some((talk) => talk.id === change.talkId)) return { ok: false, error: 'Доклад больше не существует' };
+        if (isTalkTaken(application, change.talkId, latest.current.applications)) {
+          return { ok: false, error: 'С этим докладом уже есть другая заявка' };
+        }
+      }
+
+      dispatch({ type: 'application/talkChangeAnswered', applicationId, approved });
+      dispatch({
+        type: 'notification/added',
+        role: 'speaker',
+        notification: notificationOf(`Смена доклада в заявке на «${event.name}»: ${approved ? 'подтверждена' : 'отклонена'}`),
+      });
+      return { ok: true };
+    },
+
     decideApplication: (applicationId, status) => {
       const application = latest.current.applications.find((item) => item.id === applicationId);
       const event = application && latest.current.events.find((item) => item.id === application.eventId);
       if (!application || event?.owner !== 'devrel') return { ok: false, error: 'Заявка не найдена' };
-      if (application.status !== 'sent') return { ok: false, error: 'Решение по заявке уже принято' };
+      // A reserved application can still be accepted or rejected later.
+      if (application.status !== 'sent' && application.status !== 'reserve') {
+        return { ok: false, error: 'Решение по заявке уже принято' };
+      }
+      if (application.status === status) return { ok: false, error: 'Заявка уже в этом статусе' };
+      if (application.talkChange) return { ok: false, error: 'Сначала ответьте на запрос смены доклада' };
+      if (isEventPast(event)) return { ok: false, error: 'Мероприятие уже прошло' };
+      if (status === 'accepted' && isSpeakerConfirmed(event.id, latest.current.applications, latest.current.invitations)) {
+        return { ok: false, error: 'Спикер уже участвует в этом мероприятии' };
+      }
 
       dispatch({ type: 'application/decided', applicationId, status });
       dispatch({ type: 'notification/added', role: 'speaker', notification: notificationOf(`Заявка на «${event.name}»: ${applicationStatuses[status].label.toLowerCase()}`) });
@@ -79,8 +144,12 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       if (event?.owner !== 'devrel' || event.state !== 'published') {
         return { ok: false, error: 'Выберите свое опубликованное мероприятие' };
       }
+      if (isEventPast(event)) return { ok: false, error: 'Мероприятие уже прошло' };
+      if (isSpeakerConfirmed(eventId, latest.current.applications, latest.current.invitations)) {
+        return { ok: false, error: 'Спикер уже участвует в этом мероприятии' };
+      }
       if (!topic.trim()) return { ok: false, error: 'Укажите предлагаемую тему' };
-      if (latest.current.invitations.some((item) => item.eventId === eventId && item.status === 'sent')) {
+      if (hasPendingInvitation(eventId, latest.current.invitations)) {
         return { ok: false, error: 'Приглашение на это мероприятие уже ожидает ответа Спикера' };
       }
 
@@ -98,6 +167,13 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       if (invitation.status !== 'sent') return { ok: false, error: 'Ответ на приглашение уже дан' };
 
       const event = latest.current.events.find((item) => item.id === invitation.eventId);
+      // Declining is always possible; accepting only while the speaker can still take part.
+      if (answer === 'accepted' && event) {
+        if (isEventPast(event)) return { ok: false, error: 'Мероприятие уже прошло' };
+        if (isSpeakerConfirmed(event.id, latest.current.applications, latest.current.invitations)) {
+          return { ok: false, error: 'Вы уже участвуете в этом мероприятии' };
+        }
+      }
       const result = answer === 'accepted' ? 'принято' : 'отклонено';
       dispatch({ type: 'invitation/answered', invitationId, status: answer });
       dispatch({
@@ -114,6 +190,14 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       if (!input.name.trim() || !input.topic.trim() || !input.date) return { ok: false, error: 'Заполните обязательные поля' };
       if (input.cfp && input.cfp > input.date) {
         return { ok: false, error: 'Дедлайн CFP не может быть позже даты мероприятия' };
+      }
+      // A past date that was not changed may stay, so a past event can still be edited.
+      const today = todayKey();
+      if (input.date < today && input.date !== existing?.date) {
+        return { ok: false, error: 'Дата мероприятия не может быть в прошлом' };
+      }
+      if (input.cfp && input.cfp < today && input.cfp !== existing?.cfp) {
+        return { ok: false, error: 'Дедлайн CFP не может быть в прошлом' };
       }
 
       dispatch({

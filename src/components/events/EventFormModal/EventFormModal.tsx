@@ -3,7 +3,7 @@ import { Alert, Button, Grid, Input, Modal, Select, Stack, Textarea, useToast } 
 import type { EventInput } from '@/store/demoContext';
 import { useDemoActions } from '@/store/useDemoStore';
 import type { EventFormat, TechEvent } from '@/types/domain';
-import { daysFromToday } from '@/utils/date';
+import { daysFromToday, todayKey } from '@/utils/date';
 
 const FORMATS: EventFormat[] = ['Офлайн', 'Онлайн', 'Гибрид'];
 
@@ -26,6 +26,11 @@ function initialValues(event?: TechEvent): EventInput {
   };
 }
 
+/** Earliest selectable day: today, or the saved past value so it can stay unchanged. */
+function minDay(saved: string | undefined, today: string): string {
+  return saved && saved < today ? saved : today;
+}
+
 /** Create or edit a DevRel's event; saving a draft is free, publishing is a separate step. */
 export function EventFormModal({ event, onClose }: EventFormModalProps) {
   const { saveEvent } = useDemoActions();
@@ -33,8 +38,9 @@ export function EventFormModal({ event, onClose }: EventFormModalProps) {
   const formId = useId();
   const [values, setValues] = useState(() => initialValues(event));
   const [error, setError] = useState<string>();
+  const today = todayKey();
 
-  const set = <Key extends keyof EventInput>(key: Key, value: EventInput[Key]) => {
+  const set =<Key extends keyof EventInput>(key: Key, value: EventInput[Key]) => {
     setValues((current) => ({ ...current, [key]: value }));
     setError(undefined);
   };
@@ -71,10 +77,18 @@ export function EventFormModal({ event, onClose }: EventFormModalProps) {
           <Grid columns={2}>
             <Input label="Название мероприятия" required value={values.name} onChange={(e) => set('name', e.target.value)} />
             <Input label="Тематика" required value={values.topic} onChange={(e) => set('topic', e.target.value)} />
-            <Input label="Дата мероприятия" type="date" required value={values.date} onChange={(e) => set('date', e.target.value)} />
+            <Input
+              label="Дата мероприятия"
+              type="date"
+              required
+              min={minDay(event?.date, today)}
+              value={values.date}
+              onChange={(e) => set('date', e.target.value)}
+            />
             <Input
               label="Дедлайн CFP"
               type="date"
+              min={minDay(event?.cfp, today)}
               max={values.date}
               hint="Не позже даты мероприятия"
               value={values.cfp ?? ''}

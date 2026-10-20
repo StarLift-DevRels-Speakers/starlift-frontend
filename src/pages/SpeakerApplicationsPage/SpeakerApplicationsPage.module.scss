@@ -5,3 +5,10 @@
 
   color: var(--sl-muted);
 }
+
+.change {
+  @include text('caption');
+
+  display: block;
+  color: var(--sl-muted);
+}
