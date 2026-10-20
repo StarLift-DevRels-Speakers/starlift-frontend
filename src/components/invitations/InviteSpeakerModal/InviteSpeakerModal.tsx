@@ -1,6 +1,7 @@
 import { useId, useState, type FormEvent } from 'react';
 import { rolePath } from '@/app/navigation';
 import { Alert, Button, Input, LinkButton, Modal, Select, Stack, useToast } from '@/components/ui';
+import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useDemoActions, useDemoState } from '@/store/useDemoStore';
 
 export interface InviteSpeakerModalProps {
@@ -10,13 +11,17 @@ export interface InviteSpeakerModalProps {
 
 /** DevRel invites a speaker to one of their published events. */
 export function InviteSpeakerModal({ speakerName, onClose }: InviteSpeakerModalProps) {
-  const { events, talks } = useDemoState();
+  const { events, talks, applications, invitations } = useDemoState();
   const { sendInvitation } = useDemoActions();
   const { toast } = useToast();
   const formId = useId();
 
   const ownPublished = events.filter((event) => event.owner === 'devrel' && event.state === 'published');
-  const [eventId, setEventId] = useState(ownPublished[0]?.id ?? '');
+  // Past events and events the speaker already takes part in are not offered.
+  const available = ownPublished.filter(
+    (event) => !isEventPast(event) && !isSpeakerConfirmed(event.id, applications, invitations),
+  );
+  const [eventId, setEventId] = useState(available[0]?.id ?? '');
   const [topic, setTopic] = useState(talks[0]?.name ?? '');
   const [error, setError] = useState<string>();
 
@@ -39,13 +44,17 @@ export function InviteSpeakerModal({ speakerName, onClose }: InviteSpeakerModalP
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Отмена</Button>
-          {ownPublished.length > 0 && <Button type="submit" form={formId}>Отправить приглашение</Button>}
+          {available.length > 0 && <Button type="submit" form={formId}>Отправить приглашение</Button>}
         </>
       }
     >
-      {ownPublished.length === 0 ? (
+      {available.length === 0 ? (
         <Stack gap={3}>
-          <Alert tone="warning">Для отправки приглашения нужно опубликованное мероприятие, которым вы управляете.</Alert>
+          <Alert tone="warning">
+            {ownPublished.length === 0
+              ? 'Для отправки приглашения нужно опубликованное мероприятие, которым вы управляете.'
+              : 'Нет мероприятий для приглашения: они уже прошли или Спикер в них уже участвует.'}
+          </Alert>
           <div>
             <LinkButton to={rolePath('devrel', 'events')} size="sm" onClick={onClose}>Мои мероприятия</LinkButton>
           </div>
@@ -63,7 +72,7 @@ export function InviteSpeakerModal({ speakerName, onClose }: InviteSpeakerModalP
                 setEventId(event.target.value);
                 setError(undefined);
               }}
-              options={ownPublished.map((event) => ({ value: event.id, label: event.name }))}
+              options={available.map((event) => ({ value: event.id, label: event.name }))}
             />
             <Input
               label="Предлагаемая тема"

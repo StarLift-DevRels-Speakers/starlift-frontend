@@ -33,7 +33,11 @@ export type EventInput = Omit<TechEvent, 'id' | 'owner' | 'state'>;
 export interface DemoActions {
   /** Speaker applies to a published event's CFP with one of their talks. */
   submitApplication: (eventId: string, talkId: string) => ActionResult;
-  /** DevRel decides on a pending application to one of their events. */
+  /** Speaker asks to switch the talk of a pending or accepted application; the DevRel approves it. */
+  requestTalkChange: (applicationId: string, talkId: string) => ActionResult;
+  /** DevRel approves or rejects the speaker's requested talk change. */
+  answerTalkChange: (applicationId: string, approved: boolean) => ActionResult;
+  /** DevRel decides on a pending or reserved application to one of their events. */
   decideApplication: (applicationId: string, status: Exclude<ApplicationStatus, 'sent'>) => ActionResult;
   /** DevRel invites the speaker to one of their published events. */
   sendInvitation: (eventId: string, topic: string) => ActionResult;

@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { rolePath } from '@/app/navigation';
 import { AiResultCard } from '@/components/ai/AiResultCard/AiResultCard';
+import { EventDetailsModal } from '@/components/events/EventDetailsModal/EventDetailsModal';
 import { Alert, Avatar, Badge, Button, Card, EmptyState, LinkButton, Stack } from '@/components/ui';
 import { isSubscriptionActive } from '@/features/billing/access';
+import { isCfpOpen } from '@/features/events/events';
 import { useDemoState } from '@/store/useDemoStore';
 import type { AiResult } from '@/types/domain';
 import type { Role } from '@/types/role';
@@ -19,6 +22,8 @@ export interface AiResultViewProps {
 export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
   const { events, billing, profiles } = useDemoState();
   const speaker = profiles.speaker;
+  // The event opens in place, so the speaker stays on the AI matching page.
+  const [openEventId, setOpenEventId] = useState<string | null>(null);
 
   if (result.kind === 'insufficient') {
     return (
@@ -49,10 +54,20 @@ export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
 
   if (role === 'speaker') {
     const published = events.filter((event) => event.state === 'published');
+    // Only events still accepting applications are suggested.
+    const matches = published.filter((event) => isCfpOpen(event));
+    const openEvent = published.find((event) => event.id === openEventId);
     return (
       <Stack gap={3}>
         <Alert>Пример результата интеллектуального подбора. Основания приведены только для демонстрации формата.</Alert>
-        {published.map((event) => (
+        {matches.length === 0 && (
+          <EmptyState
+            variant="plain"
+            title="Мероприятий с открытым CFP сейчас нет"
+            description="Подходящие мероприятия появятся здесь, когда откроется прием заявок."
+          />
+        )}
+        {matches.map((event) => (
           <AiResultCard
             key={event.id}
             title={event.name}
@@ -60,10 +75,11 @@ export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
             reasons={{ title: 'Почему подходит', items: ['Тематика близка к профилю Спикера', 'Доступен открытый CFP'] }}
             caveats={{ title: 'Что уточнить', items: ['Точные требования к опыту выступлений', 'Подтверждение доступности на дату'] }}
             actions={
-              <LinkButton to={`${rolePath('speaker', 'events')}?event=${event.id}`} size="sm">Открыть мероприятие</LinkButton>
+              <Button size="sm" onClick={() => setOpenEventId(event.id)}>Открыть мероприятие</Button>
             }
           />
         ))}
+        {openEvent && <EventDetailsModal event={openEvent} onClose={() => setOpenEventId(null)} />}
       </Stack>
     );
   }
