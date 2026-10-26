@@ -1,32 +1,32 @@
 import { useState } from 'react';
 import { Button, Modal, useToast } from '@/components/ui';
-import { useDemoActions } from '@/store/useDemoStore';
+import { useAppActions } from '@/store/useAppStore';
 
-/** Restores the initial demo data after a confirmation (it discards every change). */
+/** Discards the test purchases (billing is still a browser-side demo) after a confirmation. */
 export function ResetDemoButton({ className }: { className?: string }) {
-  const { resetDemo } = useDemoActions();
+  const { resetDemoBilling } = useAppActions();
   const { toast } = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
     <>
       <Button variant="text" size="sm" className={className} onClick={() => setConfirmOpen(true)}>
-        Сбросить демо
+        Сбросить тестовые покупки
       </Button>
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Сбросить демонстрационные данные?"
-        description="Заявки, приглашения, мероприятия, покупки и отзывы вернутся к исходному состоянию. Ссылка на форму отзыва изменится."
+        title="Сбросить тестовые покупки?"
+        description="Подписки, разовые права и результаты AI-подбора вернутся к исходному состоянию. Доклады, заявки, мероприятия и отзывы хранятся на сервере и не изменятся."
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirmOpen(false)}>Отмена</Button>
             <Button
               variant="danger"
               onClick={() => {
-                resetDemo();
+                resetDemoBilling();
                 setConfirmOpen(false);
-                toast('Демонстрационные данные сброшены');
+                toast('Тестовые покупки сброшены');
               }}
             >
               Сбросить

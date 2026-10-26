@@ -6,11 +6,11 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Button, Card, EmptyState, Grid, Input, LinkButton, Stack } from '@/components/ui';
 import { matchesEventQuery } from '@/features/events/events';
 import { useUrlSearchQuery } from '@/hooks/useUrlSearchQuery';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 
 /** Speaker's free catalog of published events with manual search and CFP applications. */
 export function EventsCatalogPage() {
-  const { events } = useDemoState();
+  const { events } = useAppState();
   const [params, setParams] = useSearchParams();
   const [query, changeQuery] = useUrlSearchQuery();
   const openEventId = params.get('event');

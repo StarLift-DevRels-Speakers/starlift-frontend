@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Alert, Badge, Button, Card, Grid, Input, LinkButton, Select, Stack, useToast } from '@/components/ui';
 import { aiOutcomeOptions, aiRight } from '@/features/ai/aiMatch';
 import { isSubscriptionActive } from '@/features/billing/access';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { AiOutcome } from '@/types/domain';
 import type { Role } from '@/types/role';
 import { formatLongDate } from '@/utils/date';
@@ -46,14 +46,14 @@ export interface AiMatchPageProps {
 
 /** AI matching: events for a speaker, speakers for a DevRel. Paid after the free trial. */
 export function AiMatchPage({ role }: AiMatchPageProps) {
-  const { billing: allBilling, aiResults, events, profiles } = useDemoState();
-  const { runAiMatch } = useDemoActions();
+  const { billing: allBilling, aiResults, events, profile } = useAppState();
+  const { runAiMatch } = useAppActions();
   const { toast } = useToast();
   const isSpeaker = role === 'speaker';
   const billing = allBilling[role];
   const subscribed = isSubscriptionActive(billing);
   const result = aiResults[role];
-  const skills = profiles.speaker.skills;
+  const skills = profile.skills;
 
   const [topics, setTopics] = useState(isSpeaker ? skills : 'Java, Backend');
   const [region, setRegion] = useState('Россия');
@@ -62,7 +62,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
   const [format, setFormat] = useState(formatOptions[role][0]);
   const [outcome, setOutcome] = useState<AiOutcome>('success');
   const [paywallOpen, setPaywallOpen] = useState(false);
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const [invited, setInvited] = useState<{ id: string; name: string } | null>(null);
 
   const run = () => {
     const response = runAiMatch(role, topics, outcome);
@@ -205,7 +205,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
             actions={<span className={styles.note}>{formatLongDate(result.at)}</span>}
             aria-live="polite"
           >
-            <AiResultView role={role} result={result} onInvite={() => setInviteOpen(true)} />
+            <AiResultView role={role} result={result} onInvite={setInvited} />
           </Card>
         )}
       </Stack>
@@ -222,7 +222,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
         />
       )}
 
-      {inviteOpen && <InviteSpeakerModal speakerName={profiles.speaker.name} onClose={() => setInviteOpen(false)} />}
+      {invited && <InviteSpeakerModal speaker={invited} defaultTopic={topics} onClose={() => setInvited(null)} />}
     </>
   );
 }

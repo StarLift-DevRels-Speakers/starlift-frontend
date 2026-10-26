@@ -12,14 +12,14 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Grid, LinkButton, Stack } from '@/components/ui';
 import { aiAccessLabel, isSubscriptionActive } from '@/features/billing/access';
 import { calendarEntriesFor, upcomingEntries } from '@/features/calendar/calendarEntries';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import { pluralize } from '@/utils/plural';
 
 const to = (slug: string) => rolePath('devrel', slug);
 
 export function DevrelDashboardPage() {
-  const demo = useDemoState();
-  const firstName = demo.profiles.devrel.name.split(' ')[0];
+  const demo = useAppState();
+  const firstName = demo.profile.name.split(' ')[0];
   const billing = demo.billing.devrel;
   const hasSubscription = isSubscriptionActive(billing);
   const calendarEntries = calendarEntriesFor('devrel', demo);
@@ -66,7 +66,7 @@ export function DevrelDashboardPage() {
                 />
               </TaskListCard>
               <UpcomingCard role="devrel" entries={upcomingEntries(calendarEntries, 4)} />
-              <NotificationsCard role="devrel" notifications={demo.notifications.devrel.slice(0, 3)} />
+              <NotificationsCard role="devrel" notifications={demo.notifications.slice(0, 3)} />
             </>
           }
           aside={

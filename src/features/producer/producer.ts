@@ -4,8 +4,8 @@ import type { DevelopmentPlan, Feedback, FeedbackQuestionKey, PlanStep, Speech, 
 import { daysFromToday, parseDay } from '@/utils/date';
 import { pluralize } from '@/utils/plural';
 
-// AI producer of the mockup (`producerFacts`, `producerSteps`, `build-plan`). Everything is
-// counted in the browser from structured answers; no model is called.
+// Facts the AI producer screen shows before and next to the plan: counters and answer
+// distributions are counted in the browser; the plan itself is built by the backend model.
 
 /** Minimum number of matching answers before a pattern counts as confirmed. */
 export const CONFIRMATION_THRESHOLD = 3;
@@ -56,7 +56,7 @@ export function collectFacts({ talks, speeches, events, feedback }: ProducerSour
 
 /** Reviews where the listener picked option `choice` for question `key`. */
 export function answersWith(facts: ProducerFacts, key: FeedbackQuestionKey, choice: number): Feedback[] {
-  return facts.feedback.filter((item) => item.answers[key] === choice);
+  return facts.feedback.filter((item) => item.answers?.[key] === choice);
 }
 
 /** How many times each of the three options was chosen. */
@@ -95,7 +95,7 @@ export function readinessRules(facts: ProducerFacts): ReadinessRule[] {
     { ok: facts.speeches.length > 0, title: 'Есть история выступлений', value: countLabel(facts.speeches.length, recordForms) },
     { ok: facts.openCfp.length > 0, title: 'Есть открытые CFP для следующего шага', value: `${facts.openCfp.length} доступно` },
     { ok: false, title: 'Расчет NPS и его динамики', value: 'Нет вопроса 0–10' },
-    { ok: false, title: 'Связь каждого отзыва с выступлением', value: 'Общая ссылка на Спикера' },
+    { ok: true, title: 'Связь каждого отзыва с выступлением', value: 'Ссылка на выступление' },
   ];
 }
 

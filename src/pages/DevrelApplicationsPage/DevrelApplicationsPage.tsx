@@ -5,7 +5,7 @@ import { InviteSpeakerModal } from '@/components/invitations/InviteSpeakerModal/
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Avatar, Button, Card, EmptyState, Grid, ListItem, Stack, useToast } from '@/components/ui';
 import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { ApplicationStatus } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
 import styles from './DevrelApplicationsPage.module.scss';
@@ -14,24 +14,22 @@ type Decision = Exclude<ApplicationStatus, 'sent'>;
 
 /** DevRel reviews applications to their own events and sends invitations. */
 export function DevrelApplicationsPage() {
-  const { applications, invitations, events, profiles } = useDemoState();
-  const { decideApplication, answerTalkChange } = useDemoActions();
+  const { applications, invitations, events } = useAppState();
+  const { decideApplication, answerTalkChange } = useAppActions();
   const { toast } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  // The demo has a single speaker account.
-  const speakerName = profiles.speaker.name;
   const ownEvents = new Map(events.filter((event) => event.owner === 'devrel').map((event) => [event.id, event]));
   const incoming = applications.filter((application) => ownEvents.has(application.eventId));
   const sentInvitations = invitations.filter((invitation) => ownEvents.has(invitation.eventId));
 
-  const decide = (applicationId: string, decision: Decision) => {
-    const result = decideApplication(applicationId, decision);
+  const decide = async (applicationId: string, decision: Decision) => {
+    const result = await decideApplication(applicationId, decision);
     toast(result.ok ? 'Статус заявки обновлен' : result.error);
   };
 
-  const answerChange = (applicationId: string, approved: boolean) => {
-    const result = answerTalkChange(applicationId, approved);
+  const answerChange = async (applicationId: string, approved: boolean) => {
+    const result = await answerTalkChange(applicationId, approved);
     toast(result.ok ? (approved ? 'Смена доклада подтверждена' : 'Смена доклада отклонена') : result.error);
   };
 
@@ -54,12 +52,12 @@ export function DevrelApplicationsPage() {
                   // A reserved application can still be accepted or rejected, until the event is over;
                   // a requested talk change is answered first.
                   const decidable = (application.status === 'sent' || application.status === 'reserve') && !past && !change;
-                  const confirmed = isSpeakerConfirmed(application.eventId, applications, invitations);
+                  const confirmed = isSpeakerConfirmed(application.eventId, applications, invitations, application.speakerId);
                   return (
                     <ListItem
                       key={application.id}
-                      leading={<Avatar name={speakerName} decorative />}
-                      title={speakerName}
+                      leading={<Avatar name={application.speakerName} decorative />}
+                      title={application.speakerName}
                       meta={
                         <>
                           <span>{event?.name} · {application.topic}</span>
@@ -108,8 +106,8 @@ export function DevrelApplicationsPage() {
                 {sentInvitations.map((invitation) => (
                   <ListItem
                     key={invitation.id}
-                    leading={<Avatar name={speakerName} decorative />}
-                    title={speakerName}
+                    leading={<Avatar name={invitation.speakerName} decorative />}
+                    title={invitation.speakerName}
                     meta={<span>{ownEvents.get(invitation.eventId)?.name} · {invitation.topic}</span>}
                   >
                     <InvitationStatusBadge status={invitation.status} role="devrel" />
@@ -123,11 +121,11 @@ export function DevrelApplicationsPage() {
         </Grid>
 
         <p className={styles.note}>
-          Состояния и переходы указаны для демонстрации. Полный жизненный цикл заявок и приглашений необходимо утвердить отдельно.
+          Полный жизненный цикл заявок и приглашений необходимо утвердить отдельно.
         </p>
       </Stack>
 
-      {inviteOpen && <InviteSpeakerModal speakerName={speakerName} onClose={() => setInviteOpen(false)} />}
+      {inviteOpen && <InviteSpeakerModal onClose={() => setInviteOpen(false)} />}
     </>
   );
 }

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
+import { Home, ProtectedArea, RoleSection } from '@/app/guards';
 import { navigation, roleBasePath, rolePath, type NavItem } from '@/app/navigation';
-import { AppLayout } from '@/components/layout/AppLayout/AppLayout';
 import { AiMatchPage } from '@/pages/AiMatchPage/AiMatchPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage/AnalyticsPage';
 import { BillingPage } from '@/pages/BillingPage/BillingPage';
@@ -10,6 +10,7 @@ import { DevrelApplicationsPage } from '@/pages/DevrelApplicationsPage/DevrelApp
 import { DevrelDashboardPage } from '@/pages/DevrelDashboardPage/DevrelDashboardPage';
 import { DevrelEventsPage } from '@/pages/DevrelEventsPage/DevrelEventsPage';
 import { EventsCatalogPage } from '@/pages/EventsCatalogPage/EventsCatalogPage';
+import { LoginPage } from '@/pages/LoginPage/LoginPage';
 import { MediaPage } from '@/pages/MediaPage/MediaPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage/PlaceholderPage';
@@ -41,7 +42,7 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     reviews: <SpeakerReviewsPage />,
     media: <MediaPage />,
     billing: <BillingPage role="speaker" />,
-    notifications: <NotificationsPage role="speaker" />,
+    notifications: <NotificationsPage />,
   },
   devrel: {
     '': <DevrelDashboardPage />,
@@ -53,7 +54,7 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     'ai/speaker': <AiMatchPage role="devrel" />,
     analytics: <AnalyticsPage />,
     billing: <BillingPage role="devrel" />,
-    notifications: <NotificationsPage role="devrel" />,
+    notifications: <NotificationsPage />,
   },
 };
 
@@ -80,7 +81,7 @@ function menuRoutes(role: Role, item: NavItem): RouteObject[] {
 function roleRoutes(role: Role): RouteObject {
   return {
     path: roleBasePath[role],
-    element: <AppLayout role={role} />,
+    element: <RoleSection role={role} />,
     children: [
       ...navigation[role].flatMap((item) => menuRoutes(role, item)),
       ...detailRoutes[role],
@@ -89,9 +90,15 @@ function roleRoutes(role: Role): RouteObject {
 }
 
 export const router = createBrowserRouter([
-  { path: '/', element: <Navigate to={roleBasePath.speaker} replace /> },
-  roleRoutes('speaker'),
-  roleRoutes('devrel'),
+  { path: '/login', element: <LoginPage /> },
+  {
+    element: <ProtectedArea />,
+    children: [
+      { path: '/', element: <Home /> },
+      roleRoutes('speaker'),
+      roleRoutes('devrel'),
+    ],
+  },
   // Public listener form: no account, no shell, no access to the speaker profile.
   { path: '/feedback/:token', element: <PublicFeedbackPage /> },
   // Component showcase for development.

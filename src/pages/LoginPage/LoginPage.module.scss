@@ -1,0 +1,35 @@
+@use '@/styles/mixins' as *;
+
+.page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 64px var(--sl-space-4);
+  background: linear-gradient(160deg, var(--sl-public-bg-start), var(--sl-public-bg-end));
+
+  @include down('mobile') {
+    padding: 24px var(--sl-space-3);
+  }
+}
+
+.wrap {
+  width: 100%;
+  max-width: 440px;
+}
+
+.brand {
+  margin-bottom: 25px;
+}
+
+.title {
+  margin-bottom: var(--sl-space-2);
+  font-size: 25px;
+  line-height: var(--sl-leading-h1);
+}
+
+.muted {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}

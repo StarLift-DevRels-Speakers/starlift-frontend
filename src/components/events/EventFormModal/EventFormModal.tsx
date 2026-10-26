@@ -1,7 +1,7 @@
 import { useId, useState, type FormEvent } from 'react';
 import { Alert, Button, Grid, Input, Modal, Select, Stack, Textarea, useToast } from '@/components/ui';
-import type { EventInput } from '@/store/demoContext';
-import { useDemoActions } from '@/store/useDemoStore';
+import type { EventInput } from '@/store/appContext';
+import { useAppActions } from '@/store/useAppStore';
 import type { EventFormat, TechEvent } from '@/types/domain';
 import { daysFromToday, todayKey } from '@/utils/date';
 
@@ -33,7 +33,7 @@ function minDay(saved: string | undefined, today: string): string {
 
 /** Create or edit a DevRel's event; saving a draft is free, publishing is a separate step. */
 export function EventFormModal({ event, onClose }: EventFormModalProps) {
-  const { saveEvent } = useDemoActions();
+  const { saveEvent } = useAppActions();
   const { toast } = useToast();
   const formId = useId();
   const [values, setValues] = useState(() => initialValues(event));
@@ -45,9 +45,13 @@ export function EventFormModal({ event, onClose }: EventFormModalProps) {
     setError(undefined);
   };
 
-  const handleSubmit = (formEvent: FormEvent<HTMLFormElement>) => {
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
-    const result = saveEvent(values, event?.id);
+    setPending(true);
+    const result = await saveEvent(values, event?.id);
+    setPending(false);
     if (!result.ok) {
       setError(result.error);
       return;
@@ -65,7 +69,7 @@ export function EventFormModal({ event, onClose }: EventFormModalProps) {
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Отмена</Button>
-          <Button type="submit" form={formId}>{event ? 'Сохранить изменения' : 'Создать черновик'}</Button>
+          <Button type="submit" form={formId} disabled={pending}>{event ? 'Сохранить изменения' : 'Создать черновик'}</Button>
         </>
       }
     >

@@ -1,7 +1,8 @@
 import type { Ref } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { rolePath, type NavItem } from '@/app/navigation';
-import { Avatar, Badge } from '@/components/ui';
+import { useAuth } from '@/auth/useAuth';
+import { Avatar, Badge, Button } from '@/components/ui';
 import type { UserProfile } from '@/types/domain';
 import { roleLabels, type Role } from '@/types/role';
 import styles from './TopBar.module.scss';
@@ -21,7 +22,7 @@ export interface TopBarProps {
 }
 
 export function TopBar({ role, user, hasSubscription, unreadNotifications, trail, sidebarId, sidebarOpen, onMenuToggle, menuButtonRef }: TopBarProps) {
-  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   return (
     <header className={styles.topbar}>
@@ -56,17 +57,6 @@ export function TopBar({ role, user, hasSubscription, unreadNotifications, trail
           {hasSubscription ? '● Подписка PAID' : '○ FREE'}
         </Badge>
 
-        {/* Demo-only account switch until authentication is connected. */}
-        <select
-          className={styles.roleSwitch}
-          aria-label="Демо-переключение учётной записи"
-          value={role}
-          onChange={(event) => navigate(rolePath(event.target.value as Role))}
-        >
-          <option value="speaker">🎤 Спикер · демо</option>
-          <option value="devrel">👥 DevRel · демо</option>
-        </select>
-
         <Link
           to={rolePath(role, 'notifications')}
           className={styles.iconButton}
@@ -79,6 +69,7 @@ export function TopBar({ role, user, hasSubscription, unreadNotifications, trail
         </Link>
 
         <Avatar name={user.name} size="sm" />
+        <Button variant="text" size="sm" onClick={() => void signOut()}>Выйти</Button>
       </div>
     </header>
   );

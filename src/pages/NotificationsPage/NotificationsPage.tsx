@@ -2,19 +2,14 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { NotificationList } from '@/components/notifications/NotificationList/NotificationList';
 import { Badge, Button, Card, EmptyState, FilterChips, Stack } from '@/components/ui';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
-import type { Role } from '@/types/role';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 
 type NotificationFilter = 'all' | 'unread';
 
-export interface NotificationsPageProps {
-  role: Role;
-}
-
 /** System notifications about applications, invitations, purchases and feedback. */
-export function NotificationsPage({ role }: NotificationsPageProps) {
-  const notifications = useDemoState().notifications[role];
-  const { markNotificationsRead } = useDemoActions();
+export function NotificationsPage() {
+  const { notifications } = useAppState();
+  const { markNotificationsRead } = useAppActions();
   const [filter, setFilter] = useState<NotificationFilter>('all');
 
   const unreadCount = notifications.filter((notification) => !notification.read).length;
@@ -26,7 +21,7 @@ export function NotificationsPage({ role }: NotificationsPageProps) {
         title="Уведомления"
         description="Системные уведомления о заявках, приглашениях, подписках и отзывах."
         actions={
-          <Button variant="secondary" disabled={unreadCount === 0} onClick={() => markNotificationsRead(role)}>
+          <Button variant="secondary" disabled={unreadCount === 0} onClick={() => void markNotificationsRead()}>
             Отметить всё прочитанным
           </Button>
         }
@@ -55,7 +50,7 @@ export function NotificationsPage({ role }: NotificationsPageProps) {
                     variant="soft"
                     size="sm"
                     aria-label={`Отметить прочитанным: ${notification.text}`}
-                    onClick={() => markNotificationsRead(role, notification.id)}
+                    onClick={() => void markNotificationsRead(notification.id)}
                   >
                     Прочитано
                   </Button>

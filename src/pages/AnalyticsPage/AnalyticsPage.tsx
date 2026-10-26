@@ -3,13 +3,13 @@ import { StatCard } from '@/components/dashboard/StatCard/StatCard';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Alert, Badge, Card, Grid, LinkButton, Stack } from '@/components/ui';
 import { isSubscriptionActive } from '@/features/billing/access';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 
 const to = (slug: string) => rolePath('devrel', slug);
 
 /** DevRel analytics: basic counters are free, the extended block needs the subscription. */
 export function AnalyticsPage() {
-  const { events, applications, invitations, billing } = useDemoState();
+  const { events, applications, invitations, billing } = useAppState();
   const hasSubscription = isSubscriptionActive(billing.devrel);
 
   const ownEventIds = new Set(events.filter((event) => event.owner === 'devrel').map((event) => event.id));

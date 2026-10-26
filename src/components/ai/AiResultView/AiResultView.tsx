@@ -4,8 +4,9 @@ import { AiResultCard } from '@/components/ai/AiResultCard/AiResultCard';
 import { EventDetailsModal } from '@/components/events/EventDetailsModal/EventDetailsModal';
 import { Alert, Avatar, Badge, Button, Card, EmptyState, LinkButton, Stack } from '@/components/ui';
 import { isSubscriptionActive } from '@/features/billing/access';
+import { useCatalogSpeakers } from '@/features/catalog/useCatalog';
 import { isCfpOpen } from '@/features/events/events';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import type { AiResult } from '@/types/domain';
 import type { Role } from '@/types/role';
 import { formatLongDate } from '@/utils/date';
@@ -15,13 +16,18 @@ export interface AiResultViewProps {
   role: Role;
   result: AiResult;
   /** DevRel: open the invitation form for the matched speaker. */
-  onInvite?: () => void;
+  onInvite?: (speaker: { id: string; name: string }) => void;
+}
+
+/** Words of the requested topics, e.g. «Java, Backend» → ['java', 'backend']. */
+function topicWords(topics: string): string[] {
+  return topics.toLowerCase().split(/[\s,;/]+/).filter((word) => word.length > 1);
 }
 
 /** Last AI matching result in any of its states. Demo matches illustrate the format, not real scoring. */
 export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
-  const { events, billing, profiles } = useDemoState();
-  const speaker = profiles.speaker;
+  const { events, billing } = useAppState();
+  const catalog = useCatalogSpeakers('');
   // The event opens in place, so the speaker stays on the AI matching page.
   const [openEventId, setOpenEventId] = useState<string | null>(null);
 
@@ -84,27 +90,51 @@ export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
     );
   }
 
+  // Demo matching: catalog speakers whose competencies share a word with the requested topics.
+  const words = topicWords(result.topics);
+  const matches = catalog.speakers
+    .map((speaker) => ({ speaker, shared: words.filter((word) => speaker.skills.toLowerCase().includes(word)) }))
+    .filter((match) => match.shared.length > 0)
+    .sort((a, b) => b.shared.length - a.shared.length || b.speaker.speechCount - a.speaker.speechCount)
+    .slice(0, 3);
+
   return (
     <Stack gap={3}>
-      <Alert>Демонстрационный результат, не фактическая оценка компетенций. «Слабые сигналы» — отдельная подписочная возможность.</Alert>
-      <AiResultCard
-        leading={<Avatar name={speaker.name} decorative />}
-        title={speaker.name}
-        subtitle={`${speaker.position} · ${speaker.city}`}
-        reasons={{ title: 'Основания', items: ['Совпадение: Java и backend', 'Есть история выступлений'] }}
-        caveats={{ title: 'Ограничения', items: ['Не подтверждена доступность на дату', 'Нет подтвержденных сведений о части требований'] }}
-        actions={
-          <>
-            <LinkButton to={`${rolePath('devrel', 'catalog')}/${speaker.id}`} variant="secondary" size="sm">Карточка Спикера</LinkButton>
-            <Button size="sm" onClick={onInvite}>Пригласить</Button>
-          </>
-        }
-      />
+      <Alert>Демонстрационный подбор по совпадению тем в профилях каталога, не фактическая оценка компетенций.</Alert>
+      {catalog.loading ? (
+        <p className={styles.note} role="status">Загрузка каталога…</p>
+      ) : matches.length === 0 ? (
+        <EmptyState
+          variant="plain"
+          title="В каталоге нет спикеров с такими темами"
+          description="Совпадения не придумываются. Измените тематику или посмотрите каталог целиком."
+          action={<LinkButton to={rolePath('devrel', 'catalog')} variant="soft" size="sm">Каталог спикеров</LinkButton>}
+        />
+      ) : (
+        matches.map(({ speaker, shared }) => (
+          <AiResultCard
+            key={speaker.id}
+            leading={<Avatar name={speaker.name} decorative />}
+            title={speaker.name}
+            subtitle={[speaker.position, speaker.city].filter(Boolean).join(' · ')}
+            reasons={{
+              title: 'Основания',
+              items: [`Совпадение тем: ${shared.join(', ')}`, `Выступлений: ${speaker.speechCount}, отзывов: ${speaker.feedbackCount}`],
+            }}
+            caveats={{ title: 'Ограничения', items: ['Не подтверждена доступность на дату', 'Нет подтвержденных сведений о части требований'] }}
+            actions={
+              <>
+                <LinkButton to={`${rolePath('devrel', 'catalog')}/${speaker.id}`} variant="secondary" size="sm">Карточка Спикера</LinkButton>
+                <Button size="sm" onClick={() => onInvite?.({ id: speaker.id, name: speaker.name })}>Пригласить</Button>
+              </>
+            }
+          />
+        ))
+      )}
       {isSubscriptionActive(billing.devrel) ? (
         <Card variant="flat" title="↗ Слабые сигналы" actions={<Badge tone="ai">В подписке</Badge>} className={styles.signals}>
           <p className={styles.note}>
-            Потенциальные косвенные признаки: регулярность выступлений, развитие тематики. Веса, пороги и оценка
-            потенциала пока не утверждены.
+            Оценка потенциала 1–5 по косвенным признакам доступна в карточке каждого спикера.
           </p>
         </Card>
       ) : (
