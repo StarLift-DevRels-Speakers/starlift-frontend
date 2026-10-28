@@ -24,7 +24,7 @@ export function BuildPlanCard({ hasPlans, ready, building = false, onBuild }: Bu
     >
       {!ready && (
         <Alert tone="warning">
-          Базовых данных недостаточно: для плана требуется не менее 3 отзывов за год, доклад и выступление.
+          Похоже, данных пока мало: для плана нужно не менее 3 отзывов за последний год.
         </Alert>
       )}
     </Card>

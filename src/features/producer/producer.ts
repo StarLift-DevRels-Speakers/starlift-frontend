@@ -28,7 +28,7 @@ export interface ProducerFacts {
   speeches: Speech[];
   openCfp: TechEvent[];
   talkCount: number;
-  /** Enough data for a plan: 3 reviews, a talk and a speech. */
+  /** Hint only, mirrors the backend minimum: 3 reviews of the last year. The backend decides (it also counts CFP matches). */
   ready: boolean;
 }
 
@@ -50,7 +50,7 @@ export function collectFacts({ talks, speeches, events, feedback }: ProducerSour
     speeches: latestSpeeches,
     openCfp,
     talkCount: talks.length,
-    ready: recentFeedback.length >= CONFIRMATION_THRESHOLD && talks.length > 0 && latestSpeeches.length > 0,
+    ready: recentFeedback.length >= CONFIRMATION_THRESHOLD,
   };
 }
 
