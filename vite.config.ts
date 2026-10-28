@@ -14,4 +14,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // In production nginx proxies /api to the backend on the same origin; in development Vite does it.
+  server: {
+    proxy: {
+      '/api': process.env.VITE_API_PROXY ?? 'http://localhost:8080',
+    },
+  },
 });

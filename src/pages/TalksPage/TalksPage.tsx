@@ -4,13 +4,13 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { SpeechFormModal } from '@/components/talks/SpeechFormModal/SpeechFormModal';
 import { TalkFormModal } from '@/components/talks/TalkFormModal/TalkFormModal';
 import { Button, Card, EmptyState, Grid, IconTile, ListItem, Stack } from '@/components/ui';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import { formatLongDate } from '@/utils/date';
 import styles from './TalksPage.module.scss';
 
 /** Speaker's talks and the history of speeches given with them. */
 export function TalksPage() {
-  const { talks, speeches } = useDemoState();
+  const { talks, speeches } = useAppState();
   const [params, setParams] = useSearchParams();
   const [speechFormOpen, setSpeechFormOpen] = useState(false);
 

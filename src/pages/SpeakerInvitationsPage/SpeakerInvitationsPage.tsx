@@ -3,21 +3,21 @@ import { InvitationStatusBadge } from '@/components/invitations/InvitationStatus
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Button, Card, EmptyState, LinkButton, Stack, useToast } from '@/components/ui';
 import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { InvitationStatus } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
 import styles from './SpeakerInvitationsPage.module.scss';
 
 /** Speaker reviews DevRel invitations and answers them; pending ones come first. */
 export function SpeakerInvitationsPage() {
-  const { invitations, applications, events } = useDemoState();
-  const { answerInvitation } = useDemoActions();
+  const { invitations, applications, events } = useAppState();
+  const { answerInvitation } = useAppActions();
   const { toast } = useToast();
   const eventById = new Map(events.map((event) => [event.id, event]));
   const sorted = [...invitations].sort((a, b) => Number(b.status === 'sent') - Number(a.status === 'sent'));
 
-  const answer = (invitationId: string, status: Exclude<InvitationStatus, 'sent'>) => {
-    const result = answerInvitation(invitationId, status);
+  const answer = async (invitationId: string, status: Exclude<InvitationStatus, 'sent'>) => {
+    const result = await answerInvitation(invitationId, status);
     toast(result.ok ? 'Ответ на приглашение сохранен' : result.error);
   };
 

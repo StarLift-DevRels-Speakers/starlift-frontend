@@ -8,12 +8,12 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Button, EmptyState, Grid, Stack, useToast } from '@/components/ui';
 import { hasRight, isSubscriptionActive } from '@/features/billing/access';
 import { formatRub, rightPrices } from '@/features/billing/pricing';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 
 /** DevRel's own events: free drafts, paid publication (subscription or one-time purchase). */
 export function DevrelEventsPage() {
-  const { events, billing } = useDemoState();
-  const { publishEvent } = useDemoActions();
+  const { events, billing } = useAppState();
+  const { publishEvent } = useAppActions();
   const { toast } = useToast();
   const [params, setParams] = useSearchParams();
   const [paywallEventId, setPaywallEventId] = useState<string | null>(null);
@@ -31,8 +31,8 @@ export function DevrelEventsPage() {
   const openForm = (eventId?: string) => setParams(eventId ? { edit: eventId } : { new: '1' }, { replace: true });
   const closeForm = () => setParams({}, { replace: true });
 
-  const publish = (eventId: string) => {
-    const result = publishEvent(eventId);
+  const publish = async (eventId: string) => {
+    const result = await publishEvent(eventId);
     if (result.ok) {
       toast('Мероприятие опубликовано');
     } else if (result.reason === 'paywall') {
@@ -97,9 +97,9 @@ export function DevrelEventsPage() {
           role="devrel"
           right="publication"
           onClose={() => setPaywallEventId(null)}
-          onPurchased={() => {
+          onPurchased={async () => {
             setPaywallEventId(null);
-            const result = publishEvent(paywallEventId);
+            const result = await publishEvent(paywallEventId);
             toast(result.ok ? 'Тестовая покупка оформлена, мероприятие опубликовано' : result.error);
           }}
         />

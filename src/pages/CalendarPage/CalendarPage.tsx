@@ -8,7 +8,7 @@ import { Badge, Button, Card, EmptyState, FilterChips, LinkButton, Stack, type F
 import { calendarEntriesFor } from '@/features/calendar/calendarEntries';
 import { useCalendarParams, type CalendarFilter } from '@/features/calendar/useCalendarParams';
 import type { Role } from '@/types/role';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import { formatLongDate, formatMonth, parseDay } from '@/utils/date';
 import { pluralize } from '@/utils/plural';
 import styles from './CalendarPage.module.scss';
@@ -39,7 +39,7 @@ export interface CalendarPageProps {
 
 /** Month view of events, CFP deadlines, talks and invitations; the calendar has no records of its own. */
 export function CalendarPage({ role }: CalendarPageProps) {
-  const demo = useDemoState();
+  const demo = useAppState();
   const { year, month, filter, day, shiftMonth, goToToday, setFilter, selectDay } = useCalendarParams(role);
   const monthLabel = formatMonth(year, month);
 

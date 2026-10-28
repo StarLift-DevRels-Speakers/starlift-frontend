@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Grid, LinkButton, Stack } from '@/components/ui';
 import { aiAccessLabel, isSubscriptionActive } from '@/features/billing/access';
 import { calendarEntriesFor, upcomingEntries } from '@/features/calendar/calendarEntries';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import { pluralize } from '@/utils/plural';
 
 const to = (slug: string) => rolePath('speaker', slug);
@@ -25,8 +25,8 @@ function invitationsTitle(count: number): string {
 }
 
 export function SpeakerDashboardPage() {
-  const demo = useDemoState();
-  const firstName = demo.profiles.speaker.name.split(' ')[0];
+  const demo = useAppState();
+  const firstName = demo.profile.name.split(' ')[0];
   const billing = demo.billing.speaker;
   const hasSubscription = isSubscriptionActive(billing);
   const calendarEntries = calendarEntriesFor('speaker', demo);
@@ -66,12 +66,12 @@ export function SpeakerDashboardPage() {
                 />
                 <TaskItem
                   title="Отзывы слушателей"
-                  description={`${feedbackCount} ${pluralize(feedbackCount, ['отзыв', 'отзыва', 'отзывов'])} · ссылка на форму доступна бесплатно`}
+                  description={`${feedbackCount} ${pluralize(feedbackCount, ['отзыв', 'отзыва', 'отзывов'])} · ссылка на форму для каждого выступления`}
                   action={<LinkButton to={to('reviews')} variant="secondary" size="sm">Ссылка</LinkButton>}
                 />
               </TaskListCard>
               <UpcomingCard role="speaker" entries={upcomingEntries(calendarEntries, 4)} />
-              <NotificationsCard role="speaker" notifications={demo.notifications.speaker.slice(0, 3)} />
+              <NotificationsCard role="speaker" notifications={demo.notifications.slice(0, 3)} />
             </>
           }
           aside={

@@ -134,20 +134,3 @@
     display: none;
   }
 }
-
-.roleSwitch {
-  max-width: 210px;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--sl-border);
-  border-radius: 9px;
-  background: var(--sl-page);
-  color: var(--sl-text);
-  font: var(--sl-weight-semibold) var(--sl-text-xs) / 1 var(--sl-font);
-  cursor: pointer;
-
-  @include down('mobile') {
-    max-width: 175px;
-    height: var(--sl-touch-target);
-  }
-}

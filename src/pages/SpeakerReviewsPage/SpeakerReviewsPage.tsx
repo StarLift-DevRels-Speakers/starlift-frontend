@@ -1,19 +1,48 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { errorMessage } from '@/api/client';
+import { api } from '@/api/endpoints';
+import { rolePath } from '@/app/navigation';
 import { StatCard } from '@/components/dashboard/StatCard/StatCard';
 import { FeedbackList } from '@/components/feedback/FeedbackList/FeedbackList';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Badge, Button, Card, Grid, Input, LinkButton, Stack, useToast } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, Grid, Input, LinkButton, Select, Stack, useToast } from '@/components/ui';
 import { feedbackPath, feedbackUrl } from '@/features/feedback/link';
 import { feedbackQuestions } from '@/features/feedback/questions';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
+import { formatLongDate } from '@/utils/date';
 import styles from './SpeakerReviewsPage.module.scss';
 
-/** Speaker's public feedback link and the anonymous listener feedback received through it. */
+/** Links to the public feedback form for each speech and the anonymous listener feedback received through them. */
 export function SpeakerReviewsPage() {
-  const { feedback, feedbackToken } = useDemoState();
+  const { feedback, speeches } = useAppState();
   const { toast } = useToast();
   const linkInputRef = useRef<HTMLInputElement>(null);
-  const link = feedbackUrl(feedbackToken);
+  const newestSpeeches = [...speeches].sort((a, b) => b.date.localeCompare(a.date));
+  const [speechId, setSpeechId] = useState(newestSpeeches[0]?.id ?? '');
+  // Tokens already issued in this visit, by speech: the backend returns the same token on every call.
+  const [tokens, setTokens] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string>();
+  const [pending, setPending] = useState(false);
+
+  const token = tokens[speechId];
+  const link = token ? feedbackUrl(token) : '';
+  const speechLabel = (id: string) => {
+    const speech = speeches.find((item) => item.id === id);
+    return speech && `${speech.event} · ${formatLongDate(speech.date)}`;
+  };
+
+  const getLink = async () => {
+    setPending(true);
+    setError(undefined);
+    try {
+      const response = await api.feedbackLink(speechId);
+      setTokens((current) => ({ ...current, [speechId]: response.token }));
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setPending(false);
+    }
+  };
 
   const copyLink = async () => {
     try {
@@ -40,22 +69,42 @@ export function SpeakerReviewsPage() {
             variant="ai"
             title="Ссылка для отзывов"
             titleAs="h2"
-            description="Передайте ссылку слушателям после выступления."
+            description="У каждого выступления своя ссылка: отзывы сразу привязаны к нему."
             actions={<Badge>Бесплатно</Badge>}
           >
-            <Stack gap={3}>
-              <Input ref={linkInputRef} label="Публичная ссылка (только форма)" value={link} readOnly onFocus={(e) => e.target.select()} />
-              <div className={styles.actions}>
-                <Button onClick={copyLink}>Скопировать ссылку</Button>
-                <LinkButton to={feedbackPath(feedbackToken)} target="_blank" rel="noopener noreferrer" variant="secondary">
-                  Проверить форму ↗
-                </LinkButton>
-              </div>
-              <p className={styles.fineprint}>
-                Демонстрационный вариант ссылки на спикера. Возможность отдельной ссылки на каждое выступление еще не
-                согласована.
-              </p>
-            </Stack>
+            {newestSpeeches.length === 0 ? (
+              <EmptyState
+                variant="plain"
+                title="Сначала добавьте выступление"
+                description="Ссылка на форму создается для конкретного выступления."
+                action={<LinkButton to={rolePath('speaker', 'talks')} variant="soft" size="sm">К выступлениям</LinkButton>}
+              />
+            ) : (
+              <Stack gap={3}>
+                <Select
+                  label="Выступление"
+                  value={speechId}
+                  onChange={(event) => setSpeechId(event.target.value)}
+                  options={newestSpeeches.map((speech) => ({ value: speech.id, label: `${speech.event} · ${formatLongDate(speech.date)}` }))}
+                />
+                {error && <Alert tone="danger" role="alert">{error}</Alert>}
+                {token ? (
+                  <>
+                    <Input ref={linkInputRef} label="Публичная ссылка (только форма)" value={link} readOnly onFocus={(e) => e.target.select()} />
+                    <div className={styles.actions}>
+                      <Button onClick={copyLink}>Скопировать ссылку</Button>
+                      <LinkButton to={feedbackPath(token)} target="_blank" rel="noopener noreferrer" variant="secondary">
+                        Проверить форму ↗
+                      </LinkButton>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <Button onClick={getLink} disabled={pending || !speechId}>Получить ссылку</Button>
+                  </div>
+                )}
+              </Stack>
+            )}
           </Card>
 
           <Card as="section" title="Сводка ответов" titleAs="h2">
@@ -71,7 +120,7 @@ export function SpeakerReviewsPage() {
         </Grid>
 
         <Card as="section" title="Полученные отзывы" titleAs="h2">
-          <FeedbackList feedback={feedback} emptyText="Отзывов пока нет — поделитесь ссылкой со слушателями" />
+          <FeedbackList feedback={feedback} speechLabel={speechLabel} emptyText="Отзывов пока нет — поделитесь ссылкой со слушателями" />
         </Card>
       </Stack>
     </>

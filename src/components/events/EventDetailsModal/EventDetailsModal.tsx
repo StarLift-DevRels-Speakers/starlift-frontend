@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { rolePath } from '@/app/navigation';
 import { Alert, Badge, Button, DetailList, EmptyState, LinkButton, Modal, Select, useToast } from '@/components/ui';
 import { hasPendingInvitation, isCfpOpen, isSpeakerConfirmed } from '@/features/events/events';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { TechEvent } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
 import styles from './EventDetailsModal.module.scss';
@@ -15,8 +15,8 @@ export interface EventDetailsModalProps {
 
 /** Published event details for a speaker, with a free CFP application form while the CFP is open. */
 export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
-  const { talks, applications, invitations } = useDemoState();
-  const { submitApplication } = useDemoActions();
+  const { talks, applications, invitations } = useAppState();
+  const { submitApplication } = useAppActions();
   const { toast } = useToast();
   const navigate = useNavigate();
   const formId = useId();
@@ -28,9 +28,13 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
   const invited = hasPendingInvitation(event.id, invitations);
   const canApply = cfpOpen && !confirmed && !invited && talks.length > 0;
 
-  const handleSubmit = (formEvent: FormEvent<HTMLFormElement>) => {
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
-    const result = submitApplication(event.id, talkId);
+    setPending(true);
+    const result = await submitApplication(event.id, talkId);
+    setPending(false);
     if (!result.ok) {
       setError(result.error);
       return;
@@ -49,7 +53,7 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Закрыть</Button>
-          {canApply && <Button type="submit" form={formId}>Подать заявку</Button>}
+          {canApply && <Button type="submit" form={formId} disabled={pending}>Подать заявку</Button>}
         </>
       }
     >

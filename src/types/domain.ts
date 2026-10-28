@@ -1,4 +1,4 @@
-// Domain entities of the StarLift MVP, mirrored from the mockup's demo state.
+// Domain entities of StarLift, mapped from the backend API (src/api/mappers.ts).
 // Dates are ISO strings: `YYYY-MM-DD` for calendar days, full ISO for timestamps.
 
 export interface Talk {
@@ -11,6 +11,7 @@ export interface Talk {
 /** A talk the speaker has given (or will give) at a specific event. */
 export interface Speech {
   id: string;
+  /** Talk draft the speech was given with; empty for speeches recorded without one (e.g. from parsing). */
   talkId: string;
   event: string;
   date: string;
@@ -24,6 +25,7 @@ export interface TechEvent {
   id: string;
   /** `devrel` — created by the current DevRel account. */
   owner: 'devrel' | 'other';
+  ownerName: string;
   name: string;
   date: string;
   /** CFP deadline. */
@@ -43,6 +45,8 @@ export type ApplicationStatus = 'sent' | 'accepted' | 'reserve' | 'rejected';
 export interface Application {
   id: string;
   eventId: string;
+  speakerId: string;
+  speakerName: string;
   talkId: string;
   topic: string;
   at: string;
@@ -57,6 +61,8 @@ export type InvitationStatus = 'sent' | 'accepted' | 'declined';
 export interface Invitation {
   id: string;
   eventId: string;
+  speakerId: string;
+  speakerName: string;
   status: InvitationStatus;
   date: string;
   topic: string;
@@ -64,12 +70,21 @@ export interface Invitation {
 
 export type FeedbackQuestionKey = 'utility' | 'clarity' | 'examples' | 'pace' | 'engagement';
 
-/** Anonymous listener feedback; answers are indexes of the predefined options. */
+/**
+ * Anonymous listener feedback on one speech. `answers` are indexes of the predefined options;
+ * reviews left before the form existed have no answers, only the rating and free texts.
+ */
 export interface Feedback {
   id: string;
   at: string;
-  answers: Record<FeedbackQuestionKey, number>;
+  /** Speech the review is about. */
+  speechId: string;
+  /** 0–10. */
+  rating: number;
+  answers: Record<FeedbackQuestionKey, number> | null;
   comment: string;
+  positive: string;
+  negative: string;
 }
 
 /** Named AppNotification to avoid clashing with the DOM `Notification`. */
@@ -110,7 +125,7 @@ export interface AiResult {
   topics: string;
 }
 
-/** Own profile of a speaker or a DevRel (mockup `state.speaker` / `state.devrel`). */
+/** Own profile of a speaker or a DevRel; the catalog shows speakers in the same shape. */
 export interface UserProfile {
   /** Public profile id, used in catalog links. */
   id: string;
@@ -125,7 +140,7 @@ export interface UserProfile {
   about: string;
 }
 
-/** Speaker's media file. The demo keeps only metadata: the file content is never uploaded. */
+/** Speaker's media file stored on the backend (MinIO). */
 export interface MediaFile {
   id: string;
   name: string;

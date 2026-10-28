@@ -2,24 +2,19 @@ import { useState } from 'react';
 import { rolePath } from '@/app/navigation';
 import { InviteSpeakerModal } from '@/components/invitations/InviteSpeakerModal/InviteSpeakerModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Avatar, Badge, Button, Card, EmptyState, Grid, Input, LinkButton, Stack } from '@/components/ui';
+import { Alert, Avatar, Badge, Button, Card, EmptyState, Grid, Input, LinkButton, Stack } from '@/components/ui';
 import { isSubscriptionActive } from '@/features/billing/access';
+import { useCatalogSpeakers } from '@/features/catalog/useCatalog';
 import { useUrlSearchQuery } from '@/hooks/useUrlSearchQuery';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import styles from './SpeakerCatalogPage.module.scss';
 
 /** DevRel's free catalog of public speaker profiles and listener feedback. */
 export function SpeakerCatalogPage() {
-  const { feedback, billing, profiles } = useDemoState();
+  const { billing } = useAppState();
   const [query, changeQuery] = useUrlSearchQuery();
-  const [inviteName, setInviteName] = useState<string | null>(null);
-
-  // The demo has a single speaker account.
-  const speakers = [profiles.speaker];
-  const needle = query.trim().toLowerCase();
-  const found = speakers.filter((speaker) =>
-    `${speaker.name} ${speaker.skills ?? ''} ${speaker.city}`.toLowerCase().includes(needle),
-  );
+  const { speakers, loading, error } = useCatalogSpeakers(query);
+  const [invited, setInvited] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <>
@@ -43,26 +38,32 @@ export function SpeakerCatalogPage() {
           </Grid>
         </Card>
 
-        {found.length > 0 ? (
+        {error ? (
+          <Alert tone="danger" title="Не удалось загрузить каталог">{error}</Alert>
+        ) : loading ? (
+          <p className={styles.meta} role="status">Загрузка каталога…</p>
+        ) : speakers.length > 0 ? (
           <Stack as="ul" gap={3} aria-label="Спикеры">
-            {found.map((speaker) => (
+            {speakers.map((speaker) => (
               <Card key={speaker.id} as="li">
                 <div className={styles.top}>
                   <div className={styles.person}>
                     <Avatar name={speaker.name} size="lg" decorative />
                     <div>
                       <h2 className={styles.name}>{speaker.name}</h2>
-                      <p className={styles.meta}>{speaker.position} · {speaker.city}</p>
+                      <p className={styles.meta}>{[speaker.position, speaker.city].filter(Boolean).join(' · ') || 'Профиль не заполнен'}</p>
                       {speaker.skills && <p className={styles.skills}>{speaker.skills}</p>}
                     </div>
                   </div>
                   <Badge tone="muted">Публичные данные</Badge>
                 </div>
                 <div className={styles.footer}>
-                  <p className={styles.meta}>Отзывов слушателей: {feedback.length}. Просмотр бесплатный.</p>
+                  <p className={styles.meta}>
+                    Выступлений: {speaker.speechCount} · отзывов слушателей: {speaker.feedbackCount}. Просмотр бесплатный.
+                  </p>
                   <div className={styles.actions}>
                     <LinkButton to={`${rolePath('devrel', 'catalog')}/${speaker.id}`} variant="secondary">Карточка и отзывы</LinkButton>
-                    <Button onClick={() => setInviteName(speaker.name)}>Пригласить</Button>
+                    <Button onClick={() => setInvited({ id: speaker.id, name: speaker.name })}>Пригласить</Button>
                   </div>
                 </div>
               </Card>
@@ -70,25 +71,25 @@ export function SpeakerCatalogPage() {
           </Stack>
         ) : (
           <EmptyState
-            title="Не найдено спикеров по запросу"
-            action={<Button variant="secondary" size="sm" onClick={() => changeQuery('')}>Сбросить поиск</Button>}
+            title={query ? 'Не найдено спикеров по запросу' : 'В каталоге пока нет спикеров'}
+            action={query ? <Button variant="secondary" size="sm" onClick={() => changeQuery('')}>Сбросить поиск</Button> : undefined}
           />
         )}
 
-        {!isSubscriptionActive(billing.devrel) && (
-          <Card as="section" variant="ai" title="Слабые сигналы" titleAs="h2">
-            <p className={styles.meta}>
-              Определение косвенных признаков потенциала спикера включено в подписку DevRel. Алгоритм и шкала пока не
-              согласованы.
-            </p>
+        <Card as="section" variant="ai" title="Слабые сигналы" titleAs="h2">
+          <p className={styles.meta}>
+            Оценка потенциала спикера по косвенным признакам: активность, отзывы, цели и внешние упоминания. Шкала 1–5 с
+            обоснованием — в карточке спикера.{!isSubscriptionActive(billing.devrel) && ' Входит в подписку DevRel.'}
+          </p>
+          {!isSubscriptionActive(billing.devrel) && (
             <LinkButton to={rolePath('devrel', 'billing')} variant="soft" className={styles.signalsAction}>
               Посмотреть подписку
             </LinkButton>
-          </Card>
-        )}
+          )}
+        </Card>
       </Stack>
 
-      {inviteName && <InviteSpeakerModal speakerName={inviteName} onClose={() => setInviteName(null)} />}
+      {invited && <InviteSpeakerModal speaker={invited} onClose={() => setInvited(null)} />}
     </>
   );
 }

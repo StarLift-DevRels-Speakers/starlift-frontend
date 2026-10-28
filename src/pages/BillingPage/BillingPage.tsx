@@ -15,7 +15,7 @@ import {
   subscriptions,
   type PurchaseType,
 } from '@/features/billing/pricing';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import type { Purchase, RightType } from '@/types/domain';
 import type { Role } from '@/types/role';
 import { formatLongDate } from '@/utils/date';
@@ -39,7 +39,7 @@ export interface BillingPageProps {
 
 /** Free features, test one-time purchases and the monthly subscription of the role. */
 export function BillingPage({ role }: BillingPageProps) {
-  const billing = useDemoState().billing[role];
+  const billing = useAppState().billing[role];
   const { toast } = useToast();
   const [purchaseType, setPurchaseType] = useState<PurchaseType | null>(null);
 
