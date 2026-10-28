@@ -1,0 +1,38 @@
+# StarLift — фронтенд. Статика, собранная Vite и отданная через nginx.
+#
+#   docker compose up -d --build            # прод-сборка на http://localhost:8080
+#   docker compose --profile dev up         # dev-сервер с HMR на http://localhost:5173
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: starlift-front:latest
+    container_name: starlift-front
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped
+    # HEALTHCHECK уже описан в Dockerfile (wget --spider по 127.0.0.1).
+
+  # Vite dev-сервер с горячей перезагрузкой. Запускается только с профилем dev,
+  # чтобы `docker compose up` по умолчанию поднимал прод-вариант.
+  dev:
+    profiles: ["dev"]
+    image: node:22-alpine
+    container_name: starlift-front-dev
+    working_dir: /app
+    # В package.json `yarn dev` слушает 127.0.0.1 — внутри контейнера это недоступно снаружи.
+    command: sh -c "yarn install --frozen-lockfile --network-timeout 600000 && yarn dev --host 0.0.0.0"
+    ports:
+      - "${DEV_PORT:-5173}:5173"
+    volumes:
+      - .:/app
+      # node_modules — в отдельном томе, иначе bind mount перекрывает установленные
+      # в контейнере зависимости (нативные бинарники sass-embedded/rolldown из macOS не подойдут).
+      - starlift-node-modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+    tty: true
+
+volumes:
+  starlift-node-modules:

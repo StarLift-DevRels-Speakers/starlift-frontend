@@ -1,0 +1,19 @@
+name: Frontend Startlift Deployment
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and Restart Docker Containers
+        run: |
+          docker rm -f starlift-front
+          docker compose up -d --build
+          docker image prune -f
