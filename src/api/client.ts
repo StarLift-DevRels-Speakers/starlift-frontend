@@ -1,4 +1,4 @@
-import { getSession, setSession, type Session } from '@/auth/session';
+import { getSession, setSession, syncSession, type Session } from '@/auth/session';
 
 // Thin fetch wrapper over the backend REST API. Requests go to `/api` on the same origin:
 // nginx proxies it in production, the Vite dev server in development.
@@ -23,6 +23,7 @@ export interface AuthTokensResponse {
 
 const GENERIC_ERROR = 'Что-то пошло не так. Попробуйте еще раз.';
 const NETWORK_ERROR = 'Сервер недоступен. Проверьте подключение и попробуйте еще раз.';
+const UNEXPECTED_RESPONSE = 'Сервер вернул неожиданный ответ. Попробуйте еще раз позже.';
 
 export interface RequestOptions {
   method?: string;
@@ -31,32 +32,51 @@ export interface RequestOptions {
   anonymous?: boolean;
 }
 
-let refreshing: Promise<boolean> | null = null;
+/** `rejected` — the server refused the refresh token; `offline` — no answer, the session is kept. */
+type RefreshResult = 'ok' | 'rejected' | 'offline';
+
+let refreshing: Promise<RefreshResult> | null = null;
+
+/** One refresh at a time across tabs, where the browser supports Web Locks. */
+function withRefreshLock<T>(task: () => Promise<T>): Promise<T> {
+  return 'locks' in navigator ? navigator.locks.request('starlift-token-refresh', task) : task();
+}
+
+async function refreshOnce(staleAccessToken: string): Promise<RefreshResult> {
+  // Another tab may have refreshed already: then its new pair is in storage.
+  const session = syncSession();
+  if (!session) return 'rejected';
+  if (session.accessToken !== staleAccessToken) return 'ok';
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: session.refreshToken }),
+    });
+  } catch {
+    return 'offline';
+  }
+  if ([400, 401, 403].includes(response.status)) {
+    setSession(null);
+    return 'rejected';
+  }
+  if (!response.ok) return 'offline';
+  try {
+    const tokens = (await response.json()) as AuthTokensResponse;
+    setSession({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, user: tokens.user });
+    return 'ok';
+  } catch {
+    return 'offline';
+  }
+}
 
 /** Exchanges the refresh token for a new pair; concurrent 401s wait for the same refresh. */
-function refreshTokens(): Promise<boolean> {
-  refreshing ??= (async () => {
-    const session = getSession();
-    if (!session) return false;
-    try {
-      const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: session.refreshToken }),
-      });
-      if (!response.ok) {
-        setSession(null);
-        return false;
-      }
-      const tokens = (await response.json()) as AuthTokensResponse;
-      setSession({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, user: tokens.user });
-      return true;
-    } catch {
-      return false;
-    } finally {
-      refreshing = null;
-    }
-  })();
+function refreshTokens(staleAccessToken: string): Promise<RefreshResult> {
+  refreshing ??= withRefreshLock(() => refreshOnce(staleAccessToken)).finally(() => {
+    refreshing = null;
+  });
   return refreshing;
 }
 
@@ -89,10 +109,16 @@ async function send(path: string, options: RequestOptions, retry: boolean): Prom
     throw new ApiError(0, NETWORK_ERROR);
   }
 
-  if (response.status === 401 && retry && session && !options.anonymous && (await refreshTokens())) {
-    return send(path, options, false);
+  if (response.status === 401 && session && !options.anonymous) {
+    if (!retry) {
+      // Rejected even with a fresh token: the session is no longer valid.
+      setSession(null);
+    } else {
+      const refreshed = await refreshTokens(session.accessToken);
+      if (refreshed === 'ok') return send(path, options, false);
+      if (refreshed === 'offline') throw new ApiError(0, NETWORK_ERROR);
+    }
   }
-  if (response.status === 401 && !options.anonymous) setSession(null);
   if (!response.ok) throw await errorOf(response);
   return response;
 }
@@ -102,8 +128,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   const response = await send(path, options, true);
   const text = await response.text();
   if (!text) return undefined as T;
+  // A page instead of JSON means /api did not reach the backend (e.g. the SPA fallback answered).
   const type = response.headers.get('Content-Type') ?? '';
-  return (type.includes('json') ? JSON.parse(text) : text) as T;
+  if (!type.includes('json')) throw new ApiError(response.status, UNEXPECTED_RESPONSE);
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError(response.status, UNEXPECTED_RESPONSE);
+  }
 }
 
 /** User-facing message of any error thrown by the API layer. */

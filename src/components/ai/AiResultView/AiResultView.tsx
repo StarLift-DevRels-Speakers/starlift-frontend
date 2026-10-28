@@ -27,7 +27,8 @@ function topicWords(topics: string): string[] {
 /** Last AI matching result in any of its states. Demo matches illustrate the format, not real scoring. */
 export function AiResultView({ role, result, onInvite }: AiResultViewProps) {
   const { events, billing } = useAppState();
-  const catalog = useCatalogSpeakers('');
+  // Only the DevRel result lists catalog speakers.
+  const catalog = useCatalogSpeakers('', role === 'devrel');
   // The event opens in place, so the speaker stays on the AI matching page.
   const [openEventId, setOpenEventId] = useState<string | null>(null);
 

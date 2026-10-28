@@ -15,11 +15,14 @@ export interface CatalogResult {
   error?: string;
 }
 
-/** DevRel catalog search; the backend matches name, competencies and city. */
-export function useCatalogSpeakers(query: string): CatalogResult {
+const DISABLED: CatalogResult = { speakers: [], loading: false };
+
+/** DevRel catalog search; the backend matches name, competencies and city. With `enabled: false` nothing is requested. */
+export function useCatalogSpeakers(query: string, enabled = true): CatalogResult {
   const [result, setResult] = useState<CatalogResult>({ speakers: [], loading: true });
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     // Small delay so typing does not send a request per keystroke.
     const timer = setTimeout(() => {
@@ -44,7 +47,7 @@ export function useCatalogSpeakers(query: string): CatalogResult {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, enabled]);
 
-  return result;
+  return enabled ? result : DISABLED;
 }

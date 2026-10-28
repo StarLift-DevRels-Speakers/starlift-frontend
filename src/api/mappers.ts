@@ -27,6 +27,7 @@ import type {
   TechEvent,
   UserProfile,
 } from '@/types/domain';
+import { feedbackQuestions } from '@/features/feedback/questions';
 
 // Backend DTOs → domain entities used by the screens, and back for writes.
 
@@ -94,7 +95,8 @@ export function toSpeech(speech: SpeechDto): Speech {
 
 export function toFeedback(item: FeedbackDto): Feedback {
   const answers = item.answers;
-  const complete = answers && Object.values(answers).every((value) => value !== null);
+  // Every question of the form must have an answer, otherwise the review is shown by its rating.
+  const complete = answers && feedbackQuestions.every(({ key }) => typeof answers[key] === 'number');
   return {
     id: item.id,
     at: day(item.createdDate),

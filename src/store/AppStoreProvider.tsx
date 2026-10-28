@@ -21,6 +21,7 @@ import { aiPayment, aiRight, isChargedOutcome } from '@/features/ai/aiMatch';
 import { hasRight, isSubscriptionActive } from '@/features/billing/access';
 import { rightLabels, rightPrices, subscriptions } from '@/features/billing/pricing';
 import { collectFacts } from '@/features/producer/producer';
+import type { Role } from '@/types/role';
 import { AppActionsContext, AppStateContext, type ActionResult, type AppActions } from './appContext';
 import { initialLocalDemo, loadLocalDemo, saveLocalDemo, type AppState, type LocalDemo, type RemoteSlice } from './appState';
 import styles from './AppStoreProvider.module.scss';
@@ -31,6 +32,13 @@ const SPEAKER_SLICES: RemoteSlice[] = [
   'profile', 'talks', 'speeches', 'media', 'events', 'applications', 'invitations', 'feedback', 'notifications', 'plans',
 ];
 const DEVREL_SLICES: RemoteSlice[] = ['profile', 'events', 'applications', 'invitations', 'notifications'];
+
+/** Data other users change: refreshed in the background while the tab is visible. */
+const LIVE_SLICES: Record<Role, RemoteSlice[]> = {
+  speaker: ['events', 'applications', 'invitations', 'feedback', 'notifications'],
+  devrel: ['events', 'applications', 'invitations', 'notifications'],
+};
+const LIVE_REFRESH_MS = 60_000;
 
 const ok: ActionResult = { ok: true };
 const fail = (error: unknown): ActionResult => ({ ok: false, error: errorMessage(error) });
@@ -80,11 +88,19 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
   // Actions read the latest data synchronously, so several actions in one handler see each other's results.
   const latestDemo = useRef(demo);
   const latestRemote = useRef(remote);
+  // Number of the latest request per slice: an older response that arrives later is dropped.
+  const requestNumbers = useRef<Partial<Record<RemoteSlice, number>>>({});
 
   const reload = useCallback(async (slices: RemoteSlice[]) => {
+    const numbers = slices.map((slice) => {
+      const number = (requestNumbers.current[slice] ?? 0) + 1;
+      requestNumbers.current[slice] = number;
+      return number;
+    });
     const parts = await Promise.all(slices.map((slice) => fetchSlice(slice, userId)));
+    const fresh = parts.filter((_, index) => requestNumbers.current[slices[index]] === numbers[index]);
     setRemote((current) => {
-      const next = Object.assign({ ...current }, ...parts) as RemoteState;
+      const next = Object.assign({ ...current }, ...fresh) as RemoteState;
       latestRemote.current = next;
       return next;
     });
@@ -100,6 +116,22 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
   }, [reload, role]);
 
   useEffect(loadAll, [loadAll]);
+
+  // New applications, answers and notifications from other users show up without a page reload.
+  useEffect(() => {
+    if (status !== 'ready') return;
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Background refresh is best effort: the next one or any action catches up.
+      reload(LIVE_SLICES[role]).catch(() => undefined);
+    };
+    const timer = setInterval(refresh, LIVE_REFRESH_MS);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [status, role, reload]);
 
   const retry = () => {
     setStatus('loading');
@@ -249,15 +281,17 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
       if (!collectFacts(current).ready) {
         return { ok: false, error: 'Недостаточно исходных данных: нужны минимум три отзыва за год, доклад и выступление', reason: 'not_ready' };
       }
+      let plan: Awaited<ReturnType<typeof api.buildProducerPlan>>;
       try {
-        const plan = await api.buildProducerPlan();
-        await reload(['plans', 'notifications']);
-        if (plan.status === 'ready') return ok;
-        const error = plan.message ?? 'Не удалось сформировать план. Попробуйте еще раз позже.';
-        return plan.status === 'insufficient_data' ? { ok: false, error, reason: 'not_ready' } : { ok: false, error };
+        plan = await api.buildProducerPlan();
       } catch (error) {
         return fail(error);
       }
+      // The plan is saved even if the list fails to refresh right now.
+      await reload(['plans', 'notifications']).catch(() => undefined);
+      if (plan.status === 'ready') return ok;
+      const error = plan.message ?? 'Не удалось сформировать план. Попробуйте еще раз позже.';
+      return plan.status === 'insufficient_data' ? { ok: false, error, reason: 'not_ready' } : { ok: false, error };
     },
 
     addMedia: ({ file, talkId }) => mutate(() => api.uploadMedia(file, talkId), ['media']),

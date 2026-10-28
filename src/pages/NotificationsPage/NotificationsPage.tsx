@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { NotificationList } from '@/components/notifications/NotificationList/NotificationList';
-import { Badge, Button, Card, EmptyState, FilterChips, Stack } from '@/components/ui';
+import { Badge, Button, Card, EmptyState, FilterChips, Stack, useToast } from '@/components/ui';
 import { useAppActions, useAppState } from '@/store/useAppStore';
 
 type NotificationFilter = 'all' | 'unread';
@@ -10,7 +10,13 @@ type NotificationFilter = 'all' | 'unread';
 export function NotificationsPage() {
   const { notifications } = useAppState();
   const { markNotificationsRead } = useAppActions();
+  const { toast } = useToast();
   const [filter, setFilter] = useState<NotificationFilter>('all');
+
+  const markRead = async (notificationId?: string) => {
+    const result = await markNotificationsRead(notificationId);
+    if (!result.ok) toast(result.error);
+  };
 
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   const shown = filter === 'unread' ? notifications.filter((notification) => !notification.read) : notifications;
@@ -21,7 +27,7 @@ export function NotificationsPage() {
         title="Уведомления"
         description="Системные уведомления о заявках, приглашениях, подписках и отзывах."
         actions={
-          <Button variant="secondary" disabled={unreadCount === 0} onClick={() => void markNotificationsRead()}>
+          <Button variant="secondary" disabled={unreadCount === 0} onClick={() => void markRead()}>
             Отметить всё прочитанным
           </Button>
         }
@@ -50,7 +56,7 @@ export function NotificationsPage() {
                     variant="soft"
                     size="sm"
                     aria-label={`Отметить прочитанным: ${notification.text}`}
-                    onClick={() => void markNotificationsRead(notification.id)}
+                    onClick={() => void markRead(notification.id)}
                   >
                     Прочитано
                   </Button>

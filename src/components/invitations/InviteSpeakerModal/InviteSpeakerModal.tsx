@@ -19,7 +19,8 @@ export function InviteSpeakerModal({ speaker, defaultTopic = '', onClose }: Invi
   const { sendInvitation } = useAppActions();
   const { toast } = useToast();
   const formId = useId();
-  const catalog = useCatalogSpeakers('');
+  // The catalog is needed only to pick a speaker.
+  const catalog = useCatalogSpeakers('', !speaker);
   const [speakerId, setSpeakerId] = useState(speaker?.id ?? '');
   const chosenSpeakerId = speaker?.id ?? (speakerId || catalog.speakers[0]?.id || '');
 
