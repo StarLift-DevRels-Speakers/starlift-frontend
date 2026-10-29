@@ -1,4 +1,5 @@
 import { rolePath } from '@/app/navigation';
+import { CompetitionCard } from '@/components/competition/CompetitionCard/CompetitionCard';
 import { AccessCard } from '@/components/dashboard/AccessCard/AccessCard';
 import { CalendarCard } from '@/components/dashboard/CalendarCard/CalendarCard';
 import { DashboardColumns } from '@/components/dashboard/DashboardColumns/DashboardColumns';
@@ -76,6 +77,7 @@ export function SpeakerDashboardPage() {
           }
           aside={
             <>
+              <CompetitionCard />
               <CalendarCard role="speaker" entries={calendarEntries} />
               <Grid columns={2}>
                 <FeatureCard
