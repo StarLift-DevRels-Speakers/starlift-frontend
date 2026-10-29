@@ -34,7 +34,7 @@ export function PlanDetailsCard({ plan }: { plan: DevelopmentPlan }) {
               <li key={step.title} className={styles.step}>
                 <div>
                   <p className={styles.phase}>{step.phase}</p>
-                  <p className={styles.date}>до {formatLongDate(step.due)}</p>
+                  <p className={styles.date}>{step.due ? `до ${formatLongDate(step.due)}` : 'без срока'}</p>
                 </div>
                 <div>
                   <h4 className={styles.stepTitle}>{index + 1}. {step.title}</h4>
