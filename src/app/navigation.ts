@@ -39,6 +39,7 @@ export const navigation: Record<Role, ReadonlyArray<NavItem>> = {
     { slug: 'applications', title: 'Мои заявки', icon: '✉' },
     { slug: 'invitations', title: 'Приглашения', icon: '↗' },
     { slug: 'reviews', title: 'Отзывы', icon: '☆' },
+    { slug: 'competition', title: 'Соревнование', icon: '⚑' },
     { slug: 'media', title: 'Медиа', icon: '▧' },
     { slug: 'billing', title: 'Подписка и покупки', icon: '◇' },
     { slug: 'notifications', title: 'Уведомления', icon: '♧' },

@@ -4,6 +4,7 @@ import { findNavTrail } from '@/app/navigation';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TopBar } from '@/components/layout/TopBar/TopBar';
 import { isSubscriptionActive } from '@/features/billing/access';
+import { useDailyCheckIn } from '@/hooks/useDailyCheckIn';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAppState } from '@/store/useAppStore';
 import type { Role } from '@/types/role';
@@ -28,6 +29,7 @@ export function AppLayout({ role }: AppLayoutProps) {
   const { billing, notifications, profile: user } = useAppState();
   const hasSubscription = isSubscriptionActive(billing[role]);
   const trail = findNavTrail(role, pathname);
+  useDailyCheckIn(user.id, role === 'speaker');
 
   const closeMenu = () => {
     setMenuOpen(false);

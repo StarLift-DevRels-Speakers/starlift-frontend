@@ -6,6 +6,7 @@ import { AiMatchPage } from '@/pages/AiMatchPage/AiMatchPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage/AnalyticsPage';
 import { BillingPage } from '@/pages/BillingPage/BillingPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
+import { CompetitionPage } from '@/pages/CompetitionPage/CompetitionPage';
 import { DevrelApplicationsPage } from '@/pages/DevrelApplicationsPage/DevrelApplicationsPage';
 import { DevrelDashboardPage } from '@/pages/DevrelDashboardPage/DevrelDashboardPage';
 import { DevrelEventsPage } from '@/pages/DevrelEventsPage/DevrelEventsPage';
@@ -40,6 +41,7 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     'ai/events': <AiMatchPage role="speaker" />,
     'ai/producer': <ProducerPage />,
     reviews: <SpeakerReviewsPage />,
+    competition: <CompetitionPage />,
     media: <MediaPage />,
     billing: <BillingPage role="speaker" />,
     notifications: <NotificationsPage />,
