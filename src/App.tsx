@@ -1,15 +1,15 @@
 import { RouterProvider } from 'react-router';
 import { router } from '@/app/router';
+import { AuthProvider } from '@/auth/AuthProvider';
 import { ToastProvider } from '@/components/ui';
-import { DemoStoreProvider } from '@/store/DemoStoreProvider';
 
 function App() {
   return (
-    <DemoStoreProvider>
+    <AuthProvider>
       <ToastProvider>
         <RouterProvider router={router} />
       </ToastProvider>
-    </DemoStoreProvider>
+    </AuthProvider>
   );
 }
 

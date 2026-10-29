@@ -1,36 +1,64 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
+import { ApiError, errorMessage } from '@/api/client';
+import { api } from '@/api/endpoints';
+import type { PublicFeedbackForm } from '@/api/types';
 import { BrandLogo } from '@/components/layout/BrandLogo/BrandLogo';
 import { Alert, Badge, Button, Card, OptionGroup, Stack, Textarea } from '@/components/ui';
 import { feedbackQuestions } from '@/features/feedback/questions';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
 import type { FeedbackQuestionKey } from '@/types/domain';
+import { formatLongDate } from '@/utils/date';
 import styles from './PublicFeedbackPage.module.scss';
 
 type Answers = Partial<Record<FeedbackQuestionKey, number>>;
 
+/** `null` — the link is unknown; `undefined` — still loading. */
+type FormState = PublicFeedbackForm | null | undefined;
+
 /**
- * Anonymous listener form opened by the speaker's link: no account, no app shell,
+ * Anonymous listener form opened by the link to one speech: no account, no app shell,
  * and nothing about the speaker's profile is shown.
  */
 export function PublicFeedbackPage() {
   const { token = '' } = useParams();
-  const { feedbackToken } = useDemoState();
-  const { submitFeedback } = useDemoActions();
+  const [form, setForm] = useState<FormState>();
   const [answers, setAnswers] = useState<Answers>({});
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string>();
+  const [pending, setPending] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    let cancelled = false;
+    api.publicFeedbackForm(token)
+      .then((data) => !cancelled && setForm(data))
+      .catch((caught: unknown) => {
+        if (cancelled) return;
+        if (caught instanceof ApiError && caught.status === 404) setForm(null);
+        else setError(errorMessage(caught));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const result = submitFeedback(token, answers, comment);
-    if (!result.ok) {
-      setError(result.error);
+    const complete = feedbackQuestions.every((question) => [0, 1, 2].includes(answers[question.key] ?? -1));
+    if (!complete) {
+      setError('Ответьте на все пять вопросов');
       return;
     }
-    setSubmitted(true);
-    window.scrollTo(0, 0);
+    setPending(true);
+    try {
+      await api.submitPublicFeedback(token, answers as Record<FeedbackQuestionKey, number>, comment.trim());
+      setSubmitted(true);
+      window.scrollTo(0, 0);
+    } catch (caught) {
+      setError(errorMessage(caught));
+    } finally {
+      setPending(false);
+    }
   };
 
   const startOver = () => {
@@ -49,7 +77,11 @@ export function PublicFeedbackPage() {
         </div>
 
         <Card>
-          {token !== feedbackToken ? (
+          {form === undefined ? (
+            <div className={styles.message} role="status">
+              {error ? <Alert tone="danger" role="alert">{error}</Alert> : <p className={styles.muted}>Загрузка формы…</p>}
+            </div>
+          ) : form === null ? (
             <div className={styles.message}>
               <h1 className={styles.title}>Ссылка недействительна</h1>
               <p className={styles.muted}>По этой ссылке форма обратной связи недоступна.</p>
@@ -58,13 +90,16 @@ export function PublicFeedbackPage() {
             <div className={styles.success} role="status">
               <span className={styles.check} aria-hidden="true">✓</span>
               <h1 className={styles.title}>Спасибо за отзыв!</h1>
-              <p className={styles.muted}>Ваши ответы сохранены в демонстрационном прототипе.</p>
+              <p className={styles.muted}>Ваши ответы переданы спикеру анонимно.</p>
               <Button variant="secondary" onClick={startOver}>Оставить еще один отзыв</Button>
             </div>
           ) : (
             <>
               <p className={styles.eyebrow}>Обратная связь</p>
               <h1 className={styles.title}>Оцените выступление</h1>
+              <p className={styles.muted}>
+                «{form.topic}» · {form.eventName}{form.date && `, ${formatLongDate(form.date)}`}
+              </p>
               <p className={styles.muted}>
                 Выберите ответы на пять вопросов. Комментарий можно оставить по желанию. Регистрация не требуется.
               </p>
@@ -95,10 +130,10 @@ export function PublicFeedbackPage() {
                   />
 
                   {error && <Alert tone="danger" role="alert">{error}</Alert>}
-                  <Button type="submit" size="lg" fullWidth>Отправить отзыв</Button>
+                  <Button type="submit" size="lg" fullWidth disabled={pending}>Отправить отзыв</Button>
                   <p className={styles.fineprint}>
                     Доступна только форма отзыва. Профиль, портфолио и контактные сведения Спикера по этой ссылке не
-                    раскрываются. Это демонстрационный прототип.
+                    раскрываются.
                   </p>
                 </Stack>
               </form>

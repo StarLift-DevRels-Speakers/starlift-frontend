@@ -2,7 +2,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { rolePath } from '@/app/navigation';
 import { Alert, Button, Input, LinkButton, Modal, Select, Stack, useToast } from '@/components/ui';
 import { replacementTalks } from '@/features/applications/applicationStatus';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { Application } from '@/types/domain';
 
 export interface ChangeApplicationTalkModalProps {
@@ -13,8 +13,8 @@ export interface ChangeApplicationTalkModalProps {
 
 /** Speaker asks to switch the talk of an application; the change applies after the DevRel approves it. */
 export function ChangeApplicationTalkModal({ application, eventName, onClose }: ChangeApplicationTalkModalProps) {
-  const { applications, talks } = useDemoState();
-  const { requestTalkChange } = useDemoActions();
+  const { applications, talks } = useAppState();
+  const { requestTalkChange } = useAppActions();
   const { toast } = useToast();
   const formId = useId();
 
@@ -22,9 +22,13 @@ export function ChangeApplicationTalkModal({ application, eventName, onClose }: 
   const [talkId, setTalkId] = useState(options[0]?.id ?? '');
   const [error, setError] = useState<string>();
 
-  const handleSubmit = (formEvent: FormEvent<HTMLFormElement>) => {
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
-    const result = requestTalkChange(application.id, talkId);
+    setPending(true);
+    const result = await requestTalkChange(application.id, talkId);
+    setPending(false);
     if (!result.ok) {
       setError(result.error);
       return;
@@ -41,7 +45,7 @@ export function ChangeApplicationTalkModal({ application, eventName, onClose }: 
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Отмена</Button>
-          {options.length > 0 && <Button type="submit" form={formId}>Отправить запрос</Button>}
+          {options.length > 0 && <Button type="submit" form={formId} disabled={pending}>Отправить запрос</Button>}
         </>
       }
     >

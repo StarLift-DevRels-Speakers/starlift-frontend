@@ -17,16 +17,18 @@ import { SpeakerDevelopmentCard } from '@/components/producer/SpeakerDevelopment
 import { Alert, Badge, Button, Card, LinkButton, Modal, Stack, useToast } from '@/components/ui';
 import { isSubscriptionActive } from '@/features/billing/access';
 import { collectFacts, countLabel, PLAN_SECTION_ID, reviewAnchorId } from '@/features/producer/producer';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import styles from './ProducerPage.module.scss';
 
 /** Speaker's AI producer: source data, confirmed patterns and versioned 30/60-day plans (subscription). */
 export function ProducerPage() {
-  const demo = useDemoState();
-  const { buildProducerPlan } = useDemoActions();
+  const demo = useAppState();
+  const { buildProducerPlan } = useAppActions();
   const { toast } = useToast();
   const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [notReadyOpen, setNotReadyOpen] = useState(false);
+  const [notReadyText, setNotReadyText] = useState<string>();
+  const [building, setBuilding] = useState(false);
   const scrollToPlan = useRef(false);
 
   const hasSubscription = isSubscriptionActive(demo.billing.speaker);
@@ -42,15 +44,20 @@ export function ProducerPage() {
     section?.focus({ preventScroll: true });
   }, [latestPlan?.id]);
 
-  const buildPlan = () => {
-    const result = buildProducerPlan();
+  const buildPlan = async () => {
+    setBuilding(true);
+    const result = await buildProducerPlan();
+    setBuilding(false);
     if (result.ok) {
       scrollToPlan.current = true;
-      toast('Детализированный демонстрационный план сформирован');
+      toast('План развития сформирован');
     } else if (result.reason === 'paywall') {
       setPurchaseOpen(true);
-    } else {
+    } else if (result.reason === 'not_ready') {
+      setNotReadyText(result.error);
       setNotReadyOpen(true);
+    } else {
+      toast(result.error);
     }
   };
 
@@ -63,7 +70,7 @@ export function ProducerPage() {
       />
 
       <Stack>
-        <SpeakerDevelopmentCard profile={demo.profiles.speaker} hasSubscription={hasSubscription} />
+        <SpeakerDevelopmentCard profile={demo.profile} hasSubscription={hasSubscription} />
         <ProducerKpis facts={facts} />
 
         <div className={styles.split}>
@@ -73,7 +80,7 @@ export function ProducerPage() {
 
         {hasSubscription ? (
           <>
-            <BuildPlanCard hasPlans={demo.plans.length > 0} ready={facts.ready} onBuild={buildPlan} />
+            <BuildPlanCard hasPlans={demo.plans.length > 0} ready={facts.ready} building={building} onBuild={buildPlan} />
             <AnswerDistributionCard facts={facts} />
             <ConfirmedPatternsCard facts={facts} />
             {latestPlan ? (
@@ -106,14 +113,14 @@ export function ProducerPage() {
           >
             <FeedbackList feedback={facts.feedback} anchorId={reviewAnchorId} />
             <p className={styles.fineprint}>
-              Отзывы собраны по общей ссылке на Спикера. Здесь нет достоверной привязки к конкретному выступлению.
+              Отзывы собраны по ссылкам на конкретные выступления.
             </p>
           </Card>
         )}
 
         <Alert tone="neutral">
-          Разработка ИИ-продюсера входит в ТЗ StarLift. Демонстрационные записи, счетчики и планы в этом макете не являются
-          результатами настоящей модели или подтвержденными оценками человека.
+          План формирует языковая модель по вашим отзывам, выступлениям и открытым CFP. Выводы со ссылками на отзывы
+          проверяются автоматически; неподтвержденные данными пункты отбрасываются.
         </Alert>
       </Stack>
 
@@ -141,7 +148,7 @@ export function ProducerPage() {
         }
       >
         <Alert tone="warning">
-          Для демонстрационного анализа нужны минимум три отзыва слушателей за год, один доклад и запись о выступлении.
+          {notReadyText ?? 'Для анализа нужны минимум три отзыва слушателей за год, один доклад и запись о выступлении.'}{' '}
           Добавьте факты и попробуйте еще раз.
         </Alert>
       </Modal>

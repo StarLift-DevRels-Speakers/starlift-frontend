@@ -9,7 +9,6 @@ import styles from './ProducerSources.module.scss';
 const missingMetrics = [
   'NPS: форма отзыва не содержит вопрос 0–10',
   'Текущий / следующий уровень спикера: не определены правила',
-  'Связь отзыва с конкретным докладом: не задана',
 ];
 
 export interface ProducerSourcesProps {
@@ -44,7 +43,7 @@ export function ProducerSources({ facts, talks }: ProducerSourcesProps) {
         ) : (
           <EmptyState variant="plain" title="Записей о выступлениях нет" />
         )}
-        <p className={shared.fineprint}>Дата и наименование берутся из демонстрационной истории выступлений пользователя.</p>
+        <p className={shared.fineprint}>Дата и наименование берутся из вашей истории выступлений.</p>
       </Card>
 
       <Card as="section" title="Открытые CFP" titleAs="h2" actions={<Badge tone="muted">{facts.openCfp.length} доступно</Badge>}>

@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TopBar } from '@/components/layout/TopBar/TopBar';
 import { isSubscriptionActive } from '@/features/billing/access';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import type { Role } from '@/types/role';
 import styles from './AppLayout.module.scss';
 
@@ -25,8 +25,7 @@ export function AppLayout({ role }: AppLayoutProps) {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const drawerOpen = isDrawer && menuOpen;
-  const { billing, notifications, profiles } = useDemoState();
-  const user = profiles[role];
+  const { billing, notifications, profile: user } = useAppState();
   const hasSubscription = isSubscriptionActive(billing[role]);
   const trail = findNavTrail(role, pathname);
 
@@ -67,7 +66,7 @@ export function AppLayout({ role }: AppLayoutProps) {
           role={role}
           user={user}
           hasSubscription={hasSubscription}
-          unreadNotifications={notifications[role].filter((notification) => !notification.read).length}
+          unreadNotifications={notifications.filter((notification) => !notification.read).length}
           trail={trail}
           sidebarId={sidebarId}
           sidebarOpen={drawerOpen}

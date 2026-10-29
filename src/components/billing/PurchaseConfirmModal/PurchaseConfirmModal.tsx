@@ -1,6 +1,6 @@
 import { Alert, Button, Modal, Stack } from '@/components/ui';
 import { formatRub, rightLabels, rightPrices, subscriptions, type PurchaseType } from '@/features/billing/pricing';
-import { useDemoActions } from '@/store/useDemoStore';
+import { useAppActions } from '@/store/useAppStore';
 import type { Role } from '@/types/role';
 import styles from './PurchaseConfirmModal.module.scss';
 
@@ -16,7 +16,7 @@ export interface PurchaseConfirmModalProps {
 
 /** Last step of any purchase: shows what is bought and states that no money is charged. */
 export function PurchaseConfirmModal({ role, type, cancelLabel = 'Отмена', onCancel, onPurchased }: PurchaseConfirmModalProps) {
-  const { purchase } = useDemoActions();
+  const { purchase } = useAppActions();
   const isSubscription = type === 'subscription';
   const title = isSubscription ? subscriptions[role].title : rightLabels[type];
   const price = isSubscription ? subscriptions[role].price : rightPrices[type];

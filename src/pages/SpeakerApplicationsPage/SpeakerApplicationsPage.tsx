@@ -5,14 +5,14 @@ import { ChangeApplicationTalkModal } from '@/components/applications/ChangeAppl
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Button, EmptyState, LinkButton, Stack, Table } from '@/components/ui';
 import { canRequestTalkChange } from '@/features/applications/applicationStatus';
-import { useDemoState } from '@/store/useDemoStore';
+import { useAppState } from '@/store/useAppStore';
 import type { Application } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
 import styles from './SpeakerApplicationsPage.module.scss';
 
 /** Speaker's CFP applications and the DevRel decisions on them. */
 export function SpeakerApplicationsPage() {
-  const { applications, events } = useDemoState();
+  const { applications, events } = useAppState();
   const eventById = new Map(events.map((event) => [event.id, event]));
   const [params, setParams] = useSearchParams();
 

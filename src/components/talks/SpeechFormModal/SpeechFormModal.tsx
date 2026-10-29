@@ -1,7 +1,18 @@
 import { useId, useState, type FormEvent } from 'react';
-import { Alert, Button, Input, Modal, Select, Stack, useToast } from '@/components/ui';
-import { useDemoActions, useDemoState } from '@/store/useDemoStore';
+import { Alert, Button, Grid, Input, Modal, Select, Stack, useToast } from '@/components/ui';
+import { useAppActions, useAppState } from '@/store/useAppStore';
 import { daysFromToday } from '@/utils/date';
+
+// Values stored in talks.conference_type and talks.format on the backend.
+const CONFERENCE_TYPES = [
+  { value: 'CONFERENCE', label: 'Конференция' },
+  { value: 'MEETUP', label: 'Митап' },
+  { value: 'WORKSHOP', label: 'Воркшоп' },
+];
+const FORMATS = [
+  { value: 'OFFLINE', label: 'Офлайн' },
+  { value: 'ONLINE', label: 'Онлайн' },
+];
 
 export interface SpeechFormModalProps {
   onClose: () => void;
@@ -9,18 +20,23 @@ export interface SpeechFormModalProps {
 
 /** Record a speech given with one of the speaker's talks. */
 export function SpeechFormModal({ onClose }: SpeechFormModalProps) {
-  const { talks } = useDemoState();
-  const { addSpeech } = useDemoActions();
+  const { talks } = useAppState();
+  const { addSpeech } = useAppActions();
   const { toast } = useToast();
   const formId = useId();
   const [talkId, setTalkId] = useState(talks[0]?.id ?? '');
   const [event, setEvent] = useState('');
   const [date, setDate] = useState(daysFromToday(-2));
+  const [conferenceType, setConferenceType] = useState(CONFERENCE_TYPES[0].value);
+  const [format, setFormat] = useState(FORMATS[0].value);
   const [error, setError] = useState<string>();
+  const [pending, setPending] = useState(false);
 
-  const handleSubmit = (formEvent: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
-    const result = addSpeech({ talkId, event, date });
+    setPending(true);
+    const result = await addSpeech({ talkId, event, date, conferenceType, format });
+    setPending(false);
     if (!result.ok) {
       setError(result.error);
       return;
@@ -37,7 +53,7 @@ export function SpeechFormModal({ onClose }: SpeechFormModalProps) {
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Отмена</Button>
-          {talks.length > 0 && <Button type="submit" form={formId}>Сохранить выступление</Button>}
+          {talks.length > 0 && <Button type="submit" form={formId} disabled={pending}>Сохранить выступление</Button>}
         </>
       }
     >
@@ -62,6 +78,10 @@ export function SpeechFormModal({ onClose }: SpeechFormModalProps) {
               onChange={(e) => setEvent(e.target.value)}
             />
             <Input label="Дата выступления" type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
+            <Grid columns={2} responsive={false}>
+              <Select label="Тип мероприятия" value={conferenceType} onChange={(e) => setConferenceType(e.target.value)} options={CONFERENCE_TYPES} />
+              <Select label="Формат" value={format} onChange={(e) => setFormat(e.target.value)} options={FORMATS} />
+            </Grid>
           </Stack>
         </form>
       )}

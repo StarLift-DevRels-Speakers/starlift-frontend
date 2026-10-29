@@ -1,0 +1,21 @@
+@use '@/styles/mixins' as *;
+
+.screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sl-space-4);
+  background: var(--sl-page);
+}
+
+.loading {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+}
+
+.error {
+  width: 100%;
+  max-width: 480px;
+}
