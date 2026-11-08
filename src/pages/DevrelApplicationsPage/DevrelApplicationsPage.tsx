@@ -1,9 +1,14 @@
 import { useState } from 'react';
+import type { AudienceFitCheckDto } from '@/api/types';
+import { AudienceFitBadge } from '@/components/audience/AudienceFitBadge/AudienceFitBadge';
+import { AudienceFitModal } from '@/components/audience/AudienceFitModal/AudienceFitModal';
 import { ApplicationStatusBadge } from '@/components/applications/ApplicationStatusBadge/ApplicationStatusBadge';
 import { InvitationStatusBadge } from '@/components/invitations/InvitationStatusBadge/InvitationStatusBadge';
 import { InviteSpeakerModal } from '@/components/invitations/InviteSpeakerModal/InviteSpeakerModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Avatar, Button, Card, EmptyState, Grid, ListItem, Stack, useToast } from '@/components/ui';
+import { eventTalkKey, latestBy } from '@/features/audience/audienceFit';
+import { useEventsFitChecks } from '@/features/audience/useAudience';
 import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { ApplicationStatus } from '@/types/domain';
@@ -22,6 +27,9 @@ export function DevrelApplicationsPage() {
   const ownEvents = new Map(events.filter((event) => event.owner === 'devrel').map((event) => [event.id, event]));
   const incoming = applications.filter((application) => ownEvents.has(application.eventId));
   const sentInvitations = invitations.filter((invitation) => ownEvents.has(invitation.eventId));
+  const fitChecks = useEventsFitChecks(incoming.map((application) => application.eventId));
+  const latestFit = latestBy(fitChecks, (check) => `${check.speakerId}:${eventTalkKey(check.eventId, check.talkId)}`);
+  const [openedCheck, setOpenedCheck] = useState<AudienceFitCheckDto>();
 
   const decide = async (applicationId: string, decision: Decision) => {
     const result = await decideApplication(applicationId, decision);
@@ -53,6 +61,7 @@ export function DevrelApplicationsPage() {
                   // a requested talk change is answered first.
                   const decidable = (application.status === 'sent' || application.status === 'reserve') && !past && !change;
                   const confirmed = isSpeakerConfirmed(application.eventId, applications, invitations, application.speakerId);
+                  const fit = latestFit.get(`${application.speakerId}:${eventTalkKey(application.eventId, application.talkId || null)}`);
                   return (
                     <ListItem
                       key={application.id}
@@ -66,6 +75,7 @@ export function DevrelApplicationsPage() {
                       }
                     >
                       <ApplicationStatusBadge status={application.status} />
+                      {fit && <AudienceFitBadge check={fit} context="Под аудиторию" onOpen={() => setOpenedCheck(fit)} />}
                       {change && (
                         <>
                           <span className={styles.note}>Запрошена смена доклада на «{change.topic}»</span>
@@ -126,6 +136,7 @@ export function DevrelApplicationsPage() {
       </Stack>
 
       {inviteOpen && <InviteSpeakerModal onClose={() => setInviteOpen(false)} />}
+      {openedCheck && <AudienceFitModal check={openedCheck} onClose={() => setOpenedCheck(undefined)} />}
     </>
   );
 }
