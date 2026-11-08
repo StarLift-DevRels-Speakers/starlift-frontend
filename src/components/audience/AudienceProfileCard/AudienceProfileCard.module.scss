@@ -85,3 +85,21 @@
   flex-wrap: wrap;
   gap: var(--sl-space-2);
 }
+
+.primary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-1);
+}
+
+.primaryLabel {
+  @include text('label');
+
+  font-size: var(--sl-text-lg);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

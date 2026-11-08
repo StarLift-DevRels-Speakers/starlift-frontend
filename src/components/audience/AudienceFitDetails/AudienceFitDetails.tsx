@@ -1,6 +1,6 @@
 import type { AudienceFitCheckDto } from '@/api/types';
 import { Alert, Badge, Meter } from '@/components/ui';
-import { checkLabel, checkTone, confidenceLabels } from '@/features/audience/audienceFit';
+import { checkLabel, checkTone, confidenceLabels, primaryAudience } from '@/features/audience/audienceFit';
 import styles from './AudienceFitDetails.module.scss';
 
 export interface AudienceFitDetailsProps {
@@ -27,6 +27,7 @@ export function AudienceFitDetails({ check }: AudienceFitDetailsProps) {
         </span>
       </div>
 
+      {primaryAudience(result) && <p className={styles.source}>Оценено для аудитории: {primaryAudience(result)}</p>}
       {result.summary && <p className={styles.summary}>{result.summary}</p>}
 
       {result.profileConfidence === 'low' && (
@@ -49,6 +50,17 @@ export function AudienceFitDetails({ check }: AudienceFitDetailsProps) {
         ))}
       </section>
 
+      {result.visual && (
+        <section aria-label="Наглядность презентации" className={styles.visual}>
+          <span>Слайдов: <strong>{result.visual.slides}</strong></span>
+          <span>с картинками или схемами: <strong>{result.visual.slidesWithImages}</strong></span>
+          <span>в среднем слов на слайде: <strong>{result.visual.averageWords}</strong></span>
+          {result.visual.wallOfTextSlides.length > 0 && (
+            <span>перегружены текстом: <strong>{result.visual.wallOfTextSlides.length}</strong></span>
+          )}
+        </section>
+      )}
+
       {result.issues.length > 0 && (
         <section>
           <h4 className={styles.heading}>Что поправить для этой аудитории</h4>
@@ -56,7 +68,7 @@ export function AudienceFitDetails({ check }: AudienceFitDetailsProps) {
             {result.issues.map((issue) => (
               <li key={`${issue.fragmentId}-${issue.problem}`} className={styles.item}>
                 <span className={styles.fragment}>{issue.label}</span>
-                <blockquote className={styles.quote}>{issue.quote}</blockquote>
+                {issue.quote && <blockquote className={styles.quote}>{issue.quote}</blockquote>}
                 <p>{issue.problem}</p>
                 {issue.fix && <p className={styles.fix}>→ {issue.fix}</p>}
               </li>

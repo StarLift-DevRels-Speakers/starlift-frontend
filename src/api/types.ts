@@ -311,11 +311,23 @@ export interface PointTransactionDto {
 // ---------- Audience fit ----------
 
 export type AudienceLevel = 'junior' | 'middle' | 'senior' | 'lead';
+export type AudienceSegment = 'schoolchildren' | 'students' | 'beginners' | 'practitioners' | 'experts';
 export type AudienceConfidence = 'low' | 'medium' | 'high';
+export type VisualExpectation = 'low' | 'medium' | 'high';
 
 /** Expected audience of an event, inferred by the backend from the event data or set by its DevRel. */
 export interface AudienceProfileDto {
   summary: string | null;
+  /** Who will mostly be in the room; the backend picks the largest share of `experience`. Missing in older profiles. */
+  primarySegment?: AudienceSegment | null;
+  segmentLabel?: string | null;
+  /** What in the event data points to this segment. */
+  segmentReason?: string | null;
+  /** Share of each segment in percent, summing to 100. */
+  experience?: Partial<Record<AudienceSegment, number>>;
+  /** Only when the age follows directly from the event data. */
+  ageRange?: { from: number | null; to: number | null } | null;
+  visualExpectation?: VisualExpectation;
   /** Share of each level in percent, summing to 100; empty when the level is unclear. */
   levels: Partial<Record<AudienceLevel, number>>;
   roles: string[];
@@ -341,6 +353,11 @@ export interface AudienceProfileResponseDto {
 
 export interface AudienceProfileUpdate {
   summary: string;
+  primarySegment: AudienceSegment | null;
+  segmentLabel: string;
+  ageFrom: number | null;
+  ageTo: number | null;
+  visualExpectation: VisualExpectation | null;
   levels: Record<AudienceLevel, number>;
   roles: string[];
   domains: string[];
@@ -358,10 +375,24 @@ export interface AudienceFitResultDto {
   summary: string | null;
   criteria: { key: string; label: string; score: number; comment: string | null }[];
   /** `label` and `quote` come from the material itself: "Слайд 3" and its text. */
-  issues: { fragmentId: string; label: string; quote: string; problem: string; fix: string | null }[];
+  issues: { fragmentId: string; label: string; quote: string | null; problem: string; fix: string | null }[];
   strengths: { fragmentId: string; label: string; quote: string; why: string }[];
   profileConfidence: AudienceConfidence;
   truncated: boolean;
+  primarySegment?: AudienceSegment | null;
+  segmentLabel?: string | null;
+  /** Counted by the backend from the file; null when the material has no slides. */
+  visual?: VisualStatsDto | null;
+}
+
+export interface VisualStatsDto {
+  slides: number;
+  slidesWithImages: number;
+  imageOnlySlides: number;
+  averageWords: number;
+  /** Labels like "Слайд 3". */
+  textOnlySlides: string[];
+  wallOfTextSlides: string[];
 }
 
 export type AudienceFitStatus = 'pending' | 'ready' | 'insufficient_data' | 'failed';
