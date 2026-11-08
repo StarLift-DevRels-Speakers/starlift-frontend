@@ -98,3 +98,15 @@
 .fix {
   color: var(--sl-action);
 }
+
+.visual {
+  @include text('caption');
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-1) var(--sl-space-4);
+  padding: var(--sl-space-2) var(--sl-space-3);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-neutral-bg);
+  color: var(--sl-neutral-text);
+}

@@ -5,6 +5,7 @@ import {
   checkLabel,
   checkTone,
   eventTalkKey,
+  formatAgeRange,
   hasPending,
   isCheckableFile,
   latestBy,
@@ -12,7 +13,10 @@ import {
   newestFirst,
   parseLevels,
   parseLines,
+  parseOptionalInt,
+  primaryAudience,
   profileToUpdate,
+  segmentShares,
 } from './audienceFit.ts';
 
 function result(verdict: AudienceFitResultDto['verdict'], score: number): AudienceFitResultDto {
@@ -119,6 +123,8 @@ describe('profile helpers', () => {
       evidence: [],
     });
     assert.deepEqual(update.levels, { junior: 0, middle: 0, senior: 100, lead: 0 });
+    assert.equal(update.primarySegment, null);
+    assert.equal(update.ageFrom, null);
     assert.deepEqual(update.turnoffs, ['реклама']);
     assert.equal(profileToUpdate(null).summary, '');
   });
@@ -128,5 +134,46 @@ describe('isCheckableFile', () => {
   it('accepts files the backend can read text from', () => {
     for (const name of ['talk.pdf', 'Slides.PPTX', 'speech.docx', 'notes.txt', 'readme.md']) assert.equal(isCheckableFile(name), true, name);
     for (const name of ['old.ppt', 'photo.png', 'demo.mp4', 'pdf']) assert.equal(isCheckableFile(name), false, name);
+  });
+});
+
+describe('primary audience', () => {
+  it('shows the label, else the segment name', () => {
+    assert.equal(primaryAudience({ primarySegment: 'students', segmentLabel: 'Студенты IT-направлений' }), 'Студенты IT-направлений');
+    assert.equal(primaryAudience({ primarySegment: 'experts', segmentLabel: null }), 'Опытные эксперты');
+    assert.equal(primaryAudience({}), null);
+  });
+
+  it('lists segment shares largest first', () => {
+    assert.deepEqual(segmentShares({ beginners: 30, students: 70, experts: 0 }).map((share) => [share.segment, share.percent]), [
+      ['students', 70],
+      ['beginners', 30],
+    ]);
+    assert.deepEqual(segmentShares(undefined), []);
+  });
+
+  it('formats the age range', () => {
+    assert.equal(formatAgeRange({ from: 18, to: 23 }), '18–23 лет');
+    assert.equal(formatAgeRange({ from: 14, to: null }), '14+');
+    assert.equal(formatAgeRange({ from: null, to: 17 }), 'до 17 лет');
+    assert.equal(formatAgeRange(null), null);
+    assert.equal(formatAgeRange(undefined), null);
+  });
+
+  it('parses optional whole numbers', () => {
+    assert.equal(parseOptionalInt(' 18 '), 18);
+    assert.equal(parseOptionalInt(''), null);
+    assert.equal(parseOptionalInt('18.5'), null);
+  });
+
+  it('keeps segment, age and visual expectation in the editable update', () => {
+    const update = profileToUpdate({
+      summary: null, primarySegment: 'students', segmentLabel: 'Студенты', ageRange: { from: 18, to: 23 }, visualExpectation: 'high',
+      levels: {}, roles: [], domains: [], expectations: [], assumedKnowledge: [], turnoffs: [], confidence: 'medium', evidence: [],
+    });
+    assert.equal(update.primarySegment, 'students');
+    assert.equal(update.ageFrom, 18);
+    assert.equal(update.ageTo, 23);
+    assert.equal(update.visualExpectation, 'high');
   });
 });

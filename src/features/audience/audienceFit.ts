@@ -1,5 +1,7 @@
 import type {
   AudienceConfidence,
+  AudienceSegment,
+  VisualExpectation,
   AudienceFitCheckDto,
   AudienceLevel,
   AudienceProfileDto,
@@ -18,6 +20,42 @@ export const levelLabels: Record<AudienceLevel, string> = {
   senior: 'Senior',
   lead: 'Lead',
 };
+
+export const AUDIENCE_SEGMENTS: ReadonlyArray<AudienceSegment> = ['schoolchildren', 'students', 'beginners', 'practitioners', 'experts'];
+
+export const segmentLabels: Record<AudienceSegment, string> = {
+  schoolchildren: 'Школьники',
+  students: 'Студенты',
+  beginners: 'Начинающие специалисты',
+  practitioners: 'Практикующие специалисты',
+  experts: 'Опытные эксперты',
+};
+
+export const visualLabels: Record<VisualExpectation, string> = {
+  high: 'важна наглядность',
+  medium: 'наглядность желательна',
+  low: 'подойдут плотные слайды',
+};
+
+/** "18–23 года", "14+", "до 17 лет"; null when the age is unknown. */
+export function formatAgeRange(range: AudienceProfileDto['ageRange']): string | null {
+  if (!range || (range.from == null && range.to == null)) return null;
+  if (range.from != null && range.to != null) return `${range.from}–${range.to} лет`;
+  return range.from != null ? `${range.from}+` : `до ${range.to} лет`;
+}
+
+/** Segments with a non-zero share, largest first. */
+export function segmentShares(experience: AudienceProfileDto['experience']): { segment: AudienceSegment; label: string; percent: number }[] {
+  return AUDIENCE_SEGMENTS
+    .map((segment) => ({ segment, label: segmentLabels[segment], percent: experience?.[segment] ?? 0 }))
+    .filter((share) => share.percent > 0)
+    .sort((a, b) => b.percent - a.percent);
+}
+
+/** Headline of the audience: the profile's own label, else the segment name. */
+export function primaryAudience(profile: Pick<AudienceProfileDto, 'primarySegment' | 'segmentLabel'>): string | null {
+  return profile.segmentLabel ?? (profile.primarySegment ? segmentLabels[profile.primarySegment] : null);
+}
 
 export const confidenceLabels: Record<AudienceConfidence, string> = {
   low: 'низкая',
@@ -116,6 +154,11 @@ export function profileToUpdate(profile: AudienceProfileDto | null): AudiencePro
   for (const level of AUDIENCE_LEVELS) levels[level] = profile?.levels[level] ?? 0;
   return {
     summary: profile?.summary ?? '',
+    primarySegment: profile?.primarySegment ?? null,
+    segmentLabel: profile?.segmentLabel ?? '',
+    ageFrom: profile?.ageRange?.from ?? null,
+    ageTo: profile?.ageRange?.to ?? null,
+    visualExpectation: profile?.visualExpectation ?? null,
     levels,
     roles: profile?.roles ?? [],
     domains: profile?.domains ?? [],
@@ -123,6 +166,14 @@ export function profileToUpdate(profile: AudienceProfileDto | null): AudiencePro
     assumedKnowledge: profile?.assumedKnowledge ?? [],
     turnoffs: profile?.turnoffs ?? [],
   };
+}
+
+/** Optional whole-number input: empty or invalid → null. */
+export function parseOptionalInt(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const number = Number(trimmed);
+  return Number.isInteger(number) ? number : null;
 }
 
 /** Files the backend can read the text of (PDF pages, PPTX slides, DOCX, plain text). */

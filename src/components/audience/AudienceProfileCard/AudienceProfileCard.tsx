@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AudienceProfileFormModal } from '@/components/audience/AudienceProfileFormModal/AudienceProfileFormModal';
 import { Alert, Badge, Button, Meter, Skeleton, useToast } from '@/components/ui';
-import { confidenceLabels, levelShares } from '@/features/audience/audienceFit';
+import { confidenceLabels, formatAgeRange, levelShares, primaryAudience, segmentShares, visualLabels } from '@/features/audience/audienceFit';
 import { useAudienceProfile } from '@/features/audience/useAudience';
 import styles from './AudienceProfileCard.module.scss';
 
@@ -50,9 +50,29 @@ export function AudienceProfileCard({ eventId, editable = false }: AudienceProfi
         <Alert tone="warning">{response?.message ?? 'Аудиторию пока не удалось определить.'}</Alert>
       ) : (
         <>
+          {primaryAudience(profile) && (
+            <div className={styles.primary}>
+              <span className={styles.muted}>Преимущественно</span>
+              <strong className={styles.primaryLabel}>{primaryAudience(profile)}</strong>
+              <div className={styles.chips}>
+                {formatAgeRange(profile.ageRange) && <Badge tone="muted">Возраст: {formatAgeRange(profile.ageRange)}</Badge>}
+                {profile.visualExpectation && <Badge tone="muted">Слайды: {visualLabels[profile.visualExpectation]}</Badge>}
+              </div>
+              {profile.segmentReason && <span className={styles.muted}>{profile.segmentReason}</span>}
+            </div>
+          )}
+
           {profile.summary && <p className={styles.summary}>{profile.summary}</p>}
 
-          {levelShares(profile.levels).length > 0 && (
+          {segmentShares(profile.experience).length > 1 && (
+            <div className={styles.levels} aria-label="Состав аудитории">
+              {segmentShares(profile.experience).map((share) => (
+                <Meter key={share.segment} value={share.percent} label={share.label} showLabel />
+              ))}
+            </div>
+          )}
+
+          {segmentShares(profile.experience).length <= 1 && levelShares(profile.levels).length > 0 && (
             <div className={styles.levels}>
               {levelShares(profile.levels).map((share) => (
                 <Meter key={share.level} value={share.percent} label={share.label} showLabel />

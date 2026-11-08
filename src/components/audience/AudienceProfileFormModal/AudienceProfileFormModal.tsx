@@ -1,7 +1,18 @@
 import { useId, useState, type FormEvent } from 'react';
-import type { AudienceLevel, AudienceProfileDto, AudienceProfileUpdate } from '@/api/types';
-import { Alert, Button, Grid, Input, Modal, Stack, Textarea } from '@/components/ui';
-import { AUDIENCE_LEVELS, formatLines, levelLabels, parseLevels, parseLines, profileToUpdate } from '@/features/audience/audienceFit';
+import type { AudienceLevel, AudienceProfileDto, AudienceProfileUpdate, AudienceSegment, VisualExpectation } from '@/api/types';
+import { Alert, Button, Grid, Input, Modal, Select, Stack, Textarea } from '@/components/ui';
+import {
+  AUDIENCE_LEVELS,
+  AUDIENCE_SEGMENTS,
+  formatLines,
+  levelLabels,
+  parseLevels,
+  parseLines,
+  parseOptionalInt,
+  profileToUpdate,
+  segmentLabels,
+  visualLabels,
+} from '@/features/audience/audienceFit';
 
 export interface AudienceProfileFormModalProps {
   profile: AudienceProfileDto | null;
@@ -24,6 +35,11 @@ export function AudienceProfileFormModal({ profile, onClose, onSave }: AudienceP
   const formId = useId();
   const initial = profileToUpdate(profile);
   const [summary, setSummary] = useState(initial.summary);
+  const [segment, setSegment] = useState<AudienceSegment | ''>(initial.primarySegment ?? '');
+  const [segmentLabel, setSegmentLabel] = useState(initial.segmentLabel);
+  const [ageFrom, setAgeFrom] = useState(initial.ageFrom == null ? '' : String(initial.ageFrom));
+  const [ageTo, setAgeTo] = useState(initial.ageTo == null ? '' : String(initial.ageTo));
+  const [visual, setVisual] = useState<VisualExpectation | ''>(initial.visualExpectation ?? '');
   const [levels, setLevels] = useState<Record<AudienceLevel, string>>(() => {
     const values = {} as Record<AudienceLevel, string>;
     for (const level of AUDIENCE_LEVELS) values[level] = initial.levels[level] ? String(initial.levels[level]) : '';
@@ -41,9 +57,18 @@ export function AudienceProfileFormModal({ profile, onClose, onSave }: AudienceP
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!segment) {
+      setError('Выберите, кто преимущественно будет в зале');
+      return;
+    }
     setPending(true);
     const result = await onSave({
       summary: summary.trim(),
+      primarySegment: segment,
+      segmentLabel: segmentLabel.trim(),
+      ageFrom: parseOptionalInt(ageFrom),
+      ageTo: parseOptionalInt(ageTo),
+      visualExpectation: visual || null,
       levels: parseLevels(levels),
       roles: parseLines(lists.roles),
       domains: parseLines(lists.domains),
@@ -72,6 +97,31 @@ export function AudienceProfileFormModal({ profile, onClose, onSave }: AudienceP
       <form id={formId} onSubmit={handleSubmit}>
         <Stack gap={3}>
           {error && <Alert tone="danger" role="alert">{error}</Alert>}
+          <Grid columns={2}>
+            <Select
+              label="Кто преимущественно в зале"
+              required
+              placeholder="Выберите аудиторию"
+              value={segment}
+              onChange={(e) => setSegment(e.target.value as AudienceSegment | '')}
+              options={AUDIENCE_SEGMENTS.map((value) => ({ value, label: segmentLabels[value] }))}
+            />
+            <Input
+              label="Точнее"
+              placeholder="Например, студенты IT-направлений"
+              value={segmentLabel}
+              onChange={(e) => setSegmentLabel(e.target.value)}
+            />
+            <Input label="Возраст от" type="number" min={6} max={99} value={ageFrom} onChange={(e) => setAgeFrom(e.target.value)} hint="Необязательно" />
+            <Input label="Возраст до" type="number" min={6} max={99} value={ageTo} onChange={(e) => setAgeTo(e.target.value)} />
+          </Grid>
+          <Select
+            label="Наглядность слайдов"
+            placeholder="По аудитории"
+            value={visual}
+            onChange={(e) => setVisual(e.target.value as VisualExpectation | '')}
+            options={(['high', 'medium', 'low'] as const).map((value) => ({ value, label: visualLabels[value] }))}
+          />
           <Textarea label="Кратко об аудитории" rows={2} value={summary} onChange={(e) => setSummary(e.target.value)} />
           <Grid columns={2}>
             {AUDIENCE_LEVELS.map((level) => (
