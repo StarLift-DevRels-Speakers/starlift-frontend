@@ -1,6 +1,8 @@
 import { useId, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { rolePath } from '@/app/navigation';
+import { AudienceFitPanel } from '@/components/audience/AudienceFitPanel/AudienceFitPanel';
+import { AudienceProfileCard } from '@/components/audience/AudienceProfileCard/AudienceProfileCard';
 import { Alert, Badge, Button, DetailList, EmptyState, LinkButton, Modal, Select, useToast } from '@/components/ui';
 import { hasPendingInvitation, isCfpOpen, isSpeakerConfirmed } from '@/features/events/events';
 import { useAppActions, useAppState } from '@/store/useAppStore';
@@ -73,6 +75,9 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
         />
 
         <p className={styles.description}>{event.description}</p>
+
+        <AudienceProfileCard eventId={event.id} />
+        <AudienceFitPanel event={event} />
 
         {confirmed ? (
           <Alert>Вы уже участвуете в этом мероприятии — повторная заявка не нужна.</Alert>

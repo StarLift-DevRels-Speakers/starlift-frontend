@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { EventAudienceModal } from '@/components/audience/EventAudienceModal/EventAudienceModal';
 import { PaywallModal } from '@/components/billing/PaywallModal/PaywallModal';
 import { StatCard } from '@/components/dashboard/StatCard/StatCard';
 import { EventCard } from '@/components/events/EventCard/EventCard';
@@ -17,6 +18,7 @@ export function DevrelEventsPage() {
   const { toast } = useToast();
   const [params, setParams] = useSearchParams();
   const [paywallEventId, setPaywallEventId] = useState<string | null>(null);
+  const [audienceEventId, setAudienceEventId] = useState<string | null>(null);
 
   const ownEvents = events.filter((event) => event.owner === 'devrel');
   const published = ownEvents.filter((event) => event.state === 'published').length;
@@ -27,6 +29,7 @@ export function DevrelEventsPage() {
   // `?new=1` opens the draft form (used by "+ Создать мероприятие" on the dashboard), `?edit=<id>` an existing event.
   const editId = params.get('edit');
   const editedEvent = ownEvents.find((event) => event.id === editId);
+  const audienceEvent = ownEvents.find((event) => event.id === audienceEventId);
   const formOpen = params.get('new') === '1' || Boolean(editedEvent);
   const openForm = (eventId?: string) => setParams(eventId ? { edit: eventId } : { new: '1' }, { replace: true });
   const closeForm = () => setParams({}, { replace: true });
@@ -70,6 +73,7 @@ export function DevrelEventsPage() {
                 actions={
                   <>
                     <Button variant="secondary" size="sm" onClick={() => openForm(event.id)}>Изменить</Button>
+                    <Button variant="soft" size="sm" onClick={() => setAudienceEventId(event.id)}>✦ Аудитория</Button>
                     {event.state === 'draft' && (
                       <Button size="sm" onClick={() => publish(event.id)}>
                         {canPublish ? 'Опубликовать' : `Опубликовать · ${formatRub(rightPrices.publication)}`}
@@ -91,6 +95,8 @@ export function DevrelEventsPage() {
       </Stack>
 
       {formOpen && <EventFormModal event={editedEvent} onClose={closeForm} />}
+
+      {audienceEvent && <EventAudienceModal event={audienceEvent} onClose={() => setAudienceEventId(null)} />}
 
       {paywallEventId && (
         <PaywallModal

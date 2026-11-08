@@ -1,10 +1,16 @@
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import type { AudienceFitCheckDto } from '@/api/types';
 import { rolePath } from '@/app/navigation';
 import { ApplicationStatusBadge } from '@/components/applications/ApplicationStatusBadge/ApplicationStatusBadge';
+import { AudienceFitBadge } from '@/components/audience/AudienceFitBadge/AudienceFitBadge';
+import { AudienceFitModal } from '@/components/audience/AudienceFitModal/AudienceFitModal';
 import { ChangeApplicationTalkModal } from '@/components/applications/ChangeApplicationTalkModal/ChangeApplicationTalkModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Button, EmptyState, LinkButton, Stack, Table } from '@/components/ui';
+import { Button, EmptyState, LinkButton, Stack, Table, useToast } from '@/components/ui';
 import { canRequestTalkChange } from '@/features/applications/applicationStatus';
+import { eventTalkKey, latestBy } from '@/features/audience/audienceFit';
+import { useAudienceFitChecks } from '@/features/audience/useAudience';
 import { useAppState } from '@/store/useAppStore';
 import type { Application } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
@@ -15,6 +21,15 @@ export function SpeakerApplicationsPage() {
   const { applications, events } = useAppState();
   const eventById = new Map(events.map((event) => [event.id, event]));
   const [params, setParams] = useSearchParams();
+  const { toast } = useToast();
+  const { checks, request } = useAudienceFitChecks();
+  const [openedCheck, setOpenedCheck] = useState<AudienceFitCheckDto>();
+  const latestCheck = latestBy(checks, (check) => eventTalkKey(check.eventId, check.talkId));
+
+  const checkFit = async (application: Application) => {
+    const result = await request({ eventId: application.eventId, talkId: application.talkId });
+    toast(result.ok ? 'Проверяем доклад под аудиторию мероприятия' : result.error);
+  };
 
   // `?edit=<id>` opens the talk change request for an application that still allows it.
   const editedApplication = applications.find((application) => application.id === params.get('edit'));
@@ -58,6 +73,17 @@ export function SpeakerApplicationsPage() {
                 ),
               },
               { key: 'status', header: 'Статус', render: (application) => <ApplicationStatusBadge status={application.status} /> },
+              {
+                key: 'fit',
+                header: 'Под аудиторию',
+                render: (application) => {
+                  const check = latestCheck.get(eventTalkKey(application.eventId, application.talkId || null));
+                  if (check) return <AudienceFitBadge check={check} onOpen={() => setOpenedCheck(check)} />;
+                  return application.talkId ? (
+                    <Button variant="soft" size="sm" onClick={() => checkFit(application)}>✦ Проверить</Button>
+                  ) : '—';
+                },
+              },
               { key: 'at', header: 'Дата подачи', render: (application) => formatLongDate(application.at) },
               {
                 key: 'actions',
@@ -86,6 +112,13 @@ export function SpeakerApplicationsPage() {
 
         <p className={styles.note}>Полный перечень статусов и правила переходов еще подлежат согласованию.</p>
       </Stack>
+
+      {openedCheck && (
+        <AudienceFitModal
+          check={checks.find((check) => check.id === openedCheck.id) ?? openedCheck}
+          onClose={() => setOpenedCheck(undefined)}
+        />
+      )}
 
       {canEdit && editedEvent && (
         <ChangeApplicationTalkModal application={editedApplication} eventName={editedEvent.name} onClose={closeEdit} />
