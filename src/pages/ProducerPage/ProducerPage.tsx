@@ -64,7 +64,7 @@ export function ProducerPage() {
   return (
     <>
       <PageHeader
-        title="ИИ-продюсер"
+        title="Траектория развития"
         description="Расширенная аналитика: исходные данные, доказательства, ограничения, план действий и история версий."
         actions={<Badge tone="ai">PRODUCER</Badge>}
       />

@@ -2,7 +2,7 @@
 
 .card {
   min-width: 0;
-  padding: var(--sl-space-5);
+  padding: var(--sl-space-6);
   border: 1px solid var(--sl-border);
   border-radius: var(--sl-radius-card);
   background: var(--sl-surface);
@@ -29,6 +29,10 @@
   justify-content: space-between;
   gap: var(--sl-space-3);
   margin-bottom: var(--sl-space-3);
+
+  @include down('mobile') {
+    flex-wrap: wrap;
+  }
 
   &:last-child {
     margin-bottom: 0;

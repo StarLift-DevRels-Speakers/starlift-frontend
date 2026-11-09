@@ -16,6 +16,7 @@ import { MediaPage } from '@/pages/MediaPage/MediaPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage/PlaceholderPage';
 import { ProducerPage } from '@/pages/ProducerPage/ProducerPage';
+import { ProfileEditPage } from '@/pages/ProfilePage/ProfileEditPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { PublicFeedbackPage } from '@/pages/PublicFeedbackPage/PublicFeedbackPage';
 import { SpeakerApplicationsPage } from '@/pages/SpeakerApplicationsPage/SpeakerApplicationsPage';
@@ -86,6 +87,7 @@ function roleRoutes(role: Role): RouteObject {
     element: <RoleSection role={role} />,
     children: [
       ...navigation[role].flatMap((item) => menuRoutes(role, item)),
+      { path: 'profile/edit', element: <ProfileEditPage role={role} /> },
       ...detailRoutes[role],
     ],
   };

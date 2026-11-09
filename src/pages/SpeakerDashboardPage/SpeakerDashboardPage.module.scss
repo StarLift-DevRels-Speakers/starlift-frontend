@@ -1,0 +1,11 @@
+.journey {
+  padding: var(--sl-space-3) var(--sl-space-4);
+  border: 1px solid var(--sl-brand-border);
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-brand-bg);
+
+  summary {
+    font-weight: var(--sl-weight-semibold);
+    cursor: pointer;
+  }
+}

@@ -18,12 +18,15 @@ export function SpeakerReviewsPage() {
   const { toast } = useToast();
   const linkInputRef = useRef<HTMLInputElement>(null);
   const newestSpeeches = [...speeches].sort((a, b) => b.date.localeCompare(a.date));
-  const [speechId, setSpeechId] = useState(newestSpeeches[0]?.id ?? '');
+  const [selectedSpeechId, setSelectedSpeechId] = useState('');
   // Tokens already issued in this visit, by speech: the backend returns the same token on every call.
   const [tokens, setTokens] = useState<Record<string, string>>({});
   const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
 
+  const speechId = speeches.some((speech) => speech.id === selectedSpeechId)
+    ? selectedSpeechId
+    : newestSpeeches[0]?.id ?? '';
   const token = tokens[speechId];
   const link = token ? feedbackUrl(token) : '';
   const speechLabel = (id: string) => {
@@ -77,14 +80,17 @@ export function SpeakerReviewsPage() {
                 variant="plain"
                 title="Сначала добавьте выступление"
                 description="Ссылка на форму создается для конкретного выступления."
-                action={<LinkButton to={rolePath('speaker', 'talks')} variant="soft" size="sm">К выступлениям</LinkButton>}
+                action={<LinkButton to={`${rolePath('speaker', 'talks')}?tab=performances`} variant="soft" size="sm">К выступлениям</LinkButton>}
               />
             ) : (
               <Stack gap={3}>
                 <Select
                   label="Выступление"
                   value={speechId}
-                  onChange={(event) => setSpeechId(event.target.value)}
+                  onChange={(event) => {
+                    setSelectedSpeechId(event.target.value);
+                    setError(undefined);
+                  }}
                   options={newestSpeeches.map((speech) => ({ value: speech.id, label: `${speech.event} · ${formatLongDate(speech.date)}` }))}
                 />
                 {error && <Alert tone="danger" role="alert">{error}</Alert>}

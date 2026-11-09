@@ -1,11 +1,11 @@
+import type { WorkspaceIconName } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
 import type { Role } from '@/types/role';
 
 export interface NavItem {
   /** Path inside the role section; empty for the role's home page. Group children use the full path ('ai/events'). */
   slug: string;
   title: string;
-  /** Decorative glyph until the icon set is updated. */
-  icon: string;
+  icon: WorkspaceIconName;
   /** Menu group: the item has no page of its own, its address redirects to the first child. */
   children?: ReadonlyArray<NavItem>;
 }
@@ -19,50 +19,89 @@ export function rolePath(role: Role, slug = ''): string {
   return slug ? `${roleBasePath[role]}/${slug}` : roleBasePath[role];
 }
 
-// Menu order follows StarLift_Макеты.html; AI features are grouped under StarLift AI.
-export const navigation: Record<Role, ReadonlyArray<NavItem>> = {
+interface NavigationSection {
+  title: string;
+  items: ReadonlyArray<NavItem>;
+}
+
+export const navigationSections: Record<Role, ReadonlyArray<NavigationSection>> = {
   speaker: [
-    { slug: '', title: 'Главная', icon: '◫' },
-    { slug: 'calendar', title: 'Календарь', icon: '▦' },
-    { slug: 'profile', title: 'Мой профиль', icon: '◉' },
-    { slug: 'talks', title: 'Доклады и выступления', icon: '▤' },
-    { slug: 'events', title: 'Мероприятия и CFP', icon: '▥' },
     {
-      slug: 'ai',
-      title: 'StarLift AI',
-      icon: '✦',
-      children: [
-        { slug: 'ai/events', title: 'Подбор мероприятий', icon: '◎' },
-        { slug: 'ai/producer', title: 'Траектория развития', icon: '✺' },
+      title: 'Работа',
+      items: [
+        { slug: '', title: 'Главная', icon: 'home-icon' },
+        { slug: 'calendar', title: 'Календарь', icon: 'calendar' },
+        { slug: 'talks', title: 'Доклады и выступления', icon: 'talk' },
+        { slug: 'events', title: 'Мероприятия и CFP', icon: 'event' },
+        { slug: 'applications', title: 'Мои заявки', icon: 'file' },
+        { slug: 'invitations', title: 'Приглашения', icon: 'mail' },
       ],
     },
-    { slug: 'applications', title: 'Мои заявки', icon: '✉' },
-    { slug: 'invitations', title: 'Приглашения', icon: '↗' },
-    { slug: 'reviews', title: 'Отзывы', icon: '☆' },
-    { slug: 'competition', title: 'Соревнование', icon: '⚑' },
-    { slug: 'media', title: 'Медиа', icon: '▧' },
-    { slug: 'billing', title: 'Подписка и покупки', icon: '◇' },
-    { slug: 'notifications', title: 'Уведомления', icon: '♧' },
+    {
+      title: 'Развитие',
+      items: [
+        {
+          slug: 'ai',
+          title: 'StarLift AI',
+          icon: 'star',
+          children: [
+            { slug: 'ai/events', title: 'Подбор мероприятий', icon: 'star' },
+            { slug: 'ai/producer', title: 'Траектория развития', icon: 'star' },
+          ],
+        },
+        { slug: 'reviews', title: 'Отзывы', icon: 'chat' },
+        { slug: 'competition', title: 'Соревнование', icon: 'cup' },
+      ],
+    },
+    {
+      title: 'Аккаунт',
+      items: [
+        { slug: 'profile', title: 'Мой профиль', icon: 'user' },
+        { slug: 'media', title: 'Медиа', icon: 'image' },
+        { slug: 'billing', title: 'Подписка и покупки', icon: 'card' },
+        { slug: 'notifications', title: 'Уведомления', icon: 'bell' },
+      ],
+    },
   ],
   devrel: [
-    { slug: '', title: 'Главная', icon: '◫' },
-    { slug: 'calendar', title: 'Календарь', icon: '▦' },
-    { slug: 'profile', title: 'Мой профиль', icon: '◉' },
-    { slug: 'catalog', title: 'Каталог спикеров', icon: '♙' },
-    { slug: 'events', title: 'Мои мероприятия', icon: '▥' },
     {
-      slug: 'ai',
-      title: 'StarLift AI',
-      icon: '✦',
-      children: [
-        { slug: 'ai/speaker', title: 'Подбор спикеров', icon: '◎' },
+      title: 'Работа',
+      items: [
+        { slug: '', title: 'Главная', icon: 'home-icon' },
+        { slug: 'calendar', title: 'Календарь', icon: 'calendar' },
+        { slug: 'catalog', title: 'Каталог спикеров', icon: 'user' },
+        { slug: 'events', title: 'Мои мероприятия', icon: 'event' },
+        { slug: 'applications', title: 'Заявки и приглашения', icon: 'file' },
       ],
     },
-    { slug: 'applications', title: 'Заявки и приглашения', icon: '✉' },
-    { slug: 'analytics', title: 'Аналитика', icon: '▤' },
-    { slug: 'billing', title: 'Подписка и покупки', icon: '◇' },
-    { slug: 'notifications', title: 'Уведомления', icon: '♧' },
+    {
+      title: 'Развитие',
+      items: [
+        {
+          slug: 'ai',
+          title: 'StarLift AI',
+          icon: 'star',
+          children: [
+            { slug: 'ai/speaker', title: 'Подбор спикеров', icon: 'star' },
+          ],
+        },
+        { slug: 'analytics', title: 'Аналитика', icon: 'talk' },
+      ],
+    },
+    {
+      title: 'Аккаунт',
+      items: [
+        { slug: 'profile', title: 'Мой профиль', icon: 'user' },
+        { slug: 'billing', title: 'Подписка и покупки', icon: 'card' },
+        { slug: 'notifications', title: 'Уведомления', icon: 'bell' },
+      ],
+    },
   ],
+};
+
+export const navigation: Record<Role, ReadonlyArray<NavItem>> = {
+  speaker: navigationSections.speaker.flatMap((section) => section.items),
+  devrel: navigationSections.devrel.flatMap((section) => section.items),
 };
 
 /** Menu items for the current URL, outermost first (a group, then its child); falls back to the role's home page. */

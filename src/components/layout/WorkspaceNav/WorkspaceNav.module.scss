@@ -1,0 +1,123 @@
+@use '@/styles/mixins' as *;
+
+.nav {
+  display: flex;
+  gap: 8px;
+
+  @include down('tablet') {
+    display: none;
+  }
+}
+
+.group {
+  position: relative;
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: var(--sl-radius-pill);
+    color: var(--sl-masthead-muted);
+    font-weight: var(--sl-weight-semibold);
+    list-style: none;
+    cursor: pointer;
+    transition:
+      background-color var(--sl-transition-fast),
+      color var(--sl-transition-fast);
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+      transition: transform var(--sl-transition-fast);
+    }
+  }
+
+  &[data-active='true'] summary,
+  summary:hover,
+  &[open] summary {
+    background: var(--sl-masthead-active);
+    color: var(--sl-masthead-ink);
+  }
+
+  &[open] summary::after {
+    transform: translateY(2px) rotate(225deg);
+  }
+
+  &::details-content {
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--sl-transition-fast),
+      content-visibility var(--sl-transition-fast) allow-discrete;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &[open]::details-content {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.links {
+  --menu-gap: 10px;
+
+  position: absolute;
+  top: calc(100% + var(--menu-gap));
+  left: 0;
+  display: grid;
+  gap: 4px;
+  width: max-content;
+  min-width: 230px;
+  padding: 10px;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-drawer);
+  list-style: none;
+
+  // Keep the pointer inside the dropdown while it crosses the gap.
+  &::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: calc(var(--menu-gap) + 1px);
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--sl-radius-sm);
+    color: var(--sl-text);
+    text-decoration: none;
+    transition:
+      background-color var(--sl-transition-fast),
+      color var(--sl-transition-fast);
+  }
+
+  a:hover,
+  a[aria-current='page'] {
+    background: var(--sl-brand-bg);
+    color: var(--sl-action);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
