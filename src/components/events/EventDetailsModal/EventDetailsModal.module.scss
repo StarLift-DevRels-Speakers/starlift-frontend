@@ -15,3 +15,7 @@
 .description {
   @include text('body');
 }
+
+.submit {
+  min-inline-size: min(10rem, 100%);
+}

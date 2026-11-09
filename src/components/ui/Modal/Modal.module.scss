@@ -13,6 +13,29 @@
   &::backdrop {
     background: var(--sl-overlay);
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &[open] {
+      animation: dialog-enter 200ms ease-out both;
+    }
+
+    &[open]::backdrop {
+      animation: backdrop-enter 200ms ease-out both;
+    }
+  }
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
 }
 
 .lg {

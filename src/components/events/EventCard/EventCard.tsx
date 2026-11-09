@@ -7,33 +7,35 @@ import styles from './EventCard.module.scss';
 
 export interface EventCardProps {
   event: TechEvent;
+  showPublicationState?: boolean;
   /** Role-specific buttons: "Подробнее" for speakers, "Изменить"/"Опубликовать" for DevRel. */
   actions: ReactNode;
 }
 
 /** Event summary: status, CFP state, date, place, topic and deadline. */
-export function EventCard({ event, actions }: EventCardProps) {
+export function EventCard({ event, actions, showPublicationState = true }: EventCardProps) {
   const published = event.state === 'published';
   const cfpClosed = isCfpClosed(event);
 
   return (
     <Card as="article" className={styles.card}>
       <div className={styles.top}>
+        <p className={styles.location}>{[event.format, event.city].filter(Boolean).join(' · ')}</p>
         <div className={styles.badges}>
-          <Badge tone={published ? 'brand' : 'muted'}>{published ? 'Опубликовано' : 'Черновик'}</Badge>
+          {showPublicationState && <Badge tone={published ? 'brand' : 'muted'}>{published ? 'Опубликовано' : 'Черновик'}</Badge>}
           {/* CFP state matters only once applications can be submitted. */}
           {published && event.cfp && <Badge tone={cfpClosed ? 'warning' : 'brand'}>{cfpClosed ? 'CFP закрыт' : 'CFP открыт'}</Badge>}
         </div>
-        <time dateTime={event.date} className={styles.date}>{formatLongDate(event.date)}</time>
       </div>
 
-      <h3 className={styles.title}>{event.name}</h3>
-      <p className={styles.meta}>{event.city} · {event.format} · {event.topic}</p>
+      <h2 className={styles.title}>{event.name}</h2>
+      <time dateTime={event.date} className={styles.date}>{formatLongDate(event.date)}</time>
       <p className={styles.description}>{event.description}</p>
+      {event.topic && <p className={styles.topics}><Badge tone="muted">{event.topic}</Badge></p>}
 
       <div className={styles.footer}>
         <p className={styles.deadline}>
-          CFP до: <strong>{event.cfp ? formatLongDate(event.cfp) : '—'}</strong>
+          {published ? <>CFP до: <strong>{event.cfp ? formatLongDate(event.cfp) : '—'}</strong></> : 'Ещё не опубликовано'}
         </p>
         <div className={styles.actions}>{actions}</div>
       </div>

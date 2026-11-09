@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Button, Grid, Input, Stack, Textarea, useToast } from '@/components/ui';
+import { Button, Grid, Input, LinkButton, Stack, Textarea, useToast } from '@/components/ui';
 import type { ProfileInput } from '@/store/appContext';
 import { useAppActions } from '@/store/useAppStore';
 import type { UserProfile } from '@/types/domain';
@@ -9,10 +9,12 @@ import styles from './ProfileForm.module.scss';
 export interface ProfileFormProps {
   role: Role;
   profile: UserProfile;
+  cancelTo: string;
+  onSaved: () => void;
 }
 
 /** Own profile editor; competencies and preferences exist only for the speaker. */
-export function ProfileForm({ role, profile }: ProfileFormProps) {
+export function ProfileForm({ role, profile, cancelTo, onSaved }: ProfileFormProps) {
   const { saveProfile } = useAppActions();
   const { toast } = useToast();
   const [values, setValues] = useState<ProfileInput>(profile);
@@ -26,15 +28,18 @@ export function ProfileForm({ role, profile }: ProfileFormProps) {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
     setPending(true);
     const result = await saveProfile(values);
+    if (!form.isConnected) return;
     setPending(false);
     if (!result.ok) {
       setError(result.error);
       return;
     }
     setError(undefined);
-    toast('Профиль сохранен');
+    toast('Профиль сохранён');
+    onSaved();
   };
 
   return (
@@ -59,7 +64,10 @@ export function ProfileForm({ role, profile }: ProfileFormProps) {
         </Grid>
         <Textarea label="О себе" value={values.about} onChange={change('about')} />
         <div className={styles.actions}>
-          <Button type="submit" disabled={pending}>Сохранить изменения</Button>
+          <Button className={styles.submit} type="submit" disabled={pending}>
+            {pending ? 'Сохраняем…' : 'Сохранить изменения'}
+          </Button>
+          <LinkButton to={cancelTo} variant="secondary">Отмена</LinkButton>
         </div>
       </Stack>
     </form>

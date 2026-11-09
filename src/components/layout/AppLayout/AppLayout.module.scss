@@ -1,19 +1,20 @@
 @use '@/styles/mixins' as *;
 
 .shell {
-  display: flex;
+  --sl-layout-topbar: 68px;
+  --sl-layout-max: 1280px;
+
   min-height: 100vh;
 }
 
 .main {
-  flex: 1;
   min-width: 0;
 }
 
 .content {
   max-width: var(--sl-layout-max);
   margin: 0 auto;
-  padding: var(--sl-layout-padding) var(--sl-layout-padding) 72px;
+  padding: 36px var(--sl-layout-padding) 72px;
   outline: none;
 
   @include down('tablet') {
@@ -25,11 +26,33 @@
   }
 }
 
+.trail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+  margin-bottom: var(--sl-space-4);
+  color: var(--sl-muted);
+  font-size: var(--sl-text-xs);
+  font-weight: var(--sl-weight-semibold);
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: calc(var(--sl-z-sidebar) - 1);
   background: var(--sl-overlay);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--sl-transition-base),
+    visibility var(--sl-transition-base);
+
+  &[data-open='true'] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
 }
 
 .skipLink {

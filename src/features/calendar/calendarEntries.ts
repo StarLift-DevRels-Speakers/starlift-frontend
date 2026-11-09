@@ -130,11 +130,13 @@ export function calendarEntriesFor(role: Role, source: CalendarSource): Calendar
   return role === 'speaker' ? speakerEntries(source) : devrelEntries(source);
 }
 
-/** Where an entry leads: a speaker's CFP deadline opens the event card, the rest open their section. */
+/** Opens the related section, tab or event card. */
 export function entryLink(role: Role, entry: CalendarEntry): string {
   if (role === 'speaker' && entry.kind === 'cfp' && entry.eventId) {
     return `${rolePath('speaker', 'events')}?event=${entry.eventId}`;
   }
+  if (entry.section === 'talks') return `${rolePath(role, 'talks')}?tab=performances`;
+  if (role === 'devrel' && entry.kind === 'invite') return `${rolePath(role, 'applications')}?tab=outgoing`;
   return rolePath(role, entry.section);
 }
 

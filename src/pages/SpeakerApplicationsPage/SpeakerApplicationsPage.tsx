@@ -3,10 +3,9 @@ import { rolePath } from '@/app/navigation';
 import { ApplicationStatusBadge } from '@/components/applications/ApplicationStatusBadge/ApplicationStatusBadge';
 import { ChangeApplicationTalkModal } from '@/components/applications/ChangeApplicationTalkModal/ChangeApplicationTalkModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Button, EmptyState, LinkButton, Stack, Table } from '@/components/ui';
+import { Button, Card, EmptyState, LinkButton, ListItem } from '@/components/ui';
 import { canRequestTalkChange } from '@/features/applications/applicationStatus';
 import { useAppState } from '@/store/useAppStore';
-import type { Application } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
 import styles from './SpeakerApplicationsPage.module.scss';
 
@@ -25,67 +24,52 @@ export function SpeakerApplicationsPage() {
 
   return (
     <>
-      <PageHeader title="Мои заявки" description="Отправленные заявки на CFP и текущие решения DevRel." />
+      <PageHeader
+        title="Мои заявки"
+        description="Решения организаторов и запросы на смену доклада."
+        actions={<LinkButton to={rolePath('speaker', 'events')}>Найти мероприятие</LinkButton>}
+      />
 
-      <Stack>
-        {applications.length > 0 ? (
-          <Table<Application>
-            caption="Мои заявки на CFP"
-            rows={applications}
-            getRowKey={(application) => application.id}
-            columns={[
-              {
-                key: 'event',
-                header: 'Мероприятие',
-                render: (application) => {
-                  const event = eventById.get(application.eventId);
-                  if (!event) return '—';
-                  return event.state === 'published'
-                    ? <Link to={`${rolePath('speaker', 'events')}?event=${event.id}`}>{event.name}</Link>
-                    : event.name;
-                },
-              },
-              {
-                key: 'topic',
-                header: 'Тема доклада',
-                render: (application) => (
-                  <>
-                    {application.topic}
-                    {application.talkChange && (
-                      <span className={styles.change}>Смена на «{application.talkChange.topic}» ждет подтверждения DevRel</span>
+      <Card as="section" title="Все заявки" titleAs="h2">
+        {applications.length ? (
+          <ul className={styles.list}>
+            {applications.map((application) => {
+              const event = eventById.get(application.eventId);
+              const title = event?.state === 'published'
+                ? <Link to={`${rolePath('speaker', 'events')}?event=${encodeURIComponent(event.id)}`}>{event.name}</Link>
+                : event?.name ?? 'Мероприятие';
+              return (
+                <ListItem
+                  key={application.id}
+                  title={title}
+                  meta={
+                    <>
+                      <span>{application.topic} · подана {formatLongDate(application.at)}</span>
+                      {application.talkChange && <span className={styles.change}>Смена на «{application.talkChange.topic}» ждёт подтверждения</span>}
+                    </>
+                  }
+                >
+                  <div className={styles.actions}>
+                    <ApplicationStatusBadge status={application.status} />
+                    {canRequestTalkChange(application, event) && (
+                      <Button variant="secondary" size="sm" aria-label={`Изменить доклад: ${application.topic}`} onClick={() => openEdit(application.id)}>
+                        Изменить доклад
+                      </Button>
                     )}
-                  </>
-                ),
-              },
-              { key: 'status', header: 'Статус', render: (application) => <ApplicationStatusBadge status={application.status} /> },
-              { key: 'at', header: 'Дата подачи', render: (application) => formatLongDate(application.at) },
-              {
-                key: 'actions',
-                header: 'Действия',
-                align: 'end',
-                render: (application) => canRequestTalkChange(application, eventById.get(application.eventId)) && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    aria-label={`Изменить доклад: ${application.topic}`}
-                    onClick={() => openEdit(application.id)}
-                  >
-                    Изменить доклад
-                  </Button>
-                ),
-              },
-            ]}
-          />
+                  </div>
+                </ListItem>
+              );
+            })}
+          </ul>
         ) : (
           <EmptyState
+            variant="plain"
             title="Заявок пока нет"
             description="Выберите мероприятие с открытым CFP и нажмите «Подать заявку»."
-            action={<LinkButton to={rolePath('speaker', 'events')}>Каталог мероприятий</LinkButton>}
+            action={<LinkButton to={rolePath('speaker', 'events')} variant="secondary">Открыть каталог</LinkButton>}
           />
         )}
-
-        <p className={styles.note}>Полный перечень статусов и правила переходов еще подлежат согласованию.</p>
-      </Stack>
+      </Card>
 
       {canEdit && editedEvent && (
         <ChangeApplicationTalkModal application={editedApplication} eventName={editedEvent.name} onClose={closeEdit} />

@@ -1,9 +1,10 @@
 import { getSession, setSession, syncSession, type Session } from '@/auth/session';
+import { demoEnabled } from '@/demo/config';
 
-// Thin fetch wrapper over the backend REST API. Requests go to `/api` on the same origin:
-// nginx proxies it in production, the Vite dev server in development.
-
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '';
+// Vite proxies same-origin requests in development. Production uses the backend directly.
+const BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? '' : 'https://startlift.duckdns.org')
+).replace(/\/+$/, '');
 
 /** Backend error with the user-facing message from the RFC 7807 `detail`. */
 export class ApiError extends Error {
@@ -125,6 +126,10 @@ async function send(path: string, options: RequestOptions, retry: boolean): Prom
 
 /** JSON request; resolves to `undefined` for empty responses (201/204 without a body). */
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  if (import.meta.env.DEV && demoEnabled) {
+    const { demoRequest } = await import('@/demo/api');
+    return demoRequest<T>(path, options);
+  }
   const response = await send(path, options, true);
   const text = await response.text();
   if (!text) return undefined as T;

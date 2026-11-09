@@ -1,5 +1,16 @@
 @use '@/styles/mixins' as *;
 
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(270px, 1fr);
+  align-items: start;
+  gap: var(--sl-space-4);
+
+  @media (max-width: 1150px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;

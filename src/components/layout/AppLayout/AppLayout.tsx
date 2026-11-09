@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Outlet, useLocation } from 'react-router';
-import { findNavTrail } from '@/app/navigation';
+import { Link, Outlet, useLocation } from 'react-router';
+import { findNavTrail, rolePath } from '@/app/navigation';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 import { TopBar } from '@/components/layout/TopBar/TopBar';
 import { isSubscriptionActive } from '@/features/billing/access';
@@ -24,11 +24,13 @@ export function AppLayout({ role }: AppLayoutProps) {
   const isDrawer = useMediaQuery(DRAWER_QUERY);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
 
   const drawerOpen = isDrawer && menuOpen;
   const { billing, notifications, profile: user } = useAppState();
   const hasSubscription = isSubscriptionActive(billing[role]);
   const trail = findNavTrail(role, pathname);
+  const editingProfile = pathname.replace(/\/$/, '') === rolePath(role, 'profile/edit');
   useDailyCheckIn(user.id, role === 'speaker');
 
   const closeMenu = () => {
@@ -39,6 +41,8 @@ export function AppLayout({ role }: AppLayoutProps) {
   useEffect(() => {
     if (!drawerOpen) return;
 
+    document.getElementById(sidebarId)?.querySelector('a')?.focus();
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       setMenuOpen(false);
@@ -46,7 +50,7 @@ export function AppLayout({ role }: AppLayoutProps) {
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [drawerOpen]);
+  }, [drawerOpen, sidebarId]);
 
   return (
     <div className={styles.shell}>
@@ -59,23 +63,39 @@ export function AppLayout({ role }: AppLayoutProps) {
         hasSubscription={hasSubscription}
         open={drawerOpen}
         inert={isDrawer && !drawerOpen}
-        onNavigate={() => setMenuOpen(false)}
+        onNavigate={() => {
+          if (!drawerOpen) return;
+          setMenuOpen(false);
+          mainRef.current?.focus();
+        }}
       />
-      {drawerOpen && <div className={styles.backdrop} aria-hidden="true" onClick={closeMenu} />}
+      <div className={styles.backdrop} data-open={drawerOpen} aria-hidden="true" onClick={closeMenu} />
 
       <div className={styles.main}>
         <TopBar
           role={role}
           user={user}
           hasSubscription={hasSubscription}
-          unreadNotifications={notifications.filter((notification) => !notification.read).length}
-          trail={trail}
+          notifications={notifications}
           sidebarId={sidebarId}
           sidebarOpen={drawerOpen}
           onMenuToggle={() => setMenuOpen((open) => !open)}
           menuButtonRef={menuButtonRef}
         />
-        <main id="main-content" className={styles.content} tabIndex={-1}>
+        <main ref={mainRef} id="main-content" className={styles.content} tabIndex={-1}>
+          {pathname.replace(/\/$/, '') !== rolePath(role) && (
+            <nav aria-label="Хлебные крошки" className={styles.trail}>
+              <Link to={rolePath(role)}>Обзор</Link>
+              <span aria-hidden="true">/</span>
+              {editingProfile ? (
+                <>
+                  <Link to={rolePath(role, 'profile')}>Мой профиль</Link>
+                  <span aria-hidden="true">/</span>
+                  <span aria-current="page">Редактирование</span>
+                </>
+              ) : <span aria-current="page">{trail.at(-1)?.title}</span>}
+            </nav>
+          )}
           <Outlet />
         </main>
       </div>

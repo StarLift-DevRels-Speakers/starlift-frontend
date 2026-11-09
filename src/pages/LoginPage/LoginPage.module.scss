@@ -2,11 +2,11 @@
 
 .page {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 64px var(--sl-space-4);
-  background: linear-gradient(160deg, var(--sl-public-bg-start), var(--sl-public-bg-end));
+  padding: 48px var(--sl-space-4) 64px;
+  background: linear-gradient(135deg, var(--sl-public-bg-start), var(--sl-public-bg-end));
 
   @include down('mobile') {
     padding: 24px var(--sl-space-3);
@@ -14,12 +14,45 @@
 }
 
 .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: var(--sl-space-5);
   width: 100%;
-  max-width: 440px;
+  max-width: 920px;
+
+  @include down('tablet') {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+  }
+}
+
+.intro {
+  --sl-logo-mark: var(--sl-masthead-accent);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(22px, 5vw, 56px);
+  border-radius: var(--sl-radius-card);
+  background:
+    repeating-radial-gradient(circle at 100% 0, transparent 0 34px, #ffffff18 35px 36px, transparent 37px 56px),
+    var(--sl-masthead);
+  color: var(--sl-masthead-muted);
+}
+
+.introTitle {
+  margin-bottom: var(--sl-space-3);
+  color: var(--sl-masthead-ink);
+  font-size: clamp(25px, 4vw, 46px);
+  font-weight: var(--sl-weight-bold);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
 }
 
 .brand {
+  align-self: flex-start;
   margin-bottom: 25px;
+  color: var(--sl-masthead-ink);
 }
 
 .title {

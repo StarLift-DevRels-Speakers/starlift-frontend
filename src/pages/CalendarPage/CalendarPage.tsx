@@ -4,7 +4,7 @@ import { CalendarLegend } from '@/components/calendar/CalendarLegend/CalendarLeg
 import { MonthCalendar } from '@/components/calendar/MonthCalendar/MonthCalendar';
 import { MonthSwitcher } from '@/components/calendar/MonthSwitcher/MonthSwitcher';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Badge, Button, Card, EmptyState, FilterChips, LinkButton, Stack, type FilterChipOption } from '@/components/ui';
+import { Badge, Button, Card, EmptyState, FilterChips, LinkButton, type FilterChipOption } from '@/components/ui';
 import { calendarEntriesFor } from '@/features/calendar/calendarEntries';
 import { useCalendarParams, type CalendarFilter } from '@/features/calendar/useCalendarParams';
 import type { Role } from '@/types/role';
@@ -57,7 +57,7 @@ export function CalendarPage({ role }: CalendarPageProps) {
         actions={<LinkButton to={rolePath(role)} variant="secondary">К главной</LinkButton>}
       />
 
-      <Stack>
+      <div className={styles.layout}>
         <Card as="section" aria-labelledby="calendar-month">
           <div className={styles.toolbar}>
             <div>
@@ -111,7 +111,7 @@ export function CalendarPage({ role }: CalendarPageProps) {
           )}
         </Card>
 
-      </Stack>
+      </div>
     </>
   );
 }

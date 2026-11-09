@@ -1,41 +1,44 @@
-// StarLift design tokens v0.1.
-// Source: docs/дизайн система/StarLift_design_tokens.json + StarLift_tokens_components.css.
-// Exposed as CSS custom properties: usable in SCSS modules and at runtime.
-// Names follow the design system (`--sl-*`) so values can be cross-checked with the reference HTML.
-
+// Constellation palette and layout tokens shared by both workspaces and public pages.
 :root {
   /* ---------- Colors: brand ---------- */
-  --sl-brand: #1f8a4c; // logo, decorative accents (white text on it is below AA)
-  --sl-action: #196e3d; // primary buttons, active links/tabs, text on brand-bg
-  --sl-action-hover: #12552f;
-  --sl-brand-bg: #e8f3ec; // selected items, soft buttons, badges
-  --sl-brand-bg-hover: #d7ebdd;
-  --sl-brand-border: #d4ead9; // AI card borders
-  --sl-brand-gradient-end: #f4fbf6; // AI card background gradient
+  --sl-brand: #614bde;
+  --sl-action: #4a34b8; // primary buttons, active links/tabs, text on brand-bg
+  --sl-action-hover: #36228f;
+  --sl-brand-bg: #ebe6ff; // selected items, soft buttons, badges
+  --sl-brand-bg-hover: #e0d8ff;
+  --sl-brand-border: #d7cdf9; // AI card borders
+  --sl-brand-gradient-end: #f2edff; // AI card background gradient
+
+  --sl-masthead: #211746;
+  --sl-masthead-active: #3d3069;
+  --sl-masthead-hover: #514284;
+  --sl-masthead-ink: #ffffff;
+  --sl-masthead-muted: #ded5ff;
+  --sl-masthead-accent: #ffc18c;
 
   /* ---------- Colors: surfaces ---------- */
-  --sl-page: #f6f8f6;
+  --sl-page: #eef0fa;
   --sl-surface: #ffffff;
-  --sl-surface-subtle: #f9faf9; // table header
-  --sl-surface-muted: #f2f3f5; // muted badge
-  --sl-surface-inverse: #1a1a1a; // toast
-  --sl-surface-soft: #fbfcfb; // sidebar account card
-  --sl-public-bg-start: #f5f9f5; // public feedback page gradient
-  --sl-public-bg-end: #e7efe8;
+  --sl-surface-subtle: #f4f3ff; // table header
+  --sl-surface-muted: #ececf4; // muted badge
+  --sl-surface-inverse: #1c1741; // toast
+  --sl-surface-soft: #faf8ff; // sidebar account card
+  --sl-public-bg-start: #f5f0ff; // public feedback page gradient
+  --sl-public-bg-end: #e4e8fa;
 
   /* ---------- Colors: text ---------- */
-  --sl-text: #1a1a1a;
-  --sl-muted: #6b7280;
-  --sl-text-subtle: #4b5563; // table header, muted badge
+  --sl-text: #211b38;
+  --sl-muted: #5b5672;
+  --sl-text-subtle: #514b67; // table header, muted badge
   --sl-text-nav: #56615a; // sidebar links
   --sl-text-section: #859087; // sidebar section label
   --sl-text-crumb: #69736d; // topbar breadcrumbs
   --sl-crumb-separator: #b9c5b9;
-  --sl-placeholder: #747b87;
+  --sl-placeholder: #71698a;
   --sl-text-on-action: #ffffff;
 
   /* ---------- Colors: strokes ---------- */
-  --sl-border: #e5e7eb;
+  --sl-border: #dedaf0;
 
   /* ---------- Colors: status ---------- */
   --sl-warning-bg: #fef3c7;
@@ -43,44 +46,44 @@
   --sl-warning-border: #d8a742; // growth-area accent (AI producer)
 
   // Answer distribution bars: first / second / third option of a feedback question.
-  --sl-chart-option-1: #2c945c;
-  --sl-chart-option-2: #e6b856;
-  --sl-chart-option-3: #c77a71;
-  --sl-chart-track: #e9ede9;
+  --sl-chart-option-1: #7459da;
+  --sl-chart-option-2: #eca465;
+  --sl-chart-option-3: #4e769a;
+  --sl-chart-track: #eae6f5;
 
-  --sl-ai-bg: #ede9fe;
-  --sl-ai-text: #6d28d9;
-  --sl-ai-bg-soft: #f2eafe; // AI feature icon tile
+  --sl-ai-bg: #e3ddff;
+  --sl-ai-text: #4d36b7;
+  --sl-ai-bg-soft: #efebff; // AI feature icon tile
   --sl-danger-bg: #fee2e2;
   --sl-danger-text: #991b1b;
   --sl-danger: #dc2626;
-  --sl-neutral-bg: #f3f5f3; // demo/neutral notices
-  --sl-neutral-text: #4f5a53;
+  --sl-neutral-bg: #eff0fa; // demo/neutral notices
+  --sl-neutral-text: #464160;
 
   /* ---------- Colors: calendar entry kinds ---------- */
-  --sl-cal-performance-bg: #dbeee1;
-  --sl-cal-performance-text: #196e3d;
+  --sl-cal-performance-bg: #e6dfff;
+  --sl-cal-performance-text: #4a34b8;
   --sl-cal-cfp-bg: #fef0cf;
   --sl-cal-cfp-text: #925c14;
   --sl-cal-invite-bg: #eae6fc;
   --sl-cal-invite-text: #6247a2;
   --sl-cal-event-bg: #e2edfa;
   --sl-cal-event-text: #2b5489;
-  --sl-cal-today-bg: #f0f7f1;
-  --sl-cal-today-border: #a9d1b4;
-  --sl-cal-blank-bg: #f8faf8; // cells outside the month
-  --sl-cal-blank-border: #e8ece8;
-  --sl-cal-day-hover-bg: #fcfefc;
-  --sl-cal-day-hover-border: #8fbb9e;
-  --sl-cal-date-bg: #f1f7f2; // agenda date tile
-  --sl-cal-date-border: #ddeadd;
+  --sl-cal-today-bg: #f2edff;
+  --sl-cal-today-border: #b6a7ee;
+  --sl-cal-blank-bg: #f8f7fc; // cells outside the month
+  --sl-cal-blank-border: #ece9f6;
+  --sl-cal-day-hover-bg: #f8f5ff;
+  --sl-cal-day-hover-border: #b5a6ea;
+  --sl-cal-date-bg: #f2edff; // agenda date tile
+  --sl-cal-date-border: #dfd7f9;
 
   /* ---------- Colors: loading ---------- */
-  --sl-skeleton-base: #eceeec;
+  --sl-skeleton-base: #e5e2f0;
   --sl-skeleton-highlight: var(--sl-page);
 
   /* ---------- Focus ---------- */
-  --sl-focus: 0 0 0 3px rgba(31, 138, 76, 0.2);
+  --sl-focus: 0 0 0 3px #7459da42;
   --sl-focus-danger: 0 0 0 3px rgba(220, 38, 38, 0.1);
   --sl-focus-outline: 3px solid var(--sl-brand);
 
@@ -92,11 +95,11 @@
   --sl-weight-semibold: 600;
   --sl-weight-bold: 700;
 
-  --sl-text-xxl: 32px; // display
-  --sl-text-xl: 26px; // h1 / page title
-  --sl-text-lg: 18px; // h2 / section title
+  --sl-text-xxl: 44px; // display
+  --sl-text-xl: 32px; // h1 / page title
+  --sl-text-lg: 20px; // h2 / section title
   --sl-text-md: 15px; // h3 / card title
-  --sl-text-base: 14px; // body
+  --sl-text-base: 15px; // body
   --sl-text-sm: 13px; // secondary
   --sl-text-xs: 12px; // caption
   --sl-text-2xs: 11px; // table header overline
@@ -125,18 +128,18 @@
   --sl-radius-xs: 6px;
   --sl-radius-sm: 8px;
   --sl-radius-md: 10px; // controls
-  --sl-radius-lg: 12px; // alerts, tables, inner panels
-  --sl-radius-card: 14px;
-  --sl-radius-modal: 16px;
+  --sl-radius-lg: 16px; // alerts, tables, inner panels
+  --sl-radius-card: 20px;
+  --sl-radius-modal: 24px;
   --sl-radius-pill: 999px;
 
   /* ---------- Shadows ---------- */
-  --sl-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
-  --sl-shadow-hover: 0 5px 24px rgba(17, 86, 46, 0.05); // clickable tiles
+  --sl-shadow-card: 0 4px 14px #3020640c;
+  --sl-shadow-hover: 0 8px 26px #30206419; // clickable tiles
   --sl-shadow-drawer: 8px 0 25px rgba(0, 0, 0, 0.08);
   --sl-shadow-toast: 0 14px 36px rgba(0, 0, 0, 0.17);
   --sl-shadow-modal: 0 25px 90px rgba(0, 0, 0, 0.2);
-  --sl-overlay: rgba(16, 32, 20, 0.48);
+  --sl-overlay: #1c174180;
 
   /* ---------- Component sizes ---------- */
   --sl-control-sm: 32px;

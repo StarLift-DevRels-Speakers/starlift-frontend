@@ -1,36 +1,55 @@
+import { useState } from 'react';
 import { rolePath } from '@/app/navigation';
-import { CalendarLegend } from '@/components/calendar/CalendarLegend/CalendarLegend';
-import { MiniCalendar } from '@/components/calendar/MiniCalendar/MiniCalendar';
-import { Card, LinkButton } from '@/components/ui';
-import type { CalendarEntry } from '@/features/calendar/calendarEntries';
+import { AgendaList } from '@/components/calendar/AgendaList/AgendaList';
+import { Button, Card, EmptyState, LinkButton } from '@/components/ui';
+import { upcomingEntries, type CalendarEntry } from '@/features/calendar/calendarEntries';
 import type { Role } from '@/types/role';
-import { parseDay } from '@/utils/date';
+import { daysFromToday, formatLongDate, parseDay } from '@/utils/date';
+import styles from './CalendarCard.module.scss';
 
 export interface CalendarCardProps {
   role: Role;
-  /** All entries of the role; the card shows the current month. */
   entries: CalendarEntry[];
 }
 
-/** Current month with entry markers. */
+const shortDay = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
+const weekday = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' });
+
 export function CalendarCard({ role, entries }: CalendarCardProps) {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const monthEntries = entries.filter((entry) => {
-    const date = parseDay(entry.date);
-    return date?.getFullYear() === year && date.getMonth() === month;
-  });
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const mondayOffset = (new Date().getDay() + 6) % 7;
+  const days = Array.from({ length: 7 }, (_, index) => daysFromToday(index - mondayOffset));
+  const shown = selectedDay ? entries.filter((entry) => entry.date === selectedDay) : upcomingEntries(entries, 4);
 
   return (
     <Card
       as="section"
-      title="Календарь"
+      title="Повестка"
       titleAs="h2"
-      actions={<LinkButton to={rolePath(role, 'calendar')} variant="text" size="sm">Все события →</LinkButton>}
+      actions={<LinkButton to={rolePath(role, 'calendar')} variant="text" size="sm">Календарь →</LinkButton>}
     >
-      <MiniCalendar year={year} month={month} entries={monthEntries} />
-      <CalendarLegend role={role} />
+      <div className={styles.week} role="group" aria-label="Дни текущей недели">
+        {days.map((day) => {
+          const date = parseDay(day)!;
+          return (
+            <button
+              key={day}
+              className={styles.day}
+              type="button"
+              aria-label={formatLongDate(day)}
+              aria-pressed={day === selectedDay}
+              onClick={() => setSelectedDay(day === selectedDay ? null : day)}
+            >
+              {weekday.format(date)}
+              <strong>{shortDay.format(date)}</strong>
+            </button>
+          );
+        })}
+      </div>
+      {shown.length ? <AgendaList role={role} entries={shown} /> : (
+        <EmptyState title={selectedDay ? 'На этот день событий нет' : 'Ближайших событий пока нет'} />
+      )}
+      {selectedDay && <Button variant="text" size="sm" onClick={() => setSelectedDay(null)}>Все ближайшие события →</Button>}
     </Card>
   );
 }

@@ -53,7 +53,11 @@ export function EventDetailsModal({ event, onClose }: EventDetailsModalProps) {
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Закрыть</Button>
-          {canApply && <Button type="submit" form={formId} disabled={pending}>Подать заявку</Button>}
+          {canApply && (
+            <Button className={styles.submit} type="submit" form={formId} disabled={pending}>
+              {pending ? 'Отправляем…' : 'Подать заявку'}
+            </Button>
+          )}
         </>
       }
     >

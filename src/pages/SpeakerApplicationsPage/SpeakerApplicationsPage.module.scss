@@ -1,9 +1,15 @@
 @use '@/styles/mixins' as *;
 
-.note {
-  @include text('caption');
+.list {
+  list-style: none;
+}
 
-  color: var(--sl-muted);
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-2);
 }
 
 .change {
