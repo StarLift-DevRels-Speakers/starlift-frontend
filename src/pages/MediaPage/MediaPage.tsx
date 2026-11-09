@@ -4,6 +4,7 @@ import { AudienceFitBadge } from '@/components/audience/AudienceFitBadge/Audienc
 import { AudienceFitModal } from '@/components/audience/AudienceFitModal/AudienceFitModal';
 import { useSearchParams } from 'react-router';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
+import { WorkspaceIcon } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
 import { MediaFormModal } from '@/components/media/MediaFormModal/MediaFormModal';
 import { Alert, Button, Card, EmptyState, IconTile, ListItem, Modal, Stack, useToast } from '@/components/ui';
 import { latestBy } from '@/features/audience/audienceFit';
@@ -51,7 +52,7 @@ export function MediaPage() {
         actions={<Button onClick={openForm}>+ Добавить файл</Button>}
       />
 
-      <Card as="section" aria-label="Список медиафайлов">
+      <Card as="section" title="Библиотека" titleAs="h2">
         <Stack gap={3}>
           <Alert tone="neutral">
             Файлы хранятся на сервере: PDF, презентации PowerPoint, документы Word, тексты и изображения до 50 МБ.
@@ -66,7 +67,7 @@ export function MediaPage() {
               {media.map((file) => (
                 <ListItem
                   key={file.id}
-                  leading={<IconTile>📎</IconTile>}
+                  leading={<IconTile><WorkspaceIcon name="file" /></IconTile>}
                   title={file.name}
                   meta={`${talkName.get(file.talkId) ?? 'Без доклада'} · ${formatFileSize(file.sizeBytes)}`}
                   trailing={

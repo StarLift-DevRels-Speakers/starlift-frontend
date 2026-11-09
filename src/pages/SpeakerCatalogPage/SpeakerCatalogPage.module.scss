@@ -1,6 +1,29 @@
 @use '@/styles/mixins' as *;
 
-.top,
+.loadingStatus {
+  @include visually-hidden;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  overflow-wrap: anywhere;
+  transition: border-color var(--sl-transition-fast), box-shadow var(--sl-transition-fast);
+
+  &:focus-within {
+    border-color: var(--sl-brand-border);
+    box-shadow: var(--sl-shadow-hover);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--sl-brand-border);
+      box-shadow: var(--sl-shadow-hover);
+    }
+  }
+}
+
 .footer {
   display: flex;
   flex-wrap: wrap;
@@ -27,14 +50,19 @@
 }
 
 .skills {
-  @include text('caption');
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-1);
+  list-style: none;
+}
 
-  margin-top: 2px;
-  color: var(--sl-muted);
+.skill {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .footer {
-  margin-top: var(--sl-space-4);
+  margin-top: auto;
   padding-top: var(--sl-space-4);
   border-top: 1px solid var(--sl-border);
 }

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { SpeechFormModal } from '@/components/talks/SpeechFormModal/SpeechFormModal';
 import { TalkFormModal } from '@/components/talks/TalkFormModal/TalkFormModal';
-import { Button, Card, EmptyState, Grid, IconTile, ListItem, Stack } from '@/components/ui';
+import { Button, Card, EmptyState, IconTile, ListItem, Stack, Tabs } from '@/components/ui';
 import { useAppState } from '@/store/useAppStore';
 import { formatLongDate } from '@/utils/date';
 import styles from './TalksPage.module.scss';
@@ -32,61 +32,77 @@ export function TalksPage() {
       />
 
       <Stack>
-        <Grid columns={2}>
-          <Card as="section" title="Мои доклады" titleAs="h2">
-            {talks.length > 0 ? (
-              <ul className={styles.list}>
-                {talks.map((talk) => (
-                  <ListItem
-                    key={talk.id}
-                    leading={<IconTile>▤</IconTile>}
-                    title={talk.name}
-                    meta={
-                      <>
-                        <span className={styles.caption}>{talk.topic}</span>
-                        {talk.description && <span>{talk.description}</span>}
-                      </>
-                    }
-                    trailing={
-                      <Button variant="secondary" size="sm" aria-label={`Изменить: ${talk.name}`} onClick={() => openTalkForm(talk.id)}>
-                        Изменить
-                      </Button>
-                    }
-                  />
-                ))}
-              </ul>
-            ) : (
-              <EmptyState
-                variant="plain"
-                title="Докладов пока нет"
-                description="Доклады нужны для заявок на CFP и точного AI-подбора."
-                action={<Button size="sm" onClick={() => openTalkForm()}>+ Создать доклад</Button>}
-              />
-            )}
-          </Card>
-
-          <Card
-            as="section"
-            title="История выступлений"
-            titleAs="h2"
-            actions={<Button variant="soft" size="sm" onClick={() => setSpeechFormOpen(true)}>+ Добавить</Button>}
-          >
-            {newestSpeeches.length > 0 ? (
-              <ul className={styles.list}>
-                {newestSpeeches.map((speech) => (
-                  <ListItem
-                    key={speech.id}
-                    leading={<IconTile>🎤</IconTile>}
-                    title={speech.event}
-                    meta={`${formatLongDate(speech.date)} · ${talkName.get(speech.talkId) ?? 'Доклад'}`}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <EmptyState variant="plain" title="Выступлений пока нет" description="Добавьте прошедшие выступления — они видны DevRel в каталоге." />
-            )}
-          </Card>
-        </Grid>
+        <Tabs
+          label="Доклады и выступления"
+          value={!talkFormOpen && params.get('tab') === 'performances' ? 'performances' : 'talks'}
+          onChange={(tab) => setParams(tab === 'performances' ? { tab } : {}, { replace: true })}
+          items={[
+            {
+              value: 'talks',
+              label: `Доклады · ${talks.length}`,
+              content: (
+                  <Card as="section" title="Мои доклады" titleAs="h2">
+                    {talks.length > 0 ? (
+                      <ul className={styles.list}>
+                        {talks.map((talk) => (
+                          <ListItem
+                            key={talk.id}
+                            leading={<IconTile>▤</IconTile>}
+                            title={talk.name}
+                            meta={
+                              <>
+                                <span className={styles.caption}>{talk.topic}</span>
+                                {talk.description && <span>{talk.description}</span>}
+                              </>
+                            }
+                            trailing={
+                              <Button variant="secondary" size="sm" aria-label={`Изменить: ${talk.name}`} onClick={() => openTalkForm(talk.id)}>
+                                Изменить
+                              </Button>
+                            }
+                          />
+                        ))}
+                      </ul>
+                    ) : (
+                      <EmptyState
+                        variant="plain"
+                        title="Докладов пока нет"
+                        description="Доклады нужны для заявок на CFP и точного AI-подбора."
+                        action={<Button size="sm" onClick={() => openTalkForm()}>+ Создать доклад</Button>}
+                      />
+                    )}
+                  </Card>
+              ),
+            },
+            {
+              value: 'performances',
+              label: `Выступления · ${speeches.length}`,
+              content: (
+                  <Card
+                    as="section"
+                    title="История выступлений"
+                    titleAs="h2"
+                    actions={<Button variant="soft" size="sm" onClick={() => setSpeechFormOpen(true)}>+ Добавить</Button>}
+                  >
+                    {newestSpeeches.length > 0 ? (
+                      <ul className={styles.list}>
+                        {newestSpeeches.map((speech) => (
+                          <ListItem
+                            key={speech.id}
+                            leading={<IconTile>🎤</IconTile>}
+                            title={speech.event}
+                            meta={`${formatLongDate(speech.date)} · ${talkName.get(speech.talkId) ?? 'Доклад'}`}
+                          />
+                        ))}
+                      </ul>
+                    ) : (
+                      <EmptyState variant="plain" title="Выступлений пока нет" description="Добавьте прошедшие выступления — они видны DevRel в каталоге." />
+                    )}
+                  </Card>
+              ),
+            },
+          ]}
+        />
 
       </Stack>
 

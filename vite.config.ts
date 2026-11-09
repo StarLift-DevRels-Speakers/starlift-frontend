@@ -14,10 +14,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // In production nginx proxies /api to the backend on the same origin; in development Vite does it.
+  // Keep browser requests same-origin in development.
   server: {
     proxy: {
-      '/api': process.env.VITE_API_PROXY ?? 'http://localhost:8080',
+      '/api': {
+        target: process.env.VITE_API_PROXY ?? 'https://startlift.duckdns.org',
+        changeOrigin: true,
+      },
     },
   },
 });

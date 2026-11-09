@@ -52,7 +52,11 @@ export function LoginPage() {
   return (
     <div className={styles.page}>
       <main className={styles.wrap}>
-        <BrandLogo className={styles.brand} />
+        <aside className={styles.intro} aria-label="О StarLift">
+          <BrandLogo className={styles.brand} />
+          <p className={styles.introTitle}>От темы до сцены</p>
+          <p>Доклады, мероприятия и обратная связь в одном рабочем пространстве.</p>
+        </aside>
         <Card>
           <Stack gap={4}>
             <div>

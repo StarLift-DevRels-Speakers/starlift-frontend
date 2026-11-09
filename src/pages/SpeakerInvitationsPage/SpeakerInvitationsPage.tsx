@@ -1,7 +1,8 @@
 import { rolePath } from '@/app/navigation';
 import { InvitationStatusBadge } from '@/components/invitations/InvitationStatusBadge/InvitationStatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
-import { Button, Card, EmptyState, LinkButton, Stack, useToast } from '@/components/ui';
+import { WorkspaceIcon } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
+import { Button, Card, EmptyState, IconTile, LinkButton, ListItem, Stack, useToast } from '@/components/ui';
 import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useAppActions, useAppState } from '@/store/useAppStore';
 import type { InvitationStatus } from '@/types/domain';
@@ -25,7 +26,7 @@ export function SpeakerInvitationsPage() {
     <>
       <PageHeader title="Приглашения" description="Просматривайте предложения DevRel и отвечайте на них." />
 
-      <Stack>
+      <Card as="section" title="Ваши приглашения" titleAs="h2">
         {sorted.length > 0 ? (
           <Stack as="ul" gap={3} aria-label="Приглашения">
             {sorted.map((invitation) => {
@@ -37,14 +38,13 @@ export function SpeakerInvitationsPage() {
                     : undefined
               );
               return (
-                <Card
+                <ListItem
                   key={invitation.id}
-                  as="li"
+                  leading={<IconTile><WorkspaceIcon name="mail" /></IconTile>}
                   title={event?.name ?? 'Мероприятие'}
-                  titleAs="h2"
-                  description={`Тема: ${invitation.topic || 'не указана'} · получено ${formatLongDate(invitation.date)}`}
-                  actions={<InvitationStatusBadge status={invitation.status} role="speaker" />}
+                  meta={`Тема: ${invitation.topic || 'не указана'} · получено ${formatLongDate(invitation.date)}`}
                 >
+                  <InvitationStatusBadge status={invitation.status} role="speaker" />
                   {event && (
                     <p className={styles.event}>
                       {formatLongDate(event.date)} · {event.city}, {event.format}
@@ -58,7 +58,7 @@ export function SpeakerInvitationsPage() {
                       <Button size="sm" variant="secondary" onClick={() => answer(invitation.id, 'declined')}>Отклонить</Button>
                     </div>
                   )}
-                </Card>
+                </ListItem>
               );
             })}
           </Stack>
@@ -70,7 +70,7 @@ export function SpeakerInvitationsPage() {
           />
         )}
 
-      </Stack>
+      </Card>
     </>
   );
 }

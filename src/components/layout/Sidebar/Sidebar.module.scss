@@ -1,21 +1,27 @@
 @use '@/styles/mixins' as *;
 
 .sidebar {
+  --sl-logo-mark: var(--sl-masthead-accent);
+  --sl-sidebar-ink: var(--sl-masthead-ink);
+  --sl-sidebar-muted: var(--sl-masthead-muted);
+  --sl-sidebar-selected: var(--sl-brand-bg);
+
   position: sticky;
   top: 0;
   z-index: var(--sl-z-sidebar);
-  display: flex;
+  display: none;
   flex-direction: column;
   width: var(--sl-layout-sidebar);
   height: 100vh;
   height: 100dvh;
-  padding: 25px 14px 15px;
+  padding: 24px 12px 12px;
   overflow-y: auto;
-  border-right: 1px solid var(--sl-border);
-  background: var(--sl-surface);
+  background: var(--sl-masthead);
+  color: var(--sl-sidebar-ink);
 
   // Off-canvas drawer.
   @include down('tablet') {
+    display: flex;
     position: fixed;
     left: 0;
     width: var(--sl-layout-sidebar-drawer);
@@ -32,12 +38,14 @@
 }
 
 .brand {
-  margin: 0 11px 29px;
+  margin: 0 11px 12px;
+  color: var(--sl-text-on-action);
+  font-size: 26px;
 }
 
 .section {
   margin: 0 12px 7px;
-  color: var(--sl-text-section);
+  color: var(--sl-sidebar-muted);
   font: var(--sl-weight-bold) 10px / var(--sl-leading-control) var(--sl-font);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -53,10 +61,10 @@
   display: flex;
   align-items: center;
   gap: var(--sl-space-3);
-  min-height: 39px;
-  padding: 10px var(--sl-space-3);
+  min-height: 34px;
+  padding: 8px var(--sl-space-3);
   border-radius: var(--sl-radius-md);
-  color: var(--sl-text-nav);
+  color: var(--sl-sidebar-ink);
   font: var(--sl-weight-medium) var(--sl-text-sm) / var(--sl-leading-control) var(--sl-font);
   text-decoration: none;
   transition:
@@ -64,7 +72,7 @@
     color var(--sl-transition-fast);
 
   &:hover {
-    background: var(--sl-page);
+    background: #ffffff10;
     text-decoration: none;
   }
 
@@ -73,44 +81,28 @@
   }
 }
 
-// Group title: same row as a link, but not interactive.
-.group {
-  display: flex;
-  align-items: center;
-  gap: var(--sl-space-3);
-  min-height: 39px;
-  padding: 10px var(--sl-space-3);
-  color: var(--sl-text-nav);
-  font: var(--sl-weight-medium) var(--sl-text-sm) / var(--sl-leading-control) var(--sl-font);
-}
-
-.sublist {
-  margin-left: var(--sl-space-5);
+.menuSection + .menuSection {
+  margin-top: 15px;
 }
 
 .active {
-  background: var(--sl-brand-bg);
+  background: var(--sl-sidebar-selected);
   color: var(--sl-action);
   font-weight: var(--sl-weight-bold);
 
   &:hover {
-    background: var(--sl-brand-bg);
+    background: var(--sl-sidebar-selected);
   }
 }
 
-.icon {
-  width: 21px;
+.link svg {
   flex-shrink: 0;
-  font-size: 17px;
-  text-align: center;
 }
 
 .account {
   margin-top: auto;
   padding: var(--sl-space-3);
-  border: 1px solid var(--sl-border);
-  border-radius: var(--sl-radius-lg);
-  background: var(--sl-surface-soft);
+  border-top: 1px solid #ffffff2e;
 }
 
 .nav {
@@ -139,15 +131,14 @@
 .accountPlan {
   @include text('caption');
 
-  color: var(--sl-muted);
+  color: var(--sl-sidebar-muted);
 }
 
 .accountPlan {
   margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--sl-border);
 }
 
 .reset {
   margin: var(--sl-space-1) 0 0 calc(-1 * var(--sl-space-2));
+  color: var(--sl-sidebar-ink);
 }

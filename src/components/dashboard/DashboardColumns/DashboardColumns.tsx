@@ -9,7 +9,7 @@ export interface DashboardColumnsProps {
   aside: ReactNode;
 }
 
-/** Two dashboard columns that stack into one below 1150px. */
+/** Two dashboard columns that stack when the content gets narrow. */
 export function DashboardColumns({ main, aside }: DashboardColumnsProps) {
   return (
     <div className={styles.columns}>

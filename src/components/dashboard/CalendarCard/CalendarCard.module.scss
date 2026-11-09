@@ -1,0 +1,28 @@
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: var(--sl-space-3);
+}
+
+.day {
+  min-height: 44px;
+  padding: 4px 0;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-sm);
+  background: var(--sl-surface);
+  color: var(--sl-muted);
+  font-size: var(--sl-text-xs);
+  cursor: pointer;
+
+  strong {
+    display: block;
+    color: var(--sl-text);
+  }
+
+  &:hover,
+  &[aria-pressed='true'] {
+    border-color: var(--sl-brand);
+    background: var(--sl-brand-bg);
+  }
+}
