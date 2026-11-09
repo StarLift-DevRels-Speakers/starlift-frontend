@@ -6,6 +6,7 @@ import { AiMatchPage } from '@/pages/AiMatchPage/AiMatchPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage/AnalyticsPage';
 import { BillingPage } from '@/pages/BillingPage/BillingPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
+import { CompetitionPage } from '@/pages/CompetitionPage/CompetitionPage';
 import { DevrelApplicationsPage } from '@/pages/DevrelApplicationsPage/DevrelApplicationsPage';
 import { DevrelDashboardPage } from '@/pages/DevrelDashboardPage/DevrelDashboardPage';
 import { DevrelEventsPage } from '@/pages/DevrelEventsPage/DevrelEventsPage';
@@ -15,6 +16,7 @@ import { MediaPage } from '@/pages/MediaPage/MediaPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage/PlaceholderPage';
 import { ProducerPage } from '@/pages/ProducerPage/ProducerPage';
+import { ProfileEditPage } from '@/pages/ProfilePage/ProfileEditPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { PublicFeedbackPage } from '@/pages/PublicFeedbackPage/PublicFeedbackPage';
 import { SpeakerApplicationsPage } from '@/pages/SpeakerApplicationsPage/SpeakerApplicationsPage';
@@ -40,6 +42,7 @@ const pages: Record<Role, Partial<Record<string, ReactElement>>> = {
     'ai/events': <AiMatchPage role="speaker" />,
     'ai/producer': <ProducerPage />,
     reviews: <SpeakerReviewsPage />,
+    competition: <CompetitionPage />,
     media: <MediaPage />,
     billing: <BillingPage role="speaker" />,
     notifications: <NotificationsPage />,
@@ -84,6 +87,7 @@ function roleRoutes(role: Role): RouteObject {
     element: <RoleSection role={role} />,
     children: [
       ...navigation[role].flatMap((item) => menuRoutes(role, item)),
+      { path: 'profile/edit', element: <ProfileEditPage role={role} /> },
       ...detailRoutes[role],
     ],
   };

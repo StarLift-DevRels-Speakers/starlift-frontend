@@ -10,7 +10,7 @@ export interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-export function PageHeader({ title, description, eyebrow = 'StarLift / MVP 1.0', actions }: PageHeaderProps) {
+export function PageHeader({ title, description, eyebrow, actions }: PageHeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.text}>

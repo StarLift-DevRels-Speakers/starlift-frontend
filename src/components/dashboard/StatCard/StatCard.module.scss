@@ -25,7 +25,8 @@
     border-color var(--sl-transition-fast),
     box-shadow var(--sl-transition-fast);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     border-color: var(--sl-brand-border);
     box-shadow: var(--sl-shadow-hover);
     text-decoration: none;

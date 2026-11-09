@@ -15,11 +15,12 @@
 .mark {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: var(--sl-action);
-  color: var(--sl-text-on-action);
-  font-size: 19px;
-  letter-spacing: 0;
+  color: var(--sl-logo-mark, var(--sl-action));
+
+  svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+    stroke: none;
+  }
 }

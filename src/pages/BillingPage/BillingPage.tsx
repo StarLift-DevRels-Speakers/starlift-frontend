@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DemoPurchaseNotice } from '@/components/billing/DemoPurchaseNotice/DemoPurchaseNotice';
 import { PlanCard } from '@/components/billing/PlanCard/PlanCard';
 import { PurchaseConfirmModal } from '@/components/billing/PurchaseConfirmModal/PurchaseConfirmModal';
+import { ResetDemoButton } from '@/components/common/ResetDemoButton/ResetDemoButton';
 import { StatCard } from '@/components/dashboard/StatCard/StatCard';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { Badge, Button, Card, EmptyState, Grid, Stack, Table, useToast } from '@/components/ui';
@@ -49,7 +50,7 @@ export function BillingPage({ role }: BillingPageProps) {
   return (
     <>
       <PageHeader
-        title="Тарифы и подписка"
+        title="Подписка и покупки"
         description="Бесплатные функции, разовые тестовые приобретения и платная подписка."
         actions={<Badge tone="warning">Только демонстрационный режим</Badge>}
       />
@@ -67,8 +68,8 @@ export function BillingPage({ role }: BillingPageProps) {
         </Grid>
 
         <section aria-labelledby="plans-title">
-          <h2 id="plans-title" className={styles.sectionTitle}>Тарифы и разовые операции</h2>
-          <Grid columns={3}>
+          <h2 id="plans-title" className={styles.sectionTitle}>Тарифы</h2>
+          <Grid columns={2}>
             <PlanCard
               title="Бесплатный доступ"
               price={0}
@@ -88,6 +89,12 @@ export function BillingPage({ role }: BillingPageProps) {
                 </Button>
               }
             />
+          </Grid>
+        </section>
+
+        <section aria-labelledby="rights-title">
+          <h2 id="rights-title" className={styles.sectionTitle}>Разовые покупки</h2>
+          <Grid columns={roleRights[role].length === 2 ? 3 : 2}>
             {roleRights[role].map((right) => (
               <PlanCard
                 key={right}
@@ -117,6 +124,7 @@ export function BillingPage({ role }: BillingPageProps) {
         </section>
 
         <Card as="section" title="История тестовых покупок" titleAs="h2">
+          <ResetDemoButton />
           {billing.history.length > 0 ? (
             <Table<Purchase>
               caption="История тестовых покупок"

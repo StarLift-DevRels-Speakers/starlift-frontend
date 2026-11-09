@@ -1,9 +1,15 @@
-import type { Ref } from 'react';
-import { Link } from 'react-router';
-import { rolePath, type NavItem } from '@/app/navigation';
+import { useId, useRef, type Ref } from 'react';
+import { Link, useLocation } from 'react-router';
+import { rolePath } from '@/app/navigation';
 import { useAuth } from '@/auth/useAuth';
-import { Avatar, Badge, Button } from '@/components/ui';
-import type { UserProfile } from '@/types/domain';
+import { BrandLogo } from '@/components/layout/BrandLogo/BrandLogo';
+import { WorkspaceIcon } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
+import { WorkspaceNav } from '@/components/layout/WorkspaceNav/WorkspaceNav';
+import { NotificationList } from '@/components/notifications/NotificationList/NotificationList';
+import { demoEnabled } from '@/demo/config';
+import { Avatar, Badge, Button, useToast } from '@/components/ui';
+import { useAppActions } from '@/store/useAppStore';
+import type { AppNotification, UserProfile } from '@/types/domain';
 import { roleLabels, type Role } from '@/types/role';
 import styles from './TopBar.module.scss';
 
@@ -11,9 +17,7 @@ export interface TopBarProps {
   role: Role;
   user: UserProfile;
   hasSubscription: boolean;
-  unreadNotifications: number;
-  /** Current menu items, outermost first; the last one is the current page. */
-  trail: ReadonlyArray<NavItem>;
+  notifications: AppNotification[];
   sidebarId: string;
   sidebarOpen: boolean;
   onMenuToggle: () => void;
@@ -21,8 +25,19 @@ export interface TopBarProps {
   menuButtonRef?: Ref<HTMLButtonElement>;
 }
 
-export function TopBar({ role, user, hasSubscription, unreadNotifications, trail, sidebarId, sidebarOpen, onMenuToggle, menuButtonRef }: TopBarProps) {
+export function TopBar({ role, user, hasSubscription, notifications, sidebarId, sidebarOpen, onMenuToggle, menuButtonRef }: TopBarProps) {
   const { signOut } = useAuth();
+  const { pathname } = useLocation();
+  const { markNotificationsRead } = useAppActions();
+  const { toast } = useToast();
+  const notificationsId = useId();
+  const notificationsPanel = useRef<HTMLDivElement>(null);
+  const unreadNotifications = notifications.filter((notification) => !notification.read).length;
+
+  const markAllRead = async () => {
+    const result = await markNotificationsRead();
+    if (!result.ok) toast(result.error);
+  };
 
   return (
     <header className={styles.topbar}>
@@ -36,40 +51,54 @@ export function TopBar({ role, user, hasSubscription, unreadNotifications, trail
           aria-label={sidebarOpen ? 'Закрыть меню' : 'Открыть меню'}
           onClick={onMenuToggle}
         >
-          <span aria-hidden="true">☰</span>
+          <WorkspaceIcon name="menu" />
         </button>
 
-        <nav aria-label="Хлебные крошки" className={styles.crumbs}>
-          <ol>
-            <li>StarLift</li>
-            <li>
-              <Link to={rolePath(role)}>{roleLabels[role]}</Link>
-            </li>
-            {trail.map((item, index) => (
-              <li key={item.slug} aria-current={index === trail.length - 1 ? 'page' : undefined}>{item.title}</li>
-            ))}
-          </ol>
-        </nav>
+        <BrandLogo to={rolePath(role)} className={styles.brand} />
+        <span className={styles.role}>{roleLabels[role]}</span>
       </div>
+
+      <WorkspaceNav key={pathname} role={role} pathname={pathname} />
 
       <div className={styles.right}>
         <Badge tone={hasSubscription ? 'brand' : 'muted'} className={styles.plan}>
           {hasSubscription ? '● Подписка PAID' : '○ FREE'}
         </Badge>
 
-        <Link
-          to={rolePath(role, 'notifications')}
+        <button
+          type="button"
+          popoverTarget={notificationsId}
           className={styles.iconButton}
           aria-label={unreadNotifications > 0 ? `Уведомления, непрочитанных: ${unreadNotifications}` : 'Уведомления'}
         >
-          <span aria-hidden="true">🔔</span>
+          <WorkspaceIcon name="bell" />
           {unreadNotifications > 0 && (
             <span className={styles.counter} aria-hidden="true">{unreadNotifications > 9 ? '9+' : unreadNotifications}</span>
           )}
-        </Link>
+        </button>
+        <div id={notificationsId} popover="auto" ref={notificationsPanel} className={styles.notifications}>
+          <div className={styles.notificationsHeader}>
+            <h2>Уведомления</h2>
+            <Button variant="text" size="sm" disabled={unreadNotifications === 0} onClick={() => void markAllRead()}>
+              Прочитать все
+            </Button>
+          </div>
+          {notifications.length ? (
+            <NotificationList notifications={notifications.slice(0, 3)} />
+          ) : <p>Уведомлений пока нет</p>}
+          <Link to={rolePath(role, 'notifications')} onClick={() => notificationsPanel.current?.hidePopover()}>
+            Все уведомления →
+          </Link>
+        </div>
 
-        <Avatar name={user.name} size="sm" />
-        <Button variant="text" size="sm" onClick={() => void signOut()}>Выйти</Button>
+        <Link to={rolePath(role, 'profile')} aria-label="Мой профиль">
+          <Avatar name={user.name} size="sm" decorative />
+        </Link>
+        {demoEnabled ? (
+          <Button variant="text" size="sm" className={styles.signOut} onClick={() => window.location.assign(role === 'speaker' ? '/devrel' : '/speaker')}>
+            {role === 'speaker' ? 'Демо: DevRel' : 'Демо: Спикер'}
+          </Button>
+        ) : <Button variant="text" size="sm" className={styles.signOut} onClick={() => void signOut()}>Выйти</Button>}
       </div>
     </header>
   );

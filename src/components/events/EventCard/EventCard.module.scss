@@ -3,6 +3,19 @@
 .card {
   display: flex;
   flex-direction: column;
+  transition: border-color var(--sl-transition-fast), box-shadow var(--sl-transition-fast);
+
+  &:focus-within {
+    border-color: var(--sl-brand-border);
+    box-shadow: var(--sl-shadow-hover);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--sl-brand-border);
+      box-shadow: var(--sl-shadow-hover);
+    }
+  }
 }
 
 .top,
@@ -20,7 +33,6 @@
   gap: 6px;
 }
 
-.date,
 .deadline {
   @include text('caption');
 
@@ -28,16 +40,28 @@
 }
 
 .title {
-  @include text('h3');
+  @include text('h2');
 
   margin-top: var(--sl-space-4);
 }
 
-.meta {
-  @include text('body-sm');
+.location {
+  @include text('caption');
 
-  margin-top: 2px;
   color: var(--sl-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.date {
+  @include text('label');
+
+  margin-top: var(--sl-space-1);
+  color: var(--sl-action);
+}
+
+.topics {
+  margin-bottom: var(--sl-space-4);
 }
 
 .description {

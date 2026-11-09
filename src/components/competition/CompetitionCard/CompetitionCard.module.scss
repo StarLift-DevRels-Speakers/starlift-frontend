@@ -1,0 +1,14 @@
+@use '@/styles/mixins' as *;
+
+.league {
+  @include text('label');
+
+  margin: 0 0 var(--sl-space-1);
+}
+
+.meta {
+  @include text('body-sm');
+
+  margin: 0 0 var(--sl-space-3);
+  color: var(--sl-muted);
+}

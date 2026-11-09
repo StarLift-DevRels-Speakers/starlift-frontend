@@ -20,7 +20,6 @@ import { Alert, Button, Stack } from '@/components/ui';
 import { aiPayment, aiRight, isChargedOutcome } from '@/features/ai/aiMatch';
 import { hasRight, isSubscriptionActive } from '@/features/billing/access';
 import { rightLabels, rightPrices, subscriptions } from '@/features/billing/pricing';
-import { collectFacts } from '@/features/producer/producer';
 import type { Role } from '@/types/role';
 import { AppActionsContext, AppStateContext, type ActionResult, type AppActions } from './appContext';
 import { initialLocalDemo, loadLocalDemo, saveLocalDemo, type AppState, type LocalDemo, type RemoteSlice } from './appState';
@@ -277,10 +276,7 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
       if (!isSubscriptionActive(latestDemo.current.billing.speaker)) {
         return { ok: false, error: 'Нужна подписка Спикера', reason: 'paywall' };
       }
-      const current = latestRemote.current;
-      if (!collectFacts(current).ready) {
-        return { ok: false, error: 'Недостаточно исходных данных: нужны минимум три отзыва за год, доклад и выступление', reason: 'not_ready' };
-      }
+      // Readiness is decided by the backend: with too little data it answers insufficient_data without calling the model.
       let plan: Awaited<ReturnType<typeof api.buildProducerPlan>>;
       try {
         plan = await api.buildProducerPlan();

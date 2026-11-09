@@ -2,14 +2,20 @@
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sl-space-4);
-  margin-bottom: 22px;
+  margin-bottom: 26px;
+  padding: 20px 24px;
+  border-left: 4px solid var(--sl-brand);
+  border-radius: 0 var(--sl-radius-lg) var(--sl-radius-lg) 0;
+  background: var(--sl-surface-subtle);
 
   @include down('mobile') {
+    align-items: flex-start;
     flex-direction: column;
     gap: var(--sl-space-3);
+    padding: 16px;
   }
 }
 
@@ -29,7 +35,7 @@
   @include text('h1');
 
   margin-bottom: 7px;
-  letter-spacing: -0.9px;
+  letter-spacing: -0.045em;
 
   @include down('tablet') {
     font-size: 23px;

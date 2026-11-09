@@ -4,6 +4,7 @@ import { AiResultView } from '@/components/ai/AiResultView/AiResultView';
 import { PaywallModal } from '@/components/billing/PaywallModal/PaywallModal';
 import { InviteSpeakerModal } from '@/components/invitations/InviteSpeakerModal/InviteSpeakerModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
+import { WorkspaceIcon } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
 import { Alert, Badge, Button, Card, Grid, Input, LinkButton, Select, Stack, useToast } from '@/components/ui';
 import { aiOutcomeOptions, aiRight } from '@/features/ai/aiMatch';
 import { isSubscriptionActive } from '@/features/billing/access';
@@ -92,8 +93,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
         <Grid columns={2}>
           <Card
             as="section"
-            variant="ai"
-            title={copy[role].formTitle}
+            title="Что ищем?"
             titleAs="h2"
             description={copy[role].formNote}
             actions={<Badge tone="ai">AI-функция</Badge>}
@@ -102,7 +102,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
               <Stack gap={3}>
                 {isSpeaker ? (
                   <>
-                    <Alert tone="neutral" icon="◉">
+                    <Alert tone="neutral" icon={<WorkspaceIcon name="tag" />}>
                       <span className={styles.inline}>
                         Профиль: {skills}.
                         <LinkButton to={rolePath('speaker', 'profile')} variant="text" size="sm">Изменить</LinkButton>
@@ -166,7 +166,7 @@ export function AiMatchPage({ role }: AiMatchPageProps) {
           </Card>
 
           <Stack>
-            <Card as="section" title="Ваш доступ" titleAs="h2">
+            <Card as="section" variant="ai" title="Ваш доступ" titleAs="h2">
               <ul className={styles.rows}>
                 <li>
                   <span>Подписка</span>

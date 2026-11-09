@@ -193,3 +193,117 @@ export interface TalentScoreDto {
   reason: string;
   confidence: 'low' | 'medium' | 'high';
 }
+
+// ---------- Competition (gamification) ----------
+
+export type LeagueCode = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
+export type LeagueZone = 'PROMOTION' | 'SAFE' | 'DEMOTION';
+export type PointReason =
+  | 'TALK_CREATED'
+  | 'TALK_DELETED'
+  | 'FEEDBACK_RECEIVED'
+  | 'HIGH_RATING_FEEDBACK'
+  | 'PROFILE_COMPLETED'
+  | 'DAILY_CHECK_IN'
+  | 'STREAK_BONUS'
+  | 'MANUAL';
+export type BadgeCategory = 'ACTIVITY' | 'LEAGUE' | 'SEASON';
+
+export interface SeasonDto {
+  id: number;
+  startsAt: string;
+  endsAt: string;
+  status: 'ACTIVE' | 'CLOSED';
+  closedAt: string | null;
+}
+
+export interface EarnedBadgeDto {
+  code: string;
+  title: string;
+  description: string;
+  category: BadgeCategory;
+  seasonId: number | null;
+  awardedDate: string;
+}
+
+export interface BadgeDefinitionDto {
+  code: string;
+  title: string;
+  description: string;
+  category: BadgeCategory;
+  repeatable: boolean;
+}
+
+export interface GamificationProfileDto {
+  speakerId: number;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatarColor: string | null;
+  league: LeagueCode;
+  weeklyPoints: number;
+  weeklyRank: number;
+  leagueSize: number;
+  zone: LeagueZone;
+  totalPoints: number;
+  currentStreak: number;
+  longestStreak: number;
+  checkedInToday: boolean;
+  season: SeasonDto;
+  badges: EarnedBadgeDto[];
+}
+
+export interface CheckInDto {
+  alreadyCheckedIn: boolean;
+  awardedPoints: number;
+  currentStreak: number;
+  longestStreak: number;
+  newBadges: EarnedBadgeDto[];
+}
+
+export interface LeaderboardEntryDto {
+  rank: number;
+  speakerId: number;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatarColor: string | null;
+  league: LeagueCode;
+  points: number;
+  zone: LeagueZone | null;
+  me: boolean;
+}
+
+export interface LeagueLeaderboardDto {
+  league: LeagueCode;
+  season: SeasonDto;
+  promotionCount: number;
+  demotionCount: number;
+  entries: LeaderboardEntryDto[];
+}
+
+export interface GlobalLeaderboardDto {
+  period: 'WEEK' | 'ALL_TIME';
+  season: SeasonDto | null;
+  entries: LeaderboardEntryDto[];
+}
+
+export interface LeagueDto {
+  code: LeagueCode;
+  title: string;
+  order: number;
+  participants: number;
+  promotionCount: number;
+  demotionCount: number;
+}
+
+export interface PointTransactionDto {
+  id: string;
+  speakerId: number;
+  points: number;
+  reason: PointReason;
+  sourceId: string | null;
+  comment: string | null;
+  awardedBy: number | null;
+  createdDate: string;
+}

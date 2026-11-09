@@ -1,16 +1,23 @@
 import { request, type AuthTokensResponse } from './client';
 import type {
   ApplicationDto,
+  BadgeDefinitionDto,
   CatalogSpeakerDetailsDto,
   CatalogSpeakerDto,
+  CheckInDto,
   EventBody,
   EventDto,
   FeedbackDto,
+  GamificationProfileDto,
+  GlobalLeaderboardDto,
   InvitationDto,
+  LeagueDto,
+  LeagueLeaderboardDto,
   MediaFileDto,
   MeResponse,
   NotificationDto,
   ProducerPlanDto,
+  PointTransactionDto,
   ProfilePatch,
   PublicFeedbackForm,
   SpeakerTalkDto,
@@ -87,4 +94,14 @@ export const api = {
   talentScore: (speakerId: string) => request<TalentScoreDto>(`/api/signals/speakers/${encodeURIComponent(speakerId)}/talent-score`, json('POST')),
   producerPlans: () => request<ProducerPlanDto[]>('/api/producer/me/plans'),
   buildProducerPlan: () => request<ProducerPlanDto>('/api/producer/me/plan', json('POST')),
+
+  // ---------- Competition ----------
+  competitionProfile: () => request<GamificationProfileDto>('/api/gamification/me'),
+  checkIn: () => request<CheckInDto>('/api/gamification/me/check-in', json('POST')),
+  myPoints: (limit = 50) => request<PointTransactionDto[]>(`/api/gamification/me/points?limit=${limit}`),
+  leagues: () => request<LeagueDto[]>('/api/gamification/leagues'),
+  leagueLeaderboard: () => request<LeagueLeaderboardDto>('/api/gamification/leaderboard/league'),
+  globalLeaderboard: (period: 'WEEK' | 'ALL_TIME') =>
+    request<GlobalLeaderboardDto>(`/api/gamification/leaderboard/global?period=${period}`),
+  badges: () => request<BadgeDefinitionDto[]>('/api/gamification/badges'),
 };
