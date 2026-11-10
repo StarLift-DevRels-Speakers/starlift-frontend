@@ -33,7 +33,7 @@ export interface AppState {
   /** Speaker's listener feedback. */
   feedback: Feedback[];
   notifications: AppNotification[];
-  /** Speaker's confirmed upcoming speeches, nearest first: reminders and calendar export. */
+  /** Speaker: confirmed upcoming speeches; DevRel: own published upcoming events. Nearest first, for reminders and calendar export. */
   schedule: ScheduledTalk[];
   /** Saved versions of the speaker's AI producer plan, oldest first. */
   plans: DevelopmentPlan[];

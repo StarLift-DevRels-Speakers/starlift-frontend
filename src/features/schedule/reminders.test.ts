@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { ScheduledTalk } from '@/types/domain';
-import { activeReminders, countdownLabel, dismissKey, loadDismissed, reminderCopy, saveDismissed } from './reminders.ts';
+import { activeReminders, copyFor, countdownLabel, dismissKey, hostingReminderCopy, loadDismissed, reminderCopy, saveDismissed } from './reminders.ts';
 
 const talk = (eventId: string, daysLeft: number, reminder?: ScheduledTalk['reminder']): ScheduledTalk => ({
+  kind: 'speech',
   eventId,
   eventName: `Event ${eventId}`,
   date: '2026-11-17',
@@ -39,9 +40,16 @@ describe('reminder copy', () => {
   });
 
   it('names the event in every stage title', () => {
-    for (const copy of Object.values(reminderCopy)) {
+    for (const copy of [...Object.values(reminderCopy), ...Object.values(hostingReminderCopy)]) {
       assert.match(copy.title('JPoint'), /«JPoint»/);
     }
+  });
+});
+
+describe('copyFor', () => {
+  it('speaks of a speech to a speaker and of an event to a DevRel', () => {
+    assert.match(copyFor({ ...talk('a', 1), reminder: 'one_day' }).title('JPoint'), /выступление/);
+    assert.match(copyFor({ ...talk('a', 1), kind: 'hosting', reminder: 'one_day' }).title('JPoint'), /ваше мероприятие/);
   });
 });
 

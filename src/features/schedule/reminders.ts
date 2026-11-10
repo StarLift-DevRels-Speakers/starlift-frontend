@@ -1,7 +1,7 @@
 import type { ReminderStage, ScheduledTalk } from '@/types/domain';
 
-// Reminder banner of the speaker: from a week before a confirmed speech to its day.
-// The stage comes from the backend; this module decides what to show and what the speaker hid.
+// Reminder banner: from a week before a speaker's confirmed speech (or a DevRel's own event) to its day.
+// The stage comes from the backend; this module decides what to show and what the user hid.
 
 export interface ReminderCopy {
   /** Countdown label next to the big number, e.g. «дней до выступления». */
@@ -10,6 +10,7 @@ export interface ReminderCopy {
   hint: string;
 }
 
+/** Speaker: their confirmed speech. */
 export const reminderCopy: Record<ReminderStage, ReminderCopy> = {
   week: {
     kicker: 'Осталась неделя',
@@ -32,6 +33,34 @@ export const reminderCopy: Record<ReminderStage, ReminderCopy> = {
     hint: 'Удачи на сцене! Не забудьте поделиться ссылкой на форму отзывов со слушателями.',
   },
 };
+
+/** DevRel: their own published event. */
+export const hostingReminderCopy: Record<ReminderStage, ReminderCopy> = {
+  week: {
+    kicker: 'Осталась неделя',
+    title: (eventName) => `Через неделю ваше мероприятие «${eventName}»`,
+    hint: 'Закройте решения по заявкам, соберите слайды спикеров и разошлите программу.',
+  },
+  three_days: {
+    kicker: 'Осталось 3 дня',
+    title: (eventName) => `Через 3 дня ваше мероприятие «${eventName}»`,
+    hint: 'Подтвердите спикеров и тайминг, проверьте площадку или трансляцию.',
+  },
+  one_day: {
+    kicker: 'Завтра',
+    title: (eventName) => `Завтра ваше мероприятие «${eventName}»`,
+    hint: 'Напомните спикерам время и место, подготовьте ссылки на формы отзывов.',
+  },
+  today: {
+    kicker: 'Сегодня',
+    title: (eventName) => `Сегодня ваше мероприятие «${eventName}»`,
+    hint: 'Удачного мероприятия! После выступлений поделитесь со слушателями формой отзывов.',
+  },
+};
+
+export function copyFor(talk: ScheduledTalk & { reminder: ReminderStage }): ReminderCopy {
+  return (talk.kind === 'hosting' ? hostingReminderCopy : reminderCopy)[talk.reminder];
+}
 
 /** Countdown number shown in the banner: days left, or «!» on the event day. */
 export function countdownLabel(talk: ScheduledTalk): string {

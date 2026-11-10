@@ -149,8 +149,10 @@ export interface InvitationDto {
 /** WEEK — 7–4 days left, THREE_DAYS — 3–2, ONE_DAY — tomorrow, TODAY — the event day. */
 export type ReminderStageCode = 'WEEK' | 'THREE_DAYS' | 'ONE_DAY' | 'TODAY';
 
-/** Confirmed upcoming speech: an accepted CFP application or an accepted invitation. */
+/** Speaker: confirmed upcoming speech (accepted application or invitation); DevRel: own published event. */
 export interface ScheduleItemDto {
+  /** SPEECH — the speaker's speech, HOSTING — the DevRel's own event. */
+  kind: 'SPEECH' | 'HOSTING';
   eventId: string;
   eventName: string;
   date: string;

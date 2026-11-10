@@ -71,8 +71,9 @@ export interface Invitation {
 /** How close the speech is: from a week before to the event day. */
 export type ReminderStage = 'week' | 'three_days' | 'one_day' | 'today';
 
-/** Confirmed upcoming speech of the speaker. */
+/** Speaker: confirmed upcoming speech; DevRel: own published upcoming event. */
 export interface ScheduledTalk {
+  kind: 'speech' | 'hosting';
   eventId: string;
   eventName: string;
   date: string;

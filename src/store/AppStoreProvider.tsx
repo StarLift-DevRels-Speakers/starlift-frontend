@@ -31,12 +31,12 @@ type RemoteState = Omit<AppState, 'role' | 'billing' | 'aiResults'>;
 const SPEAKER_SLICES: RemoteSlice[] = [
   'profile', 'talks', 'speeches', 'media', 'events', 'applications', 'invitations', 'feedback', 'notifications', 'schedule', 'plans',
 ];
-const DEVREL_SLICES: RemoteSlice[] = ['profile', 'events', 'applications', 'invitations', 'notifications'];
+const DEVREL_SLICES: RemoteSlice[] = ['profile', 'events', 'applications', 'invitations', 'notifications', 'schedule'];
 
 /** Data other users change: refreshed in the background while the tab is visible. */
 const LIVE_SLICES: Record<Role, RemoteSlice[]> = {
   speaker: ['events', 'applications', 'invitations', 'feedback', 'notifications', 'schedule'],
-  devrel: ['events', 'applications', 'invitations', 'notifications'],
+  devrel: ['events', 'applications', 'invitations', 'notifications', 'schedule'],
 };
 const LIVE_REFRESH_MS = 60_000;
 
@@ -184,13 +184,13 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
         audience: input.audience.trim(),
         description: input.description.trim(),
       };
-      return mutate(() => (eventId ? api.updateEvent(eventId, body) : api.createEvent(body)), ['events']);
+      return mutate(() => (eventId ? api.updateEvent(eventId, body) : api.createEvent(body)), ['events', 'schedule']);
     },
 
     publishEvent: async (eventId) => {
       const billing = latestDemo.current.billing.devrel;
       if (!hasRight(billing, 'publication')) return { ok: false, error: 'Нужен платный доступ', reason: 'paywall' };
-      const result = await mutate(() => api.publishEvent(eventId), ['events']);
+      const result = await mutate(() => api.publishEvent(eventId), ['events', 'schedule']);
       if (result.ok && !isSubscriptionActive(billing)) {
         updateDemo((current) => {
           const devrel = current.billing.devrel;
