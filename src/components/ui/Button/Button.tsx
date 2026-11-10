@@ -18,6 +18,8 @@ export interface ButtonProps extends ButtonAppearance, ComponentPropsWithRef<'bu
 
 export interface LinkButtonProps extends ButtonAppearance, LinkProps {}
 
+export interface AnchorButtonProps extends ButtonAppearance, ComponentPropsWithRef<'a'> {}
+
 function buttonClassName(
   { variant = 'primary', size = 'md', fullWidth = false }: ButtonAppearance,
   className?: string,
@@ -77,5 +79,30 @@ export function LinkButton({
         {children}
       </ButtonContent>
     </Link>
+  );
+}
+
+/** External link that looks like a Button; opens in a new tab. */
+export function AnchorButton({
+  variant,
+  size,
+  iconLeft,
+  iconRight,
+  fullWidth,
+  className,
+  children,
+  ...rest
+}: AnchorButtonProps) {
+  return (
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      className={buttonClassName({ variant, size, fullWidth }, className)}
+      {...rest}
+    >
+      <ButtonContent iconLeft={iconLeft} iconRight={iconRight}>
+        {children}
+      </ButtonContent>
+    </a>
   );
 }

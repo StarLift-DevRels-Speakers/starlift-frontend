@@ -146,6 +146,23 @@ export interface InvitationDto {
   status: 'sent' | 'accepted' | 'declined';
 }
 
+/** WEEK — 7–4 days left, THREE_DAYS — 3–2, ONE_DAY — tomorrow, TODAY — the event day. */
+export type ReminderStageCode = 'WEEK' | 'THREE_DAYS' | 'ONE_DAY' | 'TODAY';
+
+/** Confirmed upcoming speech: an accepted CFP application or an accepted invitation. */
+export interface ScheduleItemDto {
+  eventId: string;
+  eventName: string;
+  date: string;
+  city: string | null;
+  format: EventFormatCode;
+  topic: string;
+  ownerName: string | null;
+  daysLeft: number;
+  reminder: ReminderStageCode | null;
+  googleCalendarUrl: string;
+}
+
 export interface NotificationDto {
   id: string;
   text: string;

@@ -7,6 +7,7 @@ import type {
   Feedback,
   Invitation,
   MediaFile,
+  ScheduledTalk,
   Speech,
   Talk,
   TechEvent,
@@ -32,6 +33,8 @@ export interface AppState {
   /** Speaker's listener feedback. */
   feedback: Feedback[];
   notifications: AppNotification[];
+  /** Speaker's confirmed upcoming speeches, nearest first: reminders and calendar export. */
+  schedule: ScheduledTalk[];
   /** Saved versions of the speaker's AI producer plan, oldest first. */
   plans: DevelopmentPlan[];
   /** Test purchases: there is no payment backend yet, so billing stays a browser-side demo. */
@@ -50,6 +53,7 @@ export type RemoteSlice =
   | 'invitations'
   | 'feedback'
   | 'notifications'
+  | 'schedule'
   | 'plans';
 
 // ---------- Demo billing, per user ----------

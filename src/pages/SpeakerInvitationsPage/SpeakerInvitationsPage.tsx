@@ -2,6 +2,7 @@ import { rolePath } from '@/app/navigation';
 import { InvitationStatusBadge } from '@/components/invitations/InvitationStatusBadge/InvitationStatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
 import { WorkspaceIcon } from '@/components/layout/WorkspaceIcon/WorkspaceIcon';
+import { CalendarActions } from '@/components/schedule/CalendarActions/CalendarActions';
 import { Button, Card, EmptyState, IconTile, LinkButton, ListItem, Stack, useToast } from '@/components/ui';
 import { isEventPast, isSpeakerConfirmed } from '@/features/events/events';
 import { useAppActions, useAppState } from '@/store/useAppStore';
@@ -11,10 +12,11 @@ import styles from './SpeakerInvitationsPage.module.scss';
 
 /** Speaker reviews DevRel invitations and answers them; pending ones come first. */
 export function SpeakerInvitationsPage() {
-  const { invitations, applications, events } = useAppState();
+  const { invitations, applications, events, schedule } = useAppState();
   const { answerInvitation } = useAppActions();
   const { toast } = useToast();
   const eventById = new Map(events.map((event) => [event.id, event]));
+  const scheduled = new Map(schedule.map((talk) => [talk.eventId, talk]));
   const sorted = [...invitations].sort((a, b) => Number(b.status === 'sent') - Number(a.status === 'sent'));
 
   const answer = async (invitationId: string, status: Exclude<InvitationStatus, 'sent'>) => {
@@ -31,6 +33,7 @@ export function SpeakerInvitationsPage() {
           <Stack as="ul" gap={3} aria-label="Приглашения">
             {sorted.map((invitation) => {
               const event = eventById.get(invitation.eventId);
+              const talk = invitation.status === 'accepted' ? scheduled.get(invitation.eventId) : undefined;
               // Declining stays available; accepting only while the speaker can still take part.
               const blocked = event && (
                 isEventPast(event) ? 'Мероприятие уже прошло'
@@ -50,6 +53,7 @@ export function SpeakerInvitationsPage() {
                       {formatLongDate(event.date)} · {event.city}, {event.format}
                     </p>
                   )}
+                  {talk && <CalendarActions talk={talk} className={styles.actions} />}
                   {invitation.status === 'sent' && (
                     <div className={styles.actions}>
                       {blocked
