@@ -7,10 +7,12 @@ import { AudienceFitBadge } from '@/components/audience/AudienceFitBadge/Audienc
 import { AudienceFitModal } from '@/components/audience/AudienceFitModal/AudienceFitModal';
 import { ChangeApplicationTalkModal } from '@/components/applications/ChangeApplicationTalkModal/ChangeApplicationTalkModal';
 import { PageHeader } from '@/components/layout/PageHeader/PageHeader';
+import { CalendarActions } from '@/components/schedule/CalendarActions/CalendarActions';
 import { Button, Card, EmptyState, LinkButton, ListItem, useToast } from '@/components/ui';
 import { canRequestTalkChange } from '@/features/applications/applicationStatus';
 import { eventTalkKey, latestBy } from '@/features/audience/audienceFit';
 import { useAudienceFitChecks } from '@/features/audience/useAudience';
+import { downloadCalendar } from '@/features/schedule/calendarExport';
 import { useAppState } from '@/store/useAppStore';
 import type { Application } from '@/types/domain';
 import { formatLongDate } from '@/utils/date';
@@ -18,13 +20,19 @@ import styles from './SpeakerApplicationsPage.module.scss';
 
 /** Speaker's CFP applications and the DevRel decisions on them. */
 export function SpeakerApplicationsPage() {
-  const { applications, events } = useAppState();
+  const { applications, events, schedule } = useAppState();
   const eventById = new Map(events.map((event) => [event.id, event]));
+  const scheduled = new Map(schedule.map((talk) => [talk.eventId, talk]));
   const [params, setParams] = useSearchParams();
   const { toast } = useToast();
   const { checks, request } = useAudienceFitChecks();
   const [openedCheck, setOpenedCheck] = useState<AudienceFitCheckDto>();
   const latestCheck = latestBy(checks, (check) => eventTalkKey(check.eventId, check.talkId));
+
+  const downloadAll = async () => {
+    const result = await downloadCalendar();
+    if (!result.ok) toast(result.error);
+  };
 
   const checkFit = async (application: Application) => {
     const result = await request({ eventId: application.eventId, talkId: application.talkId });
@@ -42,8 +50,15 @@ export function SpeakerApplicationsPage() {
     <>
       <PageHeader
         title="Мои заявки"
-        description="Решения организаторов и запросы на смену доклада."
-        actions={<LinkButton to={rolePath('speaker', 'events')}>Найти мероприятие</LinkButton>}
+        description="Решения организаторов и запросы на смену доклада. Принятые выступления можно выгрузить в календарь."
+        actions={(
+          <>
+            {schedule.length > 0 && (
+              <Button variant="secondary" iconLeft="📅" onClick={downloadAll}>Все выступления (.ics)</Button>
+            )}
+            <LinkButton to={rolePath('speaker', 'events')}>Найти мероприятие</LinkButton>
+          </>
+        )}
       />
 
       <Card as="section" title="Все заявки" titleAs="h2">
@@ -52,6 +67,7 @@ export function SpeakerApplicationsPage() {
             {applications.map((application) => {
               const event = eventById.get(application.eventId);
               const check = latestCheck.get(eventTalkKey(application.eventId, application.talkId || null));
+              const talk = application.status === 'accepted' ? scheduled.get(application.eventId) : undefined;
               const title = event?.state === 'published'
                 ? <Link to={`${rolePath('speaker', 'events')}?event=${encodeURIComponent(event.id)}`}>{event.name}</Link>
                 : event?.name ?? 'Мероприятие';
@@ -78,6 +94,7 @@ export function SpeakerApplicationsPage() {
                     ) : application.talkId && (
                       <Button variant="soft" size="sm" onClick={() => checkFit(application)}>✦ Проверить</Button>
                     )}
+                    {talk && <CalendarActions talk={talk} className={styles.calendar} />}
                   </div>
                 </ListItem>
               );

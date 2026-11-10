@@ -12,6 +12,7 @@ import {
   toPlans,
   toProfile,
   toProfilePatch,
+  toScheduledTalk,
   toSpeech,
   toTalk,
 } from '@/api/mappers';
@@ -28,13 +29,13 @@ import styles from './AppStoreProvider.module.scss';
 type RemoteState = Omit<AppState, 'role' | 'billing' | 'aiResults'>;
 
 const SPEAKER_SLICES: RemoteSlice[] = [
-  'profile', 'talks', 'speeches', 'media', 'events', 'applications', 'invitations', 'feedback', 'notifications', 'plans',
+  'profile', 'talks', 'speeches', 'media', 'events', 'applications', 'invitations', 'feedback', 'notifications', 'schedule', 'plans',
 ];
 const DEVREL_SLICES: RemoteSlice[] = ['profile', 'events', 'applications', 'invitations', 'notifications'];
 
 /** Data other users change: refreshed in the background while the tab is visible. */
 const LIVE_SLICES: Record<Role, RemoteSlice[]> = {
-  speaker: ['events', 'applications', 'invitations', 'feedback', 'notifications'],
+  speaker: ['events', 'applications', 'invitations', 'feedback', 'notifications', 'schedule'],
   devrel: ['events', 'applications', 'invitations', 'notifications'],
 };
 const LIVE_REFRESH_MS = 60_000;
@@ -58,6 +59,7 @@ async function fetchSlice(slice: RemoteSlice, userId: number): Promise<Partial<R
     case 'invitations': return { invitations: (await api.invitations()).map(toInvitation) };
     case 'feedback': return { feedback: (await api.myFeedback()).map(toFeedback) };
     case 'notifications': return { notifications: (await api.notifications()).map(toNotification) };
+    case 'schedule': return { schedule: (await api.schedule()).map(toScheduledTalk) };
     case 'plans': return { plans: toPlans(await api.producerPlans()) };
   }
 }
@@ -69,7 +71,8 @@ function emptyRemote(user: SessionUser): RemoteState {
       name: [user.firstName, user.lastName].filter(Boolean).join(' ') || user.username,
       position: '', company: '', city: '', skills: '', preferences: '', about: '',
     },
-    talks: [], speeches: [], media: [], events: [], applications: [], invitations: [], feedback: [], notifications: [], plans: [],
+    talks: [], speeches: [], media: [], events: [], applications: [], invitations: [], feedback: [], notifications: [], schedule: [],
+    plans: [],
   };
 }
 
@@ -168,7 +171,7 @@ export function AppStoreProvider({ user, children }: { user: SessionUser; childr
       if (!topic.trim()) return Promise.resolve({ ok: false, error: 'Укажите предлагаемую тему' });
       return mutate(() => api.sendInvitation(eventId, Number(speakerId), topic.trim()), ['invitations']);
     },
-    answerInvitation: (invitationId, answer) => mutate(() => api.answerInvitation(invitationId, answer), ['invitations']),
+    answerInvitation: (invitationId, answer) => mutate(() => api.answerInvitation(invitationId, answer), ['invitations', 'schedule']),
 
     saveEvent: (input, eventId) => {
       const body = {

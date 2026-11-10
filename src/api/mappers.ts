@@ -10,6 +10,7 @@ import type {
   NotificationDto,
   ProducerPlanDto,
   ProfilePatch,
+  ScheduleItemDto,
   SpeakerTalkDto,
   SpeechDto,
 } from './types';
@@ -22,6 +23,8 @@ import type {
   FeedbackQuestionKey,
   Invitation,
   MediaFile,
+  ReminderStage,
+  ScheduledTalk,
   Speech,
   Talk,
   TechEvent,
@@ -153,6 +156,21 @@ export function toInvitation(invitation: InvitationDto): Invitation {
     status: invitation.status,
     date: invitation.date,
     topic: invitation.topic,
+  };
+}
+
+export function toScheduledTalk(item: ScheduleItemDto): ScheduledTalk {
+  return {
+    eventId: item.eventId,
+    eventName: item.eventName,
+    date: item.date,
+    city: item.city ?? '',
+    format: formats[item.format] ?? 'Офлайн',
+    topic: item.topic,
+    ownerName: item.ownerName ?? '',
+    daysLeft: item.daysLeft,
+    ...(item.reminder && { reminder: item.reminder.toLowerCase() as ReminderStage }),
+    googleCalendarUrl: item.googleCalendarUrl,
   };
 }
 

@@ -1,0 +1,198 @@
+@use '@/styles/mixins' as *;
+
+// Stage tones: calm a week out, warmer at 3 days, urgent the day before, solid brand on the day.
+.banner {
+  --reminder-bg: linear-gradient(120deg, var(--sl-brand-bg), var(--sl-brand-gradient-end));
+  --reminder-border: var(--sl-brand-border);
+  --reminder-accent: var(--sl-action);
+  --reminder-text: var(--sl-text);
+  --reminder-muted: var(--sl-text-subtle);
+  --reminder-tile-bg: var(--sl-surface);
+
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--sl-space-6);
+  margin-bottom: var(--sl-space-6);
+  padding: var(--sl-space-6) var(--sl-space-12) var(--sl-space-6) var(--sl-space-6);
+  border: 2px solid var(--reminder-border);
+  border-radius: var(--sl-radius-modal);
+  background: var(--reminder-bg);
+  box-shadow: var(--sl-shadow-card);
+  color: var(--reminder-text);
+
+  @include down('mobile') {
+    flex-direction: column;
+    gap: var(--sl-space-4);
+    padding: var(--sl-space-5) var(--sl-space-4);
+  }
+}
+
+.three_days {
+  --reminder-bg: linear-gradient(120deg, var(--sl-warning-bg), var(--sl-reminder-warm-end));
+  --reminder-border: var(--sl-warning-border);
+  --reminder-accent: var(--sl-warning-text);
+}
+
+.one_day {
+  --reminder-bg: linear-gradient(120deg, var(--sl-reminder-urgent-bg), var(--sl-warning-bg));
+  --reminder-border: var(--sl-reminder-urgent-border);
+  --reminder-accent: var(--sl-reminder-urgent-text);
+}
+
+.today {
+  --reminder-bg: linear-gradient(120deg, var(--sl-action), var(--sl-brand));
+  --reminder-border: var(--sl-action-hover);
+  --reminder-accent: var(--sl-action);
+  --reminder-text: var(--sl-text-on-action);
+  --reminder-muted: var(--sl-text-on-action);
+}
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  padding: var(--sl-space-4);
+  border-radius: var(--sl-radius-card);
+  background: var(--reminder-tile-bg);
+  color: var(--reminder-accent);
+  box-shadow: var(--sl-shadow-card);
+
+  @include down('mobile') {
+    flex-direction: row;
+    gap: var(--sl-space-3);
+    min-width: 0;
+    padding: var(--sl-space-3) var(--sl-space-4);
+  }
+}
+
+.number {
+  font-family: var(--sl-font);
+  font-size: 64px;
+  font-weight: var(--sl-weight-bold);
+  line-height: 1;
+
+  @include down('mobile') {
+    font-size: 40px;
+  }
+}
+
+.unit {
+  @include overline;
+
+  margin-top: var(--sl-space-1);
+}
+
+.body {
+  min-width: 0;
+}
+
+.kicker {
+  @include overline;
+
+  margin: 0 0 var(--sl-space-2);
+  color: var(--reminder-accent);
+
+  .today & {
+    color: var(--reminder-text);
+  }
+}
+
+.title {
+  @include text('display');
+
+  margin: 0 0 var(--sl-space-2);
+  overflow-wrap: anywhere;
+
+  @include down('mobile') {
+    @include text('h1');
+  }
+}
+
+.meta,
+.topic,
+.hint,
+.others {
+  margin: 0 0 var(--sl-space-1);
+  color: var(--reminder-muted);
+}
+
+.meta {
+  @include text('body');
+}
+
+.topic {
+  @include text('h3');
+
+  color: var(--reminder-text);
+}
+
+.hint {
+  @include text('body');
+
+  margin-top: var(--sl-space-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-4);
+}
+
+.calendar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}
+
+.link {
+  .today & {
+    color: var(--sl-text-on-action);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+  }
+}
+
+.others {
+  @include text('body-sm');
+
+  margin-top: var(--sl-space-3);
+}
+
+.close {
+  position: absolute;
+  top: var(--sl-space-3);
+  right: var(--sl-space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sl-touch-target);
+  height: var(--sl-touch-target);
+  border: 0;
+  border-radius: var(--sl-radius-pill);
+  background: transparent;
+  color: var(--reminder-muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--sl-transition-fast);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  &:focus-visible {
+    outline: var(--sl-focus-outline);
+  }
+
+  .today &:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}

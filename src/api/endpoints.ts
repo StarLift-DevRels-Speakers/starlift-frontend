@@ -1,4 +1,4 @@
-import { request, type AuthTokensResponse } from './client';
+import { request, requestBlob, type AuthTokensResponse } from './client';
 import type {
   ApplicationDto,
   AudienceFitCheckDto,
@@ -24,6 +24,7 @@ import type {
   PointTransactionDto,
   ProfilePatch,
   PublicFeedbackForm,
+  ScheduleItemDto,
   SpeakerTalkDto,
   SpeechCreate,
   SpeechDto,
@@ -87,6 +88,12 @@ export const api = {
   sendInvitation: (eventId: string, speakerId: number, topic: string) =>
     request<void>('/api/invitations', json('POST', { eventId, speakerId, topic })),
   answerInvitation: (id: string, status: string) => request<void>(`/api/invitations/${id}/answer`, json('POST', { status })),
+
+  // ---------- Speaker schedule: reminders and calendar export ----------
+  schedule: () => request<ScheduleItemDto[]>('/api/me/schedule'),
+  /** iCalendar file with all upcoming speeches, or with one when `eventId` is given. */
+  scheduleCalendar: (eventId?: string) =>
+    requestBlob(eventId ? `/api/me/schedule/${eventId}/calendar.ics` : '/api/me/schedule/calendar.ics'),
 
   // ---------- Notifications ----------
   notifications: () => request<NotificationDto[]>('/api/notifications'),
