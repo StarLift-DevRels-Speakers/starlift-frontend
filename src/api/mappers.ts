@@ -161,6 +161,7 @@ export function toInvitation(invitation: InvitationDto): Invitation {
 
 export function toScheduledTalk(item: ScheduleItemDto): ScheduledTalk {
   return {
+    kind: item.kind === 'HOSTING' ? 'hosting' : 'speech',
     eventId: item.eventId,
     eventName: item.eventName,
     date: item.date,
