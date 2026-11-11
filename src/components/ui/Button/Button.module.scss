@@ -42,11 +42,11 @@
 
 // ---------- Variants ----------
 .primary {
-  background: var(--sl-action);
+  background: var(--sl-action-fill);
   color: var(--sl-text-on-action);
 
   &:hover:not(:disabled) {
-    background: var(--sl-action-hover);
+    background: var(--sl-action-fill-hover);
   }
 }
 

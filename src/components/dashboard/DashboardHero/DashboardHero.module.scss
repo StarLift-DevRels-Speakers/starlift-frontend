@@ -1,8 +1,8 @@
 @use '@/styles/mixins' as *;
 
 .hero {
-  --hero-start: #e2dcff;
-  --hero-end: #d8e4ff;
+  --hero-start: var(--sl-hero-start);
+  --hero-end: var(--sl-hero-end);
 
   position: relative;
   isolation: isolate;
@@ -19,15 +19,15 @@
   background: linear-gradient(120deg, var(--hero-start), var(--hero-end));
 
   &[data-role='devrel'] {
-    --hero-start: #fce4d9;
-    --hero-end: #e9ddff;
+    --hero-start: var(--sl-hero-devrel-start);
+    --hero-end: var(--sl-hero-devrel-end);
   }
 
   &::after {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: repeating-radial-gradient(circle at 100% 0, transparent 0 34px, #ffffff6e 35px 36px, transparent 37px 54px);
+    background: repeating-radial-gradient(circle at 100% 0, transparent 0 34px, var(--sl-hero-pattern) 35px 36px, transparent 37px 54px);
     content: '';
   }
 }

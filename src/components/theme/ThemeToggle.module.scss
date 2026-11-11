@@ -1,0 +1,14 @@
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--sl-touch-target);
+  height: var(--sl-touch-target);
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: var(--sl-radius-pill);
+  background: transparent;
+  color: inherit;
+
+  &:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+}

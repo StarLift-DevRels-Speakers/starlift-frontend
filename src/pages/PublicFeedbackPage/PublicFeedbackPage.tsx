@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
 import { ApiError, errorMessage } from '@/api/client';
@@ -73,6 +74,7 @@ export function PublicFeedbackPage() {
       <main className={styles.wrap}>
         <div className={styles.brand}>
           <BrandLogo />
+          <span className={styles.theme}><ThemeToggle /></span>
           <Badge tone="muted">Публичная форма</Badge>
         </div>
 

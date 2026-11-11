@@ -32,7 +32,7 @@
 
   &[aria-pressed='true'] {
     border-color: var(--sl-action);
-    background: var(--sl-action);
+    background: var(--sl-action-fill);
     color: var(--sl-text-on-action);
   }
 
