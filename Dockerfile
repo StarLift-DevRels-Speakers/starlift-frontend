@@ -10,6 +10,8 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --network-timeout 600000
 
 COPY . .
+ARG VITE_API_BASE_URL=https://startlift.duckdns.org
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN yarn build
 
 # ---------- Serve: static files behind nginx ----------
