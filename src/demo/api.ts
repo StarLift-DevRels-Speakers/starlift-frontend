@@ -134,6 +134,13 @@ export async function demoRequest<T>(path: string, options: RequestOptions): Pro
 function routeRequest(route: string, method: string, body: Record<string, unknown>, url: URL, rawBody: unknown): unknown {
   const parts = route.split('/');
   const itemId = decodeURIComponent(parts[3] ?? '');
+  if (route === '/api/audio-analyses') {
+    if (method === 'GET') return [];
+    throw new Error('Анализ речи доступен при подключении к серверу. В деморежиме аудио не обрабатывается.');
+  }
+  if (route.startsWith('/api/media/files/') && route.endsWith('/url')) {
+    throw new Error('Воспроизведение записи доступно при подключении к серверу.');
+  }
   if (route === '/api/me') {
     const profile = data.profiles[String(user().id)];
     if (method === 'PATCH') Object.assign(profile, body);

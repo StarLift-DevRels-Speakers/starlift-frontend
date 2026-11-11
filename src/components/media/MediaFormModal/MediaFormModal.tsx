@@ -7,7 +7,7 @@ export interface MediaFormModalProps {
 }
 
 // Types the backend accepts (MinioService allowlist) and the request size limit of the API.
-const ACCEPT = '.pdf,.ppt,.pptx,.docx,.txt,.md,.jpg,.jpeg,.png,.gif,.webp';
+const ACCEPT = '.pdf,.ppt,.pptx,.docx,.txt,.md,.jpg,.jpeg,.png,.gif,.webp,.mp3,.wav,.ogg,.m4a';
 const MAX_BYTES = 50 * 1024 * 1024;
 
 /** Uploads a media file to the backend, optionally tied to one of the speaker's talks. */
@@ -71,7 +71,7 @@ export function MediaFormModal({ onClose }: MediaFormModalProps) {
             label="Файл"
             required
             accept={ACCEPT}
-            hint="PDF, презентации PowerPoint или изображения, до 50 МБ."
+            hint="Презентации, документы, изображения или аудио MP3, WAV, OGG, M4A, до 50 МБ. Для анализа речи — запись до 60 минут."
             error={error}
             onChange={handleFileChange}
           />

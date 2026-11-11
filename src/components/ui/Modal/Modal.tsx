@@ -14,14 +14,17 @@ export interface ModalProps {
   /** `md` (440px) for confirmations, `lg` (560px) for details and forms. */
   size?: 'md' | 'lg';
   className?: string;
+  /** Keep async detail dialogs at the top while their content loads. */
+  focusTitle?: boolean;
 }
 
 /**
  * Dialog on top of native <dialog>: focus trap, inert background, Esc and
  * focus restore come from the browser. Use it to confirm dangerous actions.
  */
-export function Modal({ open, onClose, title, description, footer, children, size = 'md', className }: ModalProps) {
+export function Modal({ open, onClose, title, description, footer, children, size = 'md', className, focusTitle = false }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
   const descriptionId = useId();
 
@@ -29,9 +32,12 @@ export function Modal({ open, onClose, title, description, footer, children, siz
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      if (focusTitle) titleRef.current?.focus();
+    }
     if (!open && dialog.open) dialog.close();
-  }, [open]);
+  }, [open, focusTitle]);
 
   // Clicks on the <dialog> element itself (not its content) land on the backdrop.
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
@@ -52,7 +58,7 @@ export function Modal({ open, onClose, title, description, footer, children, siz
       onClick={handleClick}
     >
       <div className={styles.content}>
-        <h2 id={titleId} className={styles.title}>{title}</h2>
+        <h2 ref={titleRef} tabIndex={focusTitle ? -1 : undefined} id={titleId} className={styles.title}>{title}</h2>
         {description && <p id={descriptionId} className={styles.description}>{description}</p>}
         {children}
         {footer && <div className={styles.footer}>{footer}</div>}
