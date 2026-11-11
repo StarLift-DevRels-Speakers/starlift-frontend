@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useState, type FormEvent } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
 import { ApiError, errorMessage } from '@/api/client';
@@ -59,6 +60,7 @@ export function LoginPage() {
         </aside>
         <Card>
           <Stack gap={4}>
+            <div className={styles.theme}><ThemeToggle /></div>
             <div>
               <h1 className={styles.title}>{mode === 'signIn' ? 'Вход в StarLift' : 'Регистрация спикера'}</h1>
               <p className={styles.muted}>

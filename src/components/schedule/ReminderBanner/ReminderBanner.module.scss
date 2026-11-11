@@ -41,7 +41,7 @@
 }
 
 .today {
-  --reminder-bg: linear-gradient(120deg, var(--sl-action), var(--sl-brand));
+  --reminder-bg: linear-gradient(120deg, var(--sl-action-fill), var(--sl-reminder-today-end));
   --reminder-border: var(--sl-action-hover);
   --reminder-accent: var(--sl-action);
   --reminder-text: var(--sl-text-on-action);

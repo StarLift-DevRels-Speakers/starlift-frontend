@@ -1,5 +1,14 @@
 // Constellation palette and layout tokens shared by both workspaces and public pages.
 :root {
+  color-scheme: light;
+  --sl-reminder-today-end: var(--sl-brand);
+  --sl-action-fill: var(--sl-action);
+  --sl-action-fill-hover: var(--sl-action-hover);
+  --sl-hero-start: #e2dcff;
+  --sl-hero-end: #d8e4ff;
+  --sl-hero-devrel-start: #fce4d9;
+  --sl-hero-devrel-end: #e9ddff;
+  --sl-hero-pattern: #ffffff6e;
   /* ---------- Colors: brand ---------- */
   --sl-brand: #614bde;
   --sl-action: #4a34b8; // primary buttons, active links/tabs, text on brand-bg
@@ -176,4 +185,86 @@
   /* ---------- Motion ---------- */
   --sl-transition-fast: 160ms ease;
   --sl-transition-base: 200ms ease;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --sl-reminder-today-end: #5836b0;
+  --sl-brand: #a78bfa;
+  --sl-action: #c4b5fd;
+  --sl-action-hover: #ddd3ff;
+  --sl-action-fill: #6845c5;
+  --sl-action-fill-hover: #5836b0;
+  --sl-brand-bg: #30254d;
+  --sl-brand-bg-hover: #3e3062;
+  --sl-brand-border: #574575;
+  --sl-brand-gradient-end: #242239;
+  --sl-masthead: #151020;
+  --sl-masthead-active: #35294e;
+  --sl-masthead-hover: #493763;
+  --sl-page: #14121d;
+  --sl-surface: #201c2c;
+  --sl-surface-subtle: #292336;
+  --sl-surface-muted: #332d40;
+  --sl-surface-inverse: #3b3055;
+  --sl-surface-soft: #252031;
+  --sl-public-bg-start: #211a32;
+  --sl-public-bg-end: #141923;
+  --sl-text: #f1edf9;
+  --sl-muted: #bcb3ce;
+  --sl-text-subtle: #c7bdd8;
+  --sl-text-nav: #c7bdd8;
+  --sl-text-section: #a99fbb;
+  --sl-text-crumb: #bcb3ce;
+  --sl-crumb-separator: #81758f;
+  --sl-placeholder: #a99fbb;
+  --sl-border: #494054;
+  --sl-warning-bg: #3c2d18;
+  --sl-warning-text: #f6d28b;
+  --sl-warning-border: #a7833d;
+  --sl-chart-option-1: #ac93f4;
+  --sl-chart-option-3: #7fa9d0;
+  --sl-chart-track: #383044;
+  --sl-ai-bg: #392d59;
+  --sl-ai-text: #d0bfff;
+  --sl-ai-bg-soft: #2f2549;
+  --sl-danger-bg: #44232d;
+  --sl-danger-text: #ffb3b8;
+  --sl-danger: #f87171;
+  --sl-neutral-bg: #2b2639;
+  --sl-neutral-text: #d1c8e1;
+  --sl-reminder-warm-end: #30281f;
+  --sl-reminder-urgent-bg: #432b1e;
+  --sl-reminder-urgent-text: #ffc194;
+  --sl-reminder-urgent-border: #cc884f;
+  --sl-cal-performance-bg: #36294f;
+  --sl-cal-performance-text: #d0bfff;
+  --sl-cal-cfp-bg: #3c301d;
+  --sl-cal-cfp-text: #f6d28b;
+  --sl-cal-invite-bg: #302744;
+  --sl-cal-invite-text: #ccb5f5;
+  --sl-cal-event-bg: #223249;
+  --sl-cal-event-text: #a7cdf9;
+  --sl-cal-today-bg: #35294e;
+  --sl-cal-today-border: #9d83df;
+  --sl-cal-blank-bg: #191622;
+  --sl-cal-blank-border: #302939;
+  --sl-cal-day-hover-bg: #2e253e;
+  --sl-cal-day-hover-border: #9d83df;
+  --sl-cal-date-bg: #302744;
+  --sl-cal-date-border: #574575;
+  --sl-skeleton-base: #383043;
+  --sl-focus: 0 0 0 3px #b59aed66;
+  --sl-focus-danger: 0 0 0 3px #f8717140;
+  --sl-shadow-card: 0 4px 14px #00000026;
+  --sl-shadow-hover: 0 8px 26px #00000040;
+  --sl-shadow-drawer: 8px 0 25px #00000040;
+  --sl-shadow-toast: 0 14px 36px #00000059;
+  --sl-shadow-modal: 0 25px 90px #00000080;
+  --sl-overlay: #09070ec4;
+  --sl-hero-start: #35274e;
+  --sl-hero-end: #22324d;
+  --sl-hero-devrel-start: #402b2b;
+  --sl-hero-devrel-end: #302442;
+  --sl-hero-pattern: #ffffff12;
 }

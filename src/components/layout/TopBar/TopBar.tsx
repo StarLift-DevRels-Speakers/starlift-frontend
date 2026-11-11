@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useId, useRef, type Ref } from 'react';
 import { Link, useLocation } from 'react-router';
 import { rolePath } from '@/app/navigation';
@@ -61,6 +62,7 @@ export function TopBar({ role, user, hasSubscription, notifications, sidebarId, 
       <WorkspaceNav key={pathname} role={role} pathname={pathname} />
 
       <div className={styles.right}>
+        <ThemeToggle />
         <Badge tone={hasSubscription ? 'brand' : 'muted'} className={styles.plan}>
           {hasSubscription ? '● Подписка PAID' : '○ FREE'}
         </Badge>
