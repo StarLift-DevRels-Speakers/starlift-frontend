@@ -149,6 +149,15 @@ export async function requestBlob(path: string): Promise<Blob> {
   return response.blob();
 }
 
+/** Presigned media URL; the backend returns plain text, with the same JWT refresh flow. */
+export async function requestText(path: string): Promise<string> {
+  if (import.meta.env.DEV && demoEnabled) {
+    const { demoRequest } = await import('@/demo/api');
+    return demoRequest<string>(path, {});
+  }
+  return (await send(path, {}, true)).text();
+}
+
 /** User-facing message of any error thrown by the API layer. */
 export function errorMessage(error: unknown): string {
   return error instanceof Error && error.message ? error.message : GENERIC_ERROR;

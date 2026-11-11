@@ -1,6 +1,8 @@
-import { request, requestBlob, type AuthTokensResponse } from './client';
+import { request, requestBlob, requestText, type AuthTokensResponse } from './client';
 import type {
   ApplicationDto,
+  AudioAnalysisDto,
+  AudioAnalysisSummaryDto,
   AudienceFitCheckDto,
   AudienceFitRequest,
   AudienceProfileResponseDto,
@@ -72,6 +74,13 @@ export const api = {
     return request<MediaFileDto>(`/api/media/upload${query}`, { method: 'POST', body: form });
   },
   deleteMedia: (id: string) => request<void>(`/api/media/files/${id}`, json('DELETE')),
+  mediaUrl: (id: string) => requestText(`/api/media/files/${encodeURIComponent(id)}/url`),
+
+  // ---------- Speech analysis ----------
+  audioAnalyses: () => request<AudioAnalysisSummaryDto[]>('/api/audio-analyses'),
+  startAudioAnalysis: (mediaId: string) =>
+    request<Pick<AudioAnalysisSummaryDto, 'analysisId' | 'status'>>('/api/audio-analyses', json('POST', { mediaId })),
+  audioAnalysis: (id: string) => request<AudioAnalysisDto>(`/api/audio-analyses/${encodeURIComponent(id)}`),
 
   // ---------- Events, applications, invitations ----------
   events: () => request<EventDto[]>('/api/events'),

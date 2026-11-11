@@ -95,6 +95,54 @@ export interface MediaFileDto {
   createdDate: string;
 }
 
+export interface AudioAnalysisSummaryDto {
+  analysisId: string;
+  mediaId: string;
+  status: 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+  errorCode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AudioAnalysisDto extends AudioAnalysisSummaryDto {
+  report: AudioReportDto | null;
+}
+
+export type SpeechCandidateType = 'filler' | 'repeat' | 'hesitation';
+
+export interface SpeechSegmentDto {
+  id: number;
+  startMs: number;
+  endMs: number;
+  text: string;
+}
+
+/** Version 2 fields are optional: older saved reports still work. */
+export interface AudioReportDto {
+  schemaVersion?: number;
+  durationMs: number;
+  wordCount: number;
+  wordsPerMinute: number | null;
+  minPauseMs?: number;
+  transcript: SpeechSegmentDto[];
+  pauses: { startMs: number; endMs: number; durationMs: number }[];
+  candidates: {
+    type: SpeechCandidateType;
+    text: string;
+    segmentId: number;
+    startMs?: number;
+    endMs?: number;
+    timingSource?: 'whisper' | 'estimated';
+  }[];
+  candidateSummary?: {
+    type: SpeechCandidateType;
+    count: number;
+    occurrencesPer100Words: number | null;
+    byText: { text: string; count: number }[];
+  }[];
+  tempo?: { startMs: number; endMs: number; wordCount: number; wordsPerMinute: number }[];
+}
+
 export type EventFormatCode = 'OFFLINE' | 'ONLINE' | 'HYBRID';
 
 export interface EventDto {
