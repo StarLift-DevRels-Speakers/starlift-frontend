@@ -79,6 +79,11 @@ const shapes = {
       <path d="M5 16V9a7 7 0 0 1 14 0v7l2 3H3Zm5 6h4M12 2V1" />
     </>
   ),
+  'waveform': (
+    <>
+      <path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" strokeWidth="2.2" />
+    </>
+  ),
   'menu': (
     <>
       <path d="M4 6h16M4 12h16M4 18h16" />

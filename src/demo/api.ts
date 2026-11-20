@@ -1,7 +1,7 @@
 import type { RequestOptions } from '@/api/client';
 import type {
   ApplicationDto, CatalogSpeakerDto, EventDto, FeedbackDto, InvitationDto, MediaFileDto,
-  MeUser, NotificationDto, ProducerPlanDto, SpeakerTalkDto, SpeechDto,
+  MeUser, NotificationDto, ProducerPlanDto, ScheduleItemDto, SpeakerTalkDto, SpeechDto,
 } from '@/api/types';
 import { demoSession, emptyDemo } from './config';
 
@@ -46,9 +46,11 @@ function seed(): DemoData {
       { id: 'speech-1', speakerId: -1, topic: 'React без лишней сложности', talkDate: `${date(-14)}T12:00:00`, conferenceType: 'CONFERENCE', format: 'OFFLINE', activityName: 'Frontend Community', speakerTalkId: 'talk-1' },
       { id: 'speech-2', speakerId: -1, topic: 'Доступность начинается с компонентов', talkDate: `${date(-7)}T15:00:00`, conferenceType: 'MEETUP', format: 'ONLINE', activityName: 'Design Systems Meetup', speakerTalkId: 'talk-2' },
     ],
+    // Day offsets [event, CFP deadline] per event: one published event is 3 days away, so the
+    // reminder banner has something to show, and the accepted application points at it.
     events: ['Frontend Conf', 'React Meetup', 'Дизайн-системы: практика', 'TypeScript Day', 'Новый митап команды'].map((name, index) => ({
       id: `event-${index + 1}`, ownerId: -2, ownerName: 'Мария Смирнова', own: true, name,
-      date: date(10 + index * 7), cfp: date(5 + index * 7), city: index === 1 ? '' : 'Москва',
+      date: date([10, 3, 24, 31, 45][index]), cfp: date([5, 1, 18, 25, 38][index]), city: index === 1 ? '' : 'Москва',
       format: index === 1 ? 'ONLINE' : index === 2 ? 'HYBRID' : 'OFFLINE', topic: ['React', 'TypeScript', 'Доступность'][index % 3],
       audience: 'Разработчики, тимлиды и архитекторы', description: 'Обмен опытом, практические доклады и знакомство с IT-сообществом.',
       state: index === 4 ? 'draft' : 'published',
@@ -218,6 +220,7 @@ function routeRequest(route: string, method: string, body: Record<string, unknow
     if (invitation) invitation.status = body.status as InvitationDto['status'];
     return;
   }
+  if (route === '/api/me/schedule') return demoSchedule(data);
   if (route === '/api/notifications') return data.notifications;
   if (route === '/api/notifications/read') {
     data.notifications.forEach((item) => { if (!body.id || body.id === item.id) item.read = true; });
@@ -258,6 +261,56 @@ function routeRequest(route: string, method: string, body: Record<string, unknow
   }
   if (route.startsWith('/api/gamification/')) return competition(route, url);
   throw new Error(`В деморежиме пока нет операции: ${method} ${route}`);
+}
+
+/** Whole days from today to a date or timestamp, negative for the past. */
+function daysUntil(value: string): number {
+  const target = new Date(`${value.slice(0, 10)}T12:00:00`).getTime();
+  const nowDate = new Date();
+  const from = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 12).getTime();
+  return Math.round((target - from) / 86_400_000);
+}
+
+/** Backend contract: WEEK is 7-4 days left, THREE_DAYS 3-2, ONE_DAY tomorrow, TODAY the event day. */
+function reminderStage(daysLeft: number): ScheduleItemDto['reminder'] {
+  if (daysLeft <= 0) return 'TODAY';
+  if (daysLeft === 1) return 'ONE_DAY';
+  if (daysLeft <= 3) return 'THREE_DAYS';
+  if (daysLeft <= 7) return 'WEEK';
+  return null;
+}
+
+function calendarLink(topic: string, day: string): string {
+  const stamp = day.slice(0, 10).replace(/-/g, '');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(topic)}&dates=${stamp}/${stamp}`;
+}
+
+/** Speaker: confirmed speeches (accepted applications); DevRel: own published events. Nearest first. */
+function demoSchedule(data: DemoData): ScheduleItemDto[] {
+  type Upcoming = Omit<ScheduleItemDto, 'daysLeft' | 'reminder' | 'googleCalendarUrl'>;
+  const upcoming: Upcoming[] = user().id === -2
+    ? data.events
+        .filter((event) => event.own && event.state === 'published')
+        .map((event): Upcoming => ({
+          kind: 'HOSTING', eventId: event.id, eventName: event.name, date: event.date,
+          city: event.city, format: event.format, topic: event.topic, ownerName: event.ownerName,
+        }))
+    : data.applications
+        .filter((application) => application.status === 'accepted')
+        .flatMap((application): Upcoming[] => {
+          const event = data.events.find((item) => item.id === application.eventId);
+          return event
+            ? [{
+                kind: 'SPEECH', eventId: event.id, eventName: event.name, date: event.date,
+                city: event.city, format: event.format, topic: application.topic, ownerName: event.ownerName,
+              }]
+            : [];
+        });
+  return upcoming
+    .map((item) => ({ ...item, daysLeft: daysUntil(item.date) }))
+    .filter((item) => item.daysLeft >= 0)
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .map((item) => ({ ...item, reminder: reminderStage(item.daysLeft), googleCalendarUrl: calendarLink(item.topic, item.date) }));
 }
 
 function competition(route: string, url: URL): unknown {

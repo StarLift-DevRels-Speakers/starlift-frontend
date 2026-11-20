@@ -1,0 +1,108 @@
+@use '@/styles/mixins' as *;
+
+// Same masthead palette as the platform's top bar.
+.header {
+  --sl-logo-mark: var(--sl-masthead-accent);
+
+  position: sticky;
+  top: 0;
+  z-index: var(--sl-z-topbar);
+  border-bottom: 1px solid var(--sl-masthead-active);
+  background: var(--sl-masthead);
+  color: var(--sl-masthead-ink);
+}
+
+// The header picks up a shadow as soon as the page scrolls (scroll-driven, no JS).
+@supports (animation-timeline: scroll()) {
+  .header {
+    animation: headerShadow linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 140px;
+  }
+
+  @keyframes headerShadow {
+    from {
+      box-shadow: 0 0 0 0 transparent;
+    }
+
+    to {
+      box-shadow: var(--sl-shadow-card);
+    }
+  }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-6);
+  width: 100%;
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+  padding: var(--sl-space-3) var(--sl-layout-padding);
+
+  @include down('mobile') {
+    gap: var(--sl-space-3);
+    padding: var(--sl-space-3) var(--sl-layout-padding-mobile);
+  }
+}
+
+.brand {
+  flex-shrink: 0;
+  color: var(--sl-masthead-ink);
+  font-size: var(--sl-text-lg);
+}
+
+.nav {
+  display: flex;
+  flex: 1;
+  gap: var(--sl-space-5);
+
+  @include down('tablet') {
+    display: none;
+  }
+}
+
+.navLink {
+  @include text('body-sm');
+
+  padding: 4px 0;
+  color: var(--sl-masthead-muted);
+  text-decoration: none;
+  transition: color var(--sl-transition-fast);
+  white-space: nowrap;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--sl-masthead-ink);
+  }
+
+  &:focus-visible {
+    border-radius: var(--sl-radius-xs);
+    outline: var(--sl-focus-outline);
+    outline-offset: 3px;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sl-space-2);
+  margin-left: auto;
+
+  // Text button keeps the masthead ink instead of the default action colour.
+  .signIn {
+    color: var(--sl-masthead-ink);
+
+    &:hover:not(:disabled) {
+      background: var(--sl-masthead-active);
+      color: var(--sl-masthead-ink);
+    }
+  }
+
+  @include down('mobile') {
+    .signIn {
+      display: none;
+    }
+  }
+}

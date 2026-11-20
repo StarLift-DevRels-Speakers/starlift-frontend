@@ -1,0 +1,6 @@
+# Normalise line endings in the repository: LF everywhere, CRLF only on checkout if configured.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.svg text

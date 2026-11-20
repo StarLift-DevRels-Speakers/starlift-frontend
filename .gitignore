@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 /docs/
+
+# Local agent tooling and OpenSpec workspace (kept out of the repository)
+.dsh/
+AGENTS.md
+openspec/

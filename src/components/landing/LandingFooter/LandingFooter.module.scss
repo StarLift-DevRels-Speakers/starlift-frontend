@@ -1,0 +1,120 @@
+@use '@/styles/mixins' as *;
+
+// Same masthead palette as the header and the platform's top bar.
+.footer {
+  --sl-logo-mark: var(--sl-masthead-accent);
+
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--sl-masthead-active);
+  background: var(--sl-masthead);
+  color: var(--sl-masthead-ink);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-10);
+  justify-content: space-between;
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+  padding: var(--sl-space-10) var(--sl-layout-padding);
+
+  @include down('mobile') {
+    gap: var(--sl-space-6);
+    padding: var(--sl-space-8) var(--sl-layout-padding-mobile);
+  }
+}
+
+.brand {
+  max-width: 320px;
+}
+
+.logo {
+  color: var(--sl-masthead-ink);
+  font-size: var(--sl-text-lg);
+
+  svg {
+    transition: transform var(--sl-transition-base);
+  }
+
+  &:hover svg {
+    transform: rotate(90deg);
+  }
+}
+
+.tagline {
+  @include text('body-sm');
+
+  margin-top: var(--sl-space-3);
+  color: var(--sl-masthead-muted);
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-10);
+
+  @include down('mobile') {
+    gap: var(--sl-space-8);
+  }
+}
+
+.column {
+  min-width: 140px;
+}
+
+.columnTitle {
+  @include overline;
+
+  margin-bottom: var(--sl-space-3);
+  color: var(--sl-masthead-muted);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  @include text('body-sm');
+
+  display: inline-block;
+  color: var(--sl-masthead-muted);
+  text-decoration: none;
+  transition:
+    color var(--sl-transition-fast),
+    transform var(--sl-transition-fast);
+
+  &:hover {
+    color: var(--sl-masthead-ink);
+    transform: translateX(3px);
+  }
+
+  &:focus-visible {
+    border-radius: var(--sl-radius-xs);
+    outline: var(--sl-focus-outline);
+    outline-offset: 3px;
+  }
+}
+
+.bottom {
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+  padding: var(--sl-space-4) var(--sl-layout-padding) var(--sl-space-6);
+  border-top: 1px solid var(--sl-masthead-active);
+
+  @include down('mobile') {
+    padding-inline: var(--sl-layout-padding-mobile);
+  }
+}
+
+.note {
+  @include text('caption');
+
+  color: var(--sl-masthead-muted);
+}
