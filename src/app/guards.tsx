@@ -25,7 +25,3 @@ export function RoleSection({ role }: { role: Role }) {
   const { role: own } = useAppState();
   return own === role ? <AppLayout role={role} /> : <Navigate to={roleBasePath[own]} replace />;
 }
-
-export function Home() {
-  return <Navigate to={roleBasePath[useAppState().role]} replace />;
-}

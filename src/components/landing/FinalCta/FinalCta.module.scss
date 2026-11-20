@@ -1,0 +1,181 @@
+@use '@/styles/mixins' as *;
+
+.section {
+  padding: 0 var(--sl-layout-padding) calc(var(--sl-space-12) * 2);
+
+  @include down('mobile') {
+    padding: 0 var(--sl-layout-padding-mobile) calc(var(--sl-space-8) * 2);
+  }
+}
+
+.inner {
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+}
+
+// Dark masthead panel: the same frame as the header and the footer.
+.panel {
+  position: relative;
+  overflow: hidden;
+  padding: calc(var(--sl-space-12) * 1.2) var(--sl-space-8);
+  border: 1px solid var(--sl-masthead-active);
+  border-radius: var(--sl-radius-card);
+  background: var(--sl-masthead);
+  color: var(--sl-masthead-ink);
+  text-align: center;
+
+  @include down('mobile') {
+    padding: var(--sl-space-8) var(--sl-space-4);
+  }
+}
+
+// Gradient light spot in the corner, like the soft blobs in the mockups.
+.glow {
+  position: absolute;
+  top: -40%;
+  right: -12%;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, var(--sl-masthead-hover) 0%, transparent 68%);
+  filter: blur(18px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  color: var(--sl-masthead-accent);
+  animation: starSpin 15s linear infinite;
+  pointer-events: none;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @include down('mobile') {
+    display: none;
+  }
+}
+
+@keyframes starSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.kicker {
+  @include overline;
+
+  position: relative;
+  margin-bottom: var(--sl-space-3);
+  color: var(--sl-masthead-muted);
+}
+
+.title {
+  @include text('h1');
+
+  position: relative;
+  max-width: 22ch;
+  margin: 0 auto;
+  font-size: clamp(30px, 3.2vw, 44px);
+  letter-spacing: -1px;
+  text-wrap: balance;
+}
+
+.description {
+  @include text('body');
+
+  position: relative;
+  max-width: 52ch;
+  margin: var(--sl-space-3) auto 0;
+  color: var(--sl-masthead-muted);
+  text-wrap: pretty;
+}
+
+.actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sl-space-3);
+  margin-top: var(--sl-space-6);
+}
+
+.cta,
+.ctaSecondary {
+  transition:
+    transform var(--sl-transition-base),
+    box-shadow var(--sl-transition-base),
+    background var(--sl-transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.cta:hover {
+  box-shadow: var(--sl-shadow-hover);
+}
+
+// Secondary button on the dark panel: outline in masthead colours.
+.ctaSecondary {
+  border-color: var(--sl-masthead-hover);
+  background: transparent;
+  color: var(--sl-masthead-ink);
+
+  &:hover {
+    background: var(--sl-masthead-active);
+    color: var(--sl-masthead-ink);
+  }
+}
+
+.demo {
+  @include text('body-sm');
+
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-5);
+  color: var(--sl-masthead-muted);
+}
+
+.demoLabel {
+  font-weight: var(--sl-weight-semibold);
+}
+
+.demoLink {
+  color: var(--sl-masthead-accent);
+  font-weight: var(--sl-weight-semibold);
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--sl-masthead-ink);
+  }
+
+  &:focus-visible {
+    border-radius: var(--sl-radius-xs);
+    outline: var(--sl-focus-outline);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star {
+    animation: none;
+  }
+
+  .cta:hover,
+  .ctaSecondary:hover {
+    transform: none;
+  }
+}

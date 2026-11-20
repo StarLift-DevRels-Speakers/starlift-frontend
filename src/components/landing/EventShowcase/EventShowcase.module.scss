@@ -1,0 +1,232 @@
+@use '@/styles/mixins' as *;
+
+.section {
+  padding: calc(var(--sl-space-12) * 2) var(--sl-layout-padding);
+
+  @include down('mobile') {
+    padding: calc(var(--sl-space-8) * 2) var(--sl-layout-padding-mobile);
+  }
+}
+
+.inner {
+  max-width: var(--sl-layout-max);
+  margin: 0 auto;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sl-space-8);
+
+  @include down('mobile') {
+    margin-top: var(--sl-space-6);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sl-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include down('tablet') {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.item {
+  display: flex;
+  min-width: 0;
+}
+
+// Cards fade in as they enter the viewport (scroll-driven, no JS).
+@supports (animation-timeline: view()) {
+  .item {
+    animation: eventIn linear both;
+    animation-timeline: view();
+    animation-range: entry 4% cover 24%;
+  }
+
+  @keyframes eventIn {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-4);
+  width: 100%;
+  padding: var(--sl-space-6);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-card);
+  background: var(--sl-surface);
+  box-shadow: var(--sl-shadow-card);
+  transition:
+    box-shadow var(--sl-transition-base),
+    transform var(--sl-transition-base),
+    border-color var(--sl-transition-base);
+
+  &:hover {
+    border-color: var(--sl-brand-border);
+    box-shadow: var(--sl-shadow-hover);
+    transform: translateY(-4px);
+
+    .date {
+      background: var(--sl-brand-bg);
+    }
+
+    .name {
+      color: var(--sl-action);
+    }
+  }
+
+  @include down('mobile') {
+    padding: var(--sl-space-4);
+  }
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sl-space-4);
+}
+
+.date {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 56px;
+  padding: var(--sl-space-2) 0;
+  border-radius: var(--sl-radius-md);
+  background: var(--sl-surface-subtle);
+  color: var(--sl-brand);
+  transition: background var(--sl-transition-base);
+}
+
+.day {
+  font-size: var(--sl-text-lg);
+  font-weight: var(--sl-weight-bold);
+  line-height: 1;
+}
+
+.month {
+  @include overline;
+
+  color: var(--sl-muted);
+}
+
+.nameBlock {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  @include text('h3');
+
+  letter-spacing: -0.2px;
+  transition: color var(--sl-transition-fast);
+}
+
+.meta {
+  @include text('body-sm');
+
+  margin-top: 4px;
+  color: var(--sl-muted);
+}
+
+.badge {
+  flex-shrink: 0;
+
+  @include down('mobile') {
+    display: none;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  @include text('caption');
+
+  padding: 4px var(--sl-space-3);
+  border-radius: var(--sl-radius-pill);
+  background: var(--sl-brand-bg);
+  color: var(--sl-action);
+}
+
+.text {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+  text-wrap: pretty;
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-space-3);
+  margin-top: auto;
+  padding-top: var(--sl-space-4);
+  border-top: 1px solid var(--sl-border);
+}
+
+.deadline {
+  @include text('body-sm');
+
+  color: var(--sl-muted);
+
+  strong {
+    color: var(--sl-text);
+    font-weight: var(--sl-weight-semibold);
+  }
+}
+
+.apply {
+  flex-shrink: 0;
+
+  &::after {
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform var(--sl-transition-fast);
+    content: '→';
+  }
+
+  &:hover::after {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .apply:hover::after {
+    transform: none;
+  }
+}
