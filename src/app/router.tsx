@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
-import { Home, ProtectedArea, RoleSection } from '@/app/guards';
+import { ProtectedArea, RoleSection } from '@/app/guards';
 import { navigation, roleBasePath, rolePath, type NavItem } from '@/app/navigation';
 import { AiMatchPage } from '@/pages/AiMatchPage/AiMatchPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage/AnalyticsPage';
@@ -11,6 +11,7 @@ import { DevrelApplicationsPage } from '@/pages/DevrelApplicationsPage/DevrelApp
 import { DevrelDashboardPage } from '@/pages/DevrelDashboardPage/DevrelDashboardPage';
 import { DevrelEventsPage } from '@/pages/DevrelEventsPage/DevrelEventsPage';
 import { EventsCatalogPage } from '@/pages/EventsCatalogPage/EventsCatalogPage';
+import { LandingPage } from '@/pages/LandingPage/LandingPage';
 import { LoginPage } from '@/pages/LoginPage/LoginPage';
 import { MediaPage } from '@/pages/MediaPage/MediaPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
@@ -94,11 +95,12 @@ function roleRoutes(role: Role): RouteObject {
 }
 
 export const router = createBrowserRouter([
+  // Marketing page: the root is public, the cabinets below still require a session.
+  { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   {
     element: <ProtectedArea />,
     children: [
-      { path: '/', element: <Home /> },
       roleRoutes('speaker'),
       roleRoutes('devrel'),
     ],

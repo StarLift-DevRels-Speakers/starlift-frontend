@@ -1,0 +1,134 @@
+@use '@/styles/mixins' as *;
+
+.heading {
+  position: relative;
+  max-width: 760px;
+}
+
+.centered {
+  margin: 0 auto var(--sl-space-8);
+  text-align: center;
+
+  .kicker {
+    justify-content: center;
+  }
+}
+
+// ---------- Spinning stars around the heading ----------
+.star {
+  position: absolute;
+  display: inline-flex;
+  color: var(--sl-brand);
+  opacity: 0.6;
+  pointer-events: none;
+  animation:
+    starSpin 11s linear infinite,
+    starTwinkle 6s ease-in-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.starOne {
+  top: -12px;
+  left: 1%;
+  width: 15px;
+  height: 15px;
+  animation-duration: 9s, 5s;
+}
+
+.starTwo {
+  top: 42%;
+  right: 1%;
+  width: 23px;
+  height: 23px;
+  color: var(--sl-masthead-accent);
+  animation-duration: 14s, 7s;
+  animation-direction: reverse, alternate;
+}
+
+.starThree {
+  bottom: -10px;
+  left: 18%;
+  width: 11px;
+  height: 11px;
+  animation-duration: 7s, 4.5s;
+}
+
+@keyframes starSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes starTwinkle {
+  0%,
+  100% {
+    opacity: 0.32;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star {
+    animation: none;
+  }
+}
+
+@include down('tablet') {
+  .starOne {
+    left: -4px;
+  }
+
+  .starTwo {
+    right: -6px;
+  }
+}
+
+@include down('mobile') {
+  .starThree {
+    display: none;
+  }
+}
+
+// ---------- Copy ----------
+.kicker {
+  @include overline;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-2);
+  margin-bottom: var(--sl-space-2);
+  color: var(--sl-brand);
+}
+
+.step {
+  color: var(--sl-text-section);
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  @include text('h1');
+
+  letter-spacing: -0.4px;
+  text-wrap: balance;
+
+  @include down('tablet') {
+    @include text('h2');
+  }
+}
+
+.description {
+  @include text('body');
+
+  margin-top: var(--sl-space-3);
+  color: var(--sl-muted);
+  text-wrap: pretty;
+}

@@ -67,4 +67,22 @@
   color: var(--sl-muted);
 }
 
+.back {
+  @include text('body-sm');
+
+  margin-top: var(--sl-space-6);
+  color: var(--sl-masthead-ink);
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--sl-masthead-accent);
+  }
+
+  &:focus-visible {
+    border-radius: var(--sl-radius-xs);
+    outline: var(--sl-focus-outline);
+    outline-offset: 3px;
+  }
+}
+
 .theme { display: flex; justify-content: flex-end; }
