@@ -68,6 +68,26 @@ export interface Invitation {
   topic: string;
 }
 
+/** How close the speech is: from a week before to the event day. */
+export type ReminderStage = 'week' | 'three_days' | 'one_day' | 'today';
+
+/** Speaker: confirmed upcoming speech; DevRel: own published upcoming event. */
+export interface ScheduledTalk {
+  kind: 'speech' | 'hosting';
+  eventId: string;
+  eventName: string;
+  date: string;
+  city: string;
+  format: EventFormat;
+  topic: string;
+  ownerName: string;
+  daysLeft: number;
+  /** Absent while the speech is more than a week away. */
+  reminder?: ReminderStage;
+  /** Prefilled «new event» form in Google Calendar. */
+  googleCalendarUrl: string;
+}
+
 export type FeedbackQuestionKey = 'utility' | 'clarity' | 'examples' | 'pace' | 'engagement';
 
 /**

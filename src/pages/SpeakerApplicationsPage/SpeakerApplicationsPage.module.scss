@@ -18,3 +18,9 @@
   display: block;
   color: var(--sl-muted);
 }
+
+.calendar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+}

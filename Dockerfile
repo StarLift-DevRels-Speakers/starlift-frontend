@@ -7,9 +7,14 @@ WORKDIR /app
 
 # Dependencies first, so the layer is cached until the lockfile changes.
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 600000
+RUN --mount=type=cache,id=starlift-yarn,target=/usr/local/share/.cache/yarn,sharing=locked \
+    yarn install --frozen-lockfile --non-interactive --production=false \
+    --cache-folder /usr/local/share/.cache/yarn --network-timeout 600000
 
-COPY . .
+# Keep nginx-only changes from invalidating the application build.
+COPY index.html tsconfig*.json vite.config.ts ./
+COPY src ./src
+COPY public ./public
 RUN yarn build
 
 # ---------- Serve: static files behind nginx ----------

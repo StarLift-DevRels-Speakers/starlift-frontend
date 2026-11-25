@@ -1,6 +1,10 @@
-import { request, type AuthTokensResponse } from './client';
+import { request, requestBlob, type AuthTokensResponse } from './client';
 import type {
   ApplicationDto,
+  AudienceFitCheckDto,
+  AudienceFitRequest,
+  AudienceProfileResponseDto,
+  AudienceProfileUpdate,
   BadgeDefinitionDto,
   CatalogSpeakerDetailsDto,
   CatalogSpeakerDto,
@@ -20,6 +24,7 @@ import type {
   PointTransactionDto,
   ProfilePatch,
   PublicFeedbackForm,
+  ScheduleItemDto,
   SpeakerTalkDto,
   SpeechCreate,
   SpeechDto,
@@ -84,6 +89,12 @@ export const api = {
     request<void>('/api/invitations', json('POST', { eventId, speakerId, topic })),
   answerInvitation: (id: string, status: string) => request<void>(`/api/invitations/${id}/answer`, json('POST', { status })),
 
+  // ---------- Speaker schedule: reminders and calendar export ----------
+  schedule: () => request<ScheduleItemDto[]>('/api/me/schedule'),
+  /** iCalendar file with all upcoming speeches, or with one when `eventId` is given. */
+  scheduleCalendar: (eventId?: string) =>
+    requestBlob(eventId ? `/api/me/schedule/${eventId}/calendar.ics` : '/api/me/schedule/calendar.ics'),
+
   // ---------- Notifications ----------
   notifications: () => request<NotificationDto[]>('/api/notifications'),
   markNotificationsRead: (id?: string) => request<void>('/api/notifications/read', json('POST', { id: id ?? null })),
@@ -94,6 +105,18 @@ export const api = {
   talentScore: (speakerId: string) => request<TalentScoreDto>(`/api/signals/speakers/${encodeURIComponent(speakerId)}/talent-score`, json('POST')),
   producerPlans: () => request<ProducerPlanDto[]>('/api/producer/me/plans'),
   buildProducerPlan: () => request<ProducerPlanDto>('/api/producer/me/plan', json('POST')),
+
+  // ---------- Audience fit ----------
+  audienceProfile: (eventId: string) => request<AudienceProfileResponseDto>(`/api/events/${eventId}/audience-profile`),
+  updateAudienceProfile: (eventId: string, body: AudienceProfileUpdate) =>
+    request<AudienceProfileResponseDto>(`/api/events/${eventId}/audience-profile`, json('PUT', body)),
+  refreshAudienceProfile: (eventId: string) =>
+    request<AudienceProfileResponseDto>(`/api/events/${eventId}/audience-profile/refresh`, json('POST')),
+  audienceFitChecks: (filter: { eventId?: string; talkId?: string; mediaId?: string } = {}) => {
+    const query = new URLSearchParams(Object.entries(filter).filter((entry): entry is [string, string] => Boolean(entry[1])));
+    return request<AudienceFitCheckDto[]>(`/api/audience-fit/checks${query.size ? `?${query}` : ''}`);
+  },
+  requestAudienceFit: (body: AudienceFitRequest) => request<AudienceFitCheckDto>('/api/audience-fit/checks', json('POST', body)),
 
   // ---------- Competition ----------
   competitionProfile: () => request<GamificationProfileDto>('/api/gamification/me'),

@@ -1,0 +1,12 @@
+.button {
+  padding: 0;
+  border: 0;
+  border-radius: var(--sl-radius-pill);
+  background: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--sl-action);
+    outline-offset: 2px;
+  }
+}

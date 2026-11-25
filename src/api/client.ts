@@ -143,6 +143,12 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 }
 
+/** Binary response, e.g. a calendar file; uses the session's token like `request`. */
+export async function requestBlob(path: string): Promise<Blob> {
+  const response = await send(path, {}, true);
+  return response.blob();
+}
+
 /** User-facing message of any error thrown by the API layer. */
 export function errorMessage(error: unknown): string {
   return error instanceof Error && error.message ? error.message : GENERIC_ERROR;

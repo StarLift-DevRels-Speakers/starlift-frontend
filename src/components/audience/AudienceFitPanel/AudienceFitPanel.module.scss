@@ -1,0 +1,26 @@
+@use '@/styles/mixins' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-3);
+  padding: var(--sl-space-4);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+}
+
+.title {
+  @include text('label');
+
+  font-size: var(--sl-text-base);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sl-space-3);
+
+  @include down('mobile') {
+    grid-template-columns: 1fr;
+  }
+}

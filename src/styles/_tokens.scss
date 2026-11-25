@@ -60,6 +60,12 @@
   --sl-neutral-bg: #eff0fa; // demo/neutral notices
   --sl-neutral-text: #464160;
 
+  /* ---------- Colors: speech reminder banner ---------- */
+  --sl-reminder-warm-end: #fffbeb; // 3 days left
+  --sl-reminder-urgent-bg: #ffedd5; // the day before
+  --sl-reminder-urgent-text: #9a3412;
+  --sl-reminder-urgent-border: #fb923c;
+
   /* ---------- Colors: calendar entry kinds ---------- */
   --sl-cal-performance-bg: #e6dfff;
   --sl-cal-performance-text: #4a34b8;

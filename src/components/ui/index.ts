@@ -1,5 +1,5 @@
-export { Button, LinkButton } from './Button/Button';
-export type { ButtonProps, LinkButtonProps, ButtonVariant, ButtonSize } from './Button/Button';
+export { AnchorButton, Button, LinkButton } from './Button/Button';
+export type { AnchorButtonProps, ButtonProps, LinkButtonProps, ButtonVariant, ButtonSize } from './Button/Button';
 export { Field } from './Field/Field';
 export type { FieldProps } from './Field/Field';
 export { Input } from './Input/Input';

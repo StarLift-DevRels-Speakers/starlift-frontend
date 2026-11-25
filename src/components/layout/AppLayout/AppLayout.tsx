@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import { findNavTrail, rolePath } from '@/app/navigation';
 import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
+import { ReminderBanner } from '@/components/schedule/ReminderBanner/ReminderBanner';
 import { TopBar } from '@/components/layout/TopBar/TopBar';
 import { isSubscriptionActive } from '@/features/billing/access';
 import { useDailyCheckIn } from '@/hooks/useDailyCheckIn';
@@ -96,6 +97,7 @@ export function AppLayout({ role }: AppLayoutProps) {
               ) : <span aria-current="page">{trail.at(-1)?.title}</span>}
             </nav>
           )}
+          <ReminderBanner role={role} />
           <Outlet />
         </main>
       </div>
