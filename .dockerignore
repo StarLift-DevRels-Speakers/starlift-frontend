@@ -11,3 +11,6 @@
 !tsconfig.node.json
 !tsconfig.test.json
 !vite.config.ts
+**/.DS_Store
+**/.env
+**/.env.*
